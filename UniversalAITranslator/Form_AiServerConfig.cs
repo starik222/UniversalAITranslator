@@ -79,6 +79,8 @@ namespace UniversalAITranslator
             configuration.Endpoint = textBoxServerUrl.Text;
             configuration.ModelName = comboBoxModel.SelectedItem.ToString();
             configuration.MaxLinesInQuery = (int)numericUpDownMaxLines.Value;
+            configuration.ShrinkContext = checkBoxShrinkContext.Checked;
+            configuration.KeepLastNRequestInContext = (int)numericUpDownKeepContext.Value;
             return configuration;
         }
 
@@ -134,6 +136,8 @@ namespace UniversalAITranslator
             }
             comboBoxModel.SelectedItem = configuration.ModelName;
             numericUpDownMaxLines.Value = configuration.MaxLinesInQuery;
+            checkBoxShrinkContext.Checked = configuration.ShrinkContext;
+            numericUpDownKeepContext.Value = configuration.KeepLastNRequestInContext;
         }
     }
 }

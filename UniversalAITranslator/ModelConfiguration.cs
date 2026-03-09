@@ -17,5 +17,7 @@ namespace UniversalAITranslator
         public bool NeedFixDirectSpeech { get; set; } = false;
         public DirectSpeechFixer.FixType DirectSpeechFixType { get; set; } = DirectSpeechFixer.FixType.None;
         public int MaxLinesInQuery { get; set; } = 2000;
+        public bool ShrinkContext { get; set; } = false;
+        public int KeepLastNRequestInContext { get; set; } = 2;
     }
 }

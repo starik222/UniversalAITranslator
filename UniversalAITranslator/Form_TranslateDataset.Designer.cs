@@ -67,6 +67,7 @@
             statusLabel = new ToolStripStatusLabel();
             splitContainer1 = new SplitContainer();
             groupBox1 = new GroupBox();
+            checkBoxSaveContext = new CheckBox();
             checkBoxUseCustomDict = new CheckBox();
             checkBoxEro = new CheckBox();
             checkBoxIndexedQuery = new CheckBox();
@@ -87,6 +88,7 @@
             textBoxPrompt = new TextBox();
             dataGridViewDS = new DataGridView();
             notifyIconTray = new NotifyIcon(components);
+            отчиститьКонтекстToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
@@ -111,7 +113,7 @@
             // 
             // операцииToolStripMenuItem
             // 
-            операцииToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { настроитьПодключениеToolStripMenuItem, показатьскрытьНастройкиСистемногоПромптаToolStripMenuItem, показатьскрытьПоляИмениИПолаToolStripMenuItem, toolStripSeparator2, сохранитьТекущийНаборДанныхToolStripMenuItem, загрузитьНаборДанныхИзФайлаToolStripMenuItem, toolStripSeparator3, перевестиToolStripMenuItem, перевестиСПредварительнымОбъединениемСтрокToolStripMenuItem, переводДиалоговToolStripMenuItem, toolStripSeparator4, завершитьПереводToolStripMenuItem });
+            операцииToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { настроитьПодключениеToolStripMenuItem, показатьскрытьНастройкиСистемногоПромптаToolStripMenuItem, показатьскрытьПоляИмениИПолаToolStripMenuItem, отчиститьКонтекстToolStripMenuItem, toolStripSeparator2, сохранитьТекущийНаборДанныхToolStripMenuItem, загрузитьНаборДанныхИзФайлаToolStripMenuItem, toolStripSeparator3, перевестиToolStripMenuItem, перевестиСПредварительнымОбъединениемСтрокToolStripMenuItem, переводДиалоговToolStripMenuItem, toolStripSeparator4, завершитьПереводToolStripMenuItem });
             операцииToolStripMenuItem.Name = "операцииToolStripMenuItem";
             операцииToolStripMenuItem.Size = new Size(75, 20);
             операцииToolStripMenuItem.Text = "Операции";
@@ -371,6 +373,7 @@
             // groupBox1
             // 
             groupBox1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            groupBox1.Controls.Add(checkBoxSaveContext);
             groupBox1.Controls.Add(checkBoxUseCustomDict);
             groupBox1.Controls.Add(checkBoxEro);
             groupBox1.Controls.Add(checkBoxIndexedQuery);
@@ -381,12 +384,22 @@
             groupBox1.TabStop = false;
             groupBox1.Text = "Перевод диалогов";
             // 
+            // checkBoxSaveContext
+            // 
+            checkBoxSaveContext.AutoSize = true;
+            checkBoxSaveContext.Location = new Point(6, 17);
+            checkBoxSaveContext.Name = "checkBoxSaveContext";
+            checkBoxSaveContext.Size = new Size(135, 19);
+            checkBoxSaveContext.TabIndex = 11;
+            checkBoxSaveContext.Text = "Сохранять контекст";
+            checkBoxSaveContext.UseVisualStyleBackColor = true;
+            // 
             // checkBoxUseCustomDict
             // 
             checkBoxUseCustomDict.AutoSize = true;
             checkBoxUseCustomDict.Checked = true;
             checkBoxUseCustomDict.CheckState = CheckState.Checked;
-            checkBoxUseCustomDict.Location = new Point(6, 66);
+            checkBoxUseCustomDict.Location = new Point(6, 75);
             checkBoxUseCustomDict.Name = "checkBoxUseCustomDict";
             checkBoxUseCustomDict.Size = new Size(138, 19);
             checkBoxUseCustomDict.TabIndex = 10;
@@ -396,7 +409,7 @@
             // checkBoxEro
             // 
             checkBoxEro.AutoSize = true;
-            checkBoxEro.Location = new Point(6, 16);
+            checkBoxEro.Location = new Point(6, 37);
             checkBoxEro.Name = "checkBoxEro";
             checkBoxEro.Size = new Size(116, 19);
             checkBoxEro.TabIndex = 8;
@@ -406,7 +419,7 @@
             // checkBoxIndexedQuery
             // 
             checkBoxIndexedQuery.AutoSize = true;
-            checkBoxIndexedQuery.Location = new Point(6, 41);
+            checkBoxIndexedQuery.Location = new Point(6, 56);
             checkBoxIndexedQuery.Name = "checkBoxIndexedQuery";
             checkBoxIndexedQuery.Size = new Size(158, 19);
             checkBoxIndexedQuery.TabIndex = 9;
@@ -576,6 +589,13 @@
             notifyIconTray.Text = "ИИ переводчик";
             notifyIconTray.Visible = true;
             // 
+            // отчиститьКонтекстToolStripMenuItem
+            // 
+            отчиститьКонтекстToolStripMenuItem.Name = "отчиститьКонтекстToolStripMenuItem";
+            отчиститьКонтекстToolStripMenuItem.Size = new Size(383, 22);
+            отчиститьКонтекстToolStripMenuItem.Text = "Отчистить контекст";
+            отчиститьКонтекстToolStripMenuItem.Click += отчиститьКонтекстToolStripMenuItem_Click;
+            // 
             // Form_TranslateDataset
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -668,5 +688,7 @@
         private ToolStripSeparator toolStripSeparator8;
         private ToolStripButton toolStripButton1;
         private NotifyIcon notifyIconTray;
+        private CheckBox checkBoxSaveContext;
+        private ToolStripMenuItem отчиститьКонтекстToolStripMenuItem;
     }
 }

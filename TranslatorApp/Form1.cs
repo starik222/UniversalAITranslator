@@ -27,7 +27,7 @@ namespace TranslatorApp
             textBoxOutput.Enabled = false;
             try
             {
-                textBoxOutput.Text = (await translator.TranslateText(textBoxInput.Text)).Replace("\n", "\r\n");
+                textBoxOutput.Text = (await translator.TranslateText(textBoxInput.Text, false)).Replace("\n", "\r\n");
             }
             catch (Exception ex)
             {

@@ -7,6 +7,7 @@ using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 
 namespace UniversalAITranslator
 {
@@ -16,12 +17,16 @@ namespace UniversalAITranslator
         public SystemChatMessage? SystemPrompt { get; set; } = null;
         public ChatCompletionOptions ChatOptions { get; set; }
         public bool UseChatOptions { get; set; } = false;
+        private AiChatManager chatManager;
+
+        public AiChatManager ChatManager => chatManager;
 
         private ChatClient chat;
         public AiTranslator() { }
         public AiTranslator(ModelConfiguration config)
         {
             Configuration = config;
+            chatManager = new AiChatManager();
             ApiKeyCredential credential = new ApiKeyCredential(config.ApiKey);
             OpenAIClientOptions options = new OpenAIClientOptions();
             options.Endpoint = new Uri(config.Endpoint);
@@ -46,6 +51,7 @@ namespace UniversalAITranslator
             options.NetworkTimeout = TimeSpan.FromMinutes(300);
             chat = new ChatClient(config.ModelName, credential, options);
         }
+
         /// <summary>
         /// Установка системного промпта
         /// </summary>
@@ -59,6 +65,20 @@ namespace UniversalAITranslator
                 SystemPrompt = new SystemChatMessage(prompt);
             }
         }
+
+        private List<ChatMessage> GetRequest(bool withContext)
+        {
+            if (withContext)
+            {
+                if (Configuration.ShrinkContext)
+                    return chatManager.GetRequest(Configuration.KeepLastNRequestInContext);
+                else
+                    return chatManager.GetRequest(true);
+            }
+            else
+                return chatManager.GetRequest(false);
+        }
+
 
         private string LoadSystemPromptFile(string fileName)
         {
@@ -133,22 +153,26 @@ namespace UniversalAITranslator
         /// </summary>
         /// <param name="text">Текст запроса</param>
         /// <returns></returns>
-        public async Task<string> TranslateText(string text)
+        public async Task<string> TranslateText(string text, bool withContext)
         {
-            List<ChatMessage> messages = new List<ChatMessage>();
             if (SystemPrompt != null)
-                messages.Add(SystemPrompt);
-            messages.Add(ChatMessage.CreateUserMessage(text));
+                chatManager.SetSystemPrompt(SystemPrompt);
+            else
+                chatManager.ResetSystemPrompt();
+            chatManager.SetUserPrompt(text);
             ChatCompletion result;
             if (UseChatOptions)
-                result = await chat.CompleteChatAsync(messages, ChatOptions);
+                result = await chat.CompleteChatAsync(chatManager.GetRequest(withContext), ChatOptions);
             else
-                result = await chat.CompleteChatAsync(messages);
+                result = await chat.CompleteChatAsync(chatManager.GetRequest(withContext));
             if (result.FinishReason != ChatFinishReason.Stop)
             {
                 return "Server return: " + result.FinishReason.ToString();
             }
-            return RemoveThinking(result.Content[0].Text);
+            string responseWithoutThinking = RemoveThinking(result.Content[0].Text);
+            if (withContext)
+                chatManager.AddAssistantResponse(responseWithoutThinking);
+            return responseWithoutThinking;
         }
         /// <summary>
         /// Перевод диалогового текста на основе предустановленного системного промпта. 
@@ -159,10 +183,10 @@ namespace UniversalAITranslator
         /// но увеличивает количество потребляемых токенов.</param>
         /// <param name="eroMode">Использовать ли системный промпт, направленный на перевод эротического контанта.</param>
         /// <returns></returns>
-        public async Task<string[]> TranslateStructuredText(StructuredTranslationData textData, bool withIndexes, bool eroMode)
+        public async Task<string[]> TranslateStructuredText(StructuredTranslationData textData, bool withIndexes, bool eroMode, bool withContext)
         {
             //UseChatOptions = true;
-            List<ChatMessage> messages = new List<ChatMessage>();
+            //List<ChatMessage> messages = new List<ChatMessage>();
             if (eroMode)
             {
                 if (withIndexes)
@@ -178,7 +202,9 @@ namespace UniversalAITranslator
                     SetTaggedSystemPrompt(textData.Names, SystemPromptFile.StructuredTaggedNonIndexedWithNames);
             }
             if (SystemPrompt != null)
-                messages.Add(SystemPrompt);
+                chatManager.SetSystemPrompt(SystemPrompt);
+            else
+                chatManager.ResetSystemPrompt();
             StringBuilder sb = new StringBuilder();
             if (withIndexes)
             {
@@ -218,7 +244,7 @@ namespace UniversalAITranslator
                     }
                 }
             }
-            messages.Add(ChatMessage.CreateUserMessage(sb.ToString()));
+            chatManager.SetUserPrompt(sb.ToString());
             ChatCompletion result;
             if (eroMode)
             {
@@ -231,10 +257,10 @@ namespace UniversalAITranslator
             {
                 if (UseChatOptions)
                 {
-                    result = await chat.CompleteChatAsync(messages, ChatOptions);
+                    result = await chat.CompleteChatAsync(GetRequest(withContext), ChatOptions);
                 }
                 else
-                    result = await chat.CompleteChatAsync(messages);
+                    result = await chat.CompleteChatAsync(GetRequest(withContext));
                 //if (UseChatOptions)
                 //{
                 //    //Newtonsoft.Json.Schema.JsonSchemaGenerator a = new JsonSchemaGenerator();
@@ -258,7 +284,10 @@ namespace UniversalAITranslator
             {
                 if (string.IsNullOrEmpty(result.Content[0].Text))
                     return null;
-                var lines = RemoveThinking(result.Content[0].Text).Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                string responseWithoutThinking = RemoveThinking(result.Content[0].Text);
+                if (withContext)
+                    chatManager.AddAssistantResponse(responseWithoutThinking);
+                var lines = responseWithoutThinking.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
                 if (textData.TextData.Count != lines.Length)
                 {
                     var textWithTags = lines.Select(a => SplitOnTagsAndText(a)).ToArray();
@@ -306,28 +335,30 @@ namespace UniversalAITranslator
         /// <param name="textData">Массив данных для перевода, указанные имена и пол игнорируются, так как используется только текст.
         /// Также возможно указать, как переводить указанные слова.</param>
         /// <returns></returns>
-        public async Task<string[]> TranslateNonStructuredText(StructuredTranslationData textData)
+        public async Task<string[]> TranslateNonStructuredText(StructuredTranslationData textData, bool withContext)
         {
             //UseChatOptions = true;
-            List<ChatMessage> messages = new List<ChatMessage>();
+            //List<ChatMessage> messages = new List<ChatMessage>();
             SetTaggedSystemPrompt(textData.Names, SystemPromptFile.StructuredNonTaggedWithNames);
             if (SystemPrompt != null)
-                messages.Add(SystemPrompt);
+                chatManager.SetSystemPrompt(SystemPrompt);
+            else
+                chatManager.ResetSystemPrompt();
             StringBuilder sb = new StringBuilder();
             foreach (var item in textData.TextData.Select(a => a.Text))
             {
                 sb.AppendLine(item);
             }
-            messages.Add(ChatMessage.CreateUserMessage(sb.ToString()));
+            chatManager.SetUserPrompt(sb.ToString());
             ChatCompletion result;
             try
             {
                 if (UseChatOptions)
                 {
-                    result = await chat.CompleteChatAsync(messages, ChatOptions);
+                    result = await chat.CompleteChatAsync(GetRequest(withContext), ChatOptions);
                 }
                 else
-                    result = await chat.CompleteChatAsync(messages);
+                    result = await chat.CompleteChatAsync(GetRequest(withContext));
                 //if (UseChatOptions)
                 //{
                 //    //Newtonsoft.Json.Schema.JsonSchemaGenerator a = new JsonSchemaGenerator();
@@ -350,7 +381,10 @@ namespace UniversalAITranslator
             try
             {
                 //return JsonConvert.DeserializeObject<StructuredTranslationResponse>(result.Content[0].Text);
-                return RemoveThinking(result.Content[0].Text).Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                string responseWithoutThinking = RemoveThinking(result.Content[0].Text);
+                if (withContext)
+                    chatManager.AddAssistantResponse(responseWithoutThinking);
+                return responseWithoutThinking.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             }
             catch (Exception ex)
             {
@@ -358,23 +392,27 @@ namespace UniversalAITranslator
             }
         }
 
-        public async Task<(string errText, List<TypedTranslationData>? data)> TranslateTypedText(List<TypedTranslationData> data)
+        public async Task<(string errText, List<TypedTranslationData>? data)> TranslateTypedText(List<TypedTranslationData> data, bool withContext)
         {
-            List<ChatMessage> messages = new List<ChatMessage>();
+            //List<ChatMessage> messages = new List<ChatMessage>();
             if (SystemPrompt != null)
-                messages.Add(SystemPrompt);
+                chatManager.SetSystemPrompt(SystemPrompt);
+            else
+                chatManager.ResetSystemPrompt();
             ChatOptions.ResponseFormat = ChatResponseFormat.CreateJsonObjectFormat();
             string userMessage = JsonConvert.SerializeObject(data.Where(a => a.Enabled).Select(a => a.CreateTypedRequestItem()).ToArray());
-            messages.Add(ChatMessage.CreateUserMessage(userMessage));
+            chatManager.SetUserPrompt(userMessage);
             ChatCompletion result;
             try
             {
-                result = await chat.CompleteChatAsync(messages, ChatOptions);
+                result = await chat.CompleteChatAsync(GetRequest(withContext), ChatOptions);
                 if (result.FinishReason != ChatFinishReason.Stop)
                 {
                     return ("Сервер вернул причину ошибки перевода: " + result.FinishReason.ToString(), null);
                 }
                 string rawText = RemoveThinking(result.Content[0].Text);
+                if (withContext)
+                    chatManager.AddAssistantResponse(rawText);
                 var typedResult = JsonConvert.DeserializeObject<List<TypedTranslationRequestItem>>(rawText);
                 if (typedResult == null)
                     return ("Возникла ошибка при десериализации полученного перевода", null);
@@ -389,6 +427,7 @@ namespace UniversalAITranslator
 
         public async Task<(string errText, List<ImageTranslationData>? data)> TranslateImage(string imagePath)
         {
+            //Нет смысла использовать историю запросов...
             List<ChatMessage> messages = new List<ChatMessage>();
             if (SystemPrompt != null)
                 messages.Add(SystemPrompt);
@@ -421,14 +460,20 @@ namespace UniversalAITranslator
 
         private string RemoveThinking(string text)
         {
-            if (text.Trim().StartsWith("<think>"))
-            {
-                int indexEndThink = text.IndexOf("</think>");
-                if (indexEndThink < 0)
-                    return FixPotentialBadChars(text);
-                return FixPotentialBadChars(text.Substring(indexEndThink + 8));
-            }
-            return FixPotentialBadChars(text);
+            if (string.IsNullOrWhiteSpace(text))
+                return text;
+            string pattern = @"<think>.*?(?:</think>|$)";
+            string result = Regex.Replace(text, pattern, string.Empty, RegexOptions.Singleline | RegexOptions.IgnoreCase);
+            return FixPotentialBadChars(result.Trim(['\n', '\r']).Trim());
+
+            //if (text.Trim().StartsWith("<think>"))
+            //{
+            //    int indexEndThink = text.IndexOf("</think>");
+            //    if (indexEndThink < 0)
+            //        return FixPotentialBadChars(text);
+            //    return FixPotentialBadChars(text.Substring(indexEndThink + 8));
+            //}
+            //return FixPotentialBadChars(text);
         }
 
         private string FixPotentialBadChars(string text)

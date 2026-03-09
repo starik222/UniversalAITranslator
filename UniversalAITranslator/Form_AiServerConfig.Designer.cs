@@ -53,11 +53,15 @@
             radioButtonJapQuote = new RadioButton();
             radioButtonNonQuote = new RadioButton();
             checkBoxUseFixText = new CheckBox();
+            checkBoxShrinkContext = new CheckBox();
+            numericUpDownKeepContext = new NumericUpDown();
+            label9 = new Label();
             ((System.ComponentModel.ISupportInitialize)trackBarTemperature).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDownMaxTokens).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDownSeed).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDownMaxLines).BeginInit();
             groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)numericUpDownKeepContext).BeginInit();
             SuspendLayout();
             // 
             // label1
@@ -306,11 +310,40 @@
             checkBoxUseFixText.Text = "Исправлять оформление прямой речи";
             checkBoxUseFixText.UseVisualStyleBackColor = true;
             // 
+            // checkBoxShrinkContext
+            // 
+            checkBoxShrinkContext.AutoSize = true;
+            checkBoxShrinkContext.Location = new Point(396, 309);
+            checkBoxShrinkContext.Name = "checkBoxShrinkContext";
+            checkBoxShrinkContext.Size = new Size(231, 19);
+            checkBoxShrinkContext.TabIndex = 20;
+            checkBoxShrinkContext.Text = "Использовать в контексте последние";
+            checkBoxShrinkContext.UseVisualStyleBackColor = true;
+            // 
+            // numericUpDownKeepContext
+            // 
+            numericUpDownKeepContext.Location = new Point(633, 308);
+            numericUpDownKeepContext.Name = "numericUpDownKeepContext";
+            numericUpDownKeepContext.Size = new Size(52, 23);
+            numericUpDownKeepContext.TabIndex = 21;
+            // 
+            // label9
+            // 
+            label9.AutoSize = true;
+            label9.Location = new Point(693, 310);
+            label9.Name = "label9";
+            label9.Size = new Size(58, 15);
+            label9.TabIndex = 22;
+            label9.Text = "запросов";
+            // 
             // Form_AiServerConfig
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 413);
+            Controls.Add(label9);
+            Controls.Add(numericUpDownKeepContext);
+            Controls.Add(checkBoxShrinkContext);
             Controls.Add(groupBox1);
             Controls.Add(textBoxKey);
             Controls.Add(label8);
@@ -340,6 +373,7 @@
             ((System.ComponentModel.ISupportInitialize)numericUpDownMaxLines).EndInit();
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)numericUpDownKeepContext).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -371,5 +405,8 @@
         public System.Windows.Forms.CheckBox checkBoxUseFixText;
         public System.Windows.Forms.RadioButton radioButtonRusQuote;
         public System.Windows.Forms.RadioButton radioButtonCommonQuote;
+        private CheckBox checkBoxShrinkContext;
+        private NumericUpDown numericUpDownKeepContext;
+        private Label label9;
     }
 }

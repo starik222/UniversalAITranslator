@@ -537,7 +537,7 @@ namespace UniversalAITranslator
                     translator.SetSystemPrompt(textBoxPrompt.Text);
                 }
 
-                var translationResult = await translator.TranslateTypedText(currentBlock);
+                var translationResult = await translator.TranslateTypedText(currentBlock, checkBoxSaveContext.Checked);
                 if (translationResult.data != null)
                 {
                     result.AddRange(translationResult.data);
@@ -927,11 +927,11 @@ namespace UniversalAITranslator
                 string[] structuredTranslatorResult = null;
                 if (tData.Names.Count == 0 && tData.TextData.All(a => a.Name == string.Empty))
                 {
-                    structuredTranslatorResult = await translator.TranslateNonStructuredText(tData);
+                    structuredTranslatorResult = await translator.TranslateNonStructuredText(tData, checkBoxSaveContext.Checked);
                 }
                 else
                 {
-                    structuredTranslatorResult = await translator.TranslateStructuredText(tData, indexedQuery, eroMode);
+                    structuredTranslatorResult = await translator.TranslateStructuredText(tData, indexedQuery, eroMode, checkBoxSaveContext.Checked);
                 }
                 if (structuredTranslatorResult == null || (structuredTranslatorResult.Length == 0 && currentBlock.Count > 0))
                 {
@@ -1041,6 +1041,12 @@ namespace UniversalAITranslator
             if (dataGridViewDS.Rows[e.RowIndex].HeaderCell.Value == null
     || !dataGridViewDS.Rows[e.RowIndex].HeaderCell.Value.Equals((e.RowIndex + 1).ToString()))
                 dataGridViewDS.Rows[e.RowIndex].HeaderCell.Value = (e.RowIndex + 1).ToString();
+        }
+
+        private void отчиститьКонтекстToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (translator != null)
+                translator.ChatManager.ClearHistory();
         }
     }
 }
