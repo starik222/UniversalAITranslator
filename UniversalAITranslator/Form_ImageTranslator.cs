@@ -1,0 +1,206 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Diagnostics;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using UniversalAITranslator.Utils;
+
+namespace UniversalAITranslator
+{
+    public partial class Form_ImageTranslator : Form
+    {
+        private BindingList<BindingImageTranslationData> translationDatas;
+        private Image currentImage;
+        private string imgPath;
+        public Form_ImageTranslator()
+        {
+            InitializeComponent();
+            translationDatas = new BindingList<BindingImageTranslationData>();
+            dataGridViewTranslationData.DataSource = translationDatas;
+            dataGridViewTranslationData.Refresh();
+        }
+
+        private void Form_ImageTranslator_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (pictureBoxImage.Image != null)
+                pictureBoxImage.Image.Dispose();
+            pictureBoxImage.Image = null;
+        }
+
+        public void SetTranslationData(string imagePath, List<ImageTranslationData> data)
+        {
+            imgPath = imagePath;
+            currentImage = Image.FromStream(new MemoryStream(File.ReadAllBytes(imgPath)));
+            pictureBoxImage.Image = currentImage;
+            translationDatas.Clear();
+            data.ForEach(a => translationDatas.Add(a.CreateBinding(pictureBoxImage.Image.Size.Width, pictureBoxImage.Image.Size.Height)));
+            dataGridViewTranslationData.Refresh();
+        }
+
+        private void сохранитьСкриптДляPhotoshopToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (translationDatas == null || translationDatas.Count == 0 || comboBoxAlign.SelectedIndex == -1)
+                return;
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "jsx files|*.jsx";
+            saveFileDialog.DefaultExt = ".jsx";
+            saveFileDialog.FileName = Path.Combine(Path.GetDirectoryName(imgPath), Path.GetFileNameWithoutExtension(imgPath) + ".jsx");
+            if (saveFileDialog.ShowDialog() != DialogResult.OK)
+                return;
+            SaveScript(saveFileDialog.FileName);
+            MessageBox.Show("Завершено");
+        }
+
+        private bool SaveScript(string savePath)
+        {
+            try
+            {
+                List<TextLayer> layers = new List<TextLayer>();
+                var modData = GetModifyData();
+                foreach (var item in translationDatas)
+                {
+                    TextLayer layer = new TextLayer();
+                    layer.Text = item.TranslatedText;
+
+                    int x = (int)(item.X * modData.X_Multiply + modData.X_Addition);
+                    int y = (int)(item.Y * modData.Y_Multiply + modData.Y_Addition);
+
+                    switch (comboBoxAlign.SelectedItem.ToString())
+                    {
+                        case "left":
+                            layer.X = x;
+                            break;
+                        case "center":
+                            layer.X = x + (item.Width * modData.X_Multiply) / 2;
+                            break;
+                        case "right":
+                            layer.X = x + (item.Width * modData.X_Multiply);
+                            break;
+                    }
+                    //layer.X = item.X;
+                    layer.Y = y + (item.Height * modData.Y_Multiply);
+                    layer.FontName = textBoxFont.Text;
+                    layer.FontSize = Convert.ToInt32(numericUpDownFontSize.Value);
+                    layer.Color = buttonFontColor.BackColor.ToHex();
+                    layer.StrokeEnabled = checkBoxIsStroke.Checked;
+                    layer.StrokePosition = "outside";
+                    layer.StrokeColor = buttonStrokeColor.BackColor.ToHex();
+                    layer.StrokeSize = Convert.ToInt32(numericUpDownStrokeSize.Value);
+                    layer.Justification = comboBoxAlign.SelectedItem.ToString();
+                    layer.StrokeOpacity = Convert.ToInt32(numericUpDownOpacity.Value);
+                    layers.Add(layer);
+                }
+                ScriptGenerator.GenerateJSX(imgPath, layers, savePath);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            FontDialog fontDialog = new FontDialog();
+            fontDialog.Font = new Font(textBoxFont.Text, (float)numericUpDownFontSize.Value, FontStyle.Regular);
+            if (fontDialog.ShowDialog() == DialogResult.OK)
+            {
+                textBoxFont.Text = fontDialog.Font.Name;
+                numericUpDownFontSize.Value = (int)fontDialog.Font.Size;
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            ColorDialog colorDialog = new ColorDialog();
+            colorDialog.Color = buttonFontColor.BackColor;
+            if (colorDialog.ShowDialog() != DialogResult.OK)
+                return;
+            buttonFontColor.BackColor = colorDialog.Color;
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            ColorDialog colorDialog = new ColorDialog();
+            colorDialog.Color = buttonStrokeColor.BackColor;
+            if (colorDialog.ShowDialog() != DialogResult.OK)
+                return;
+            buttonStrokeColor.BackColor = colorDialog.Color;
+        }
+
+        private void dataGridViewTranslationData_SelectionChanged(object sender, EventArgs e)
+        {
+            if (dataGridViewTranslationData.SelectedCells.Count == 0)
+                return;
+            int rowIndex = dataGridViewTranslationData.SelectedCells[0].RowIndex;
+            var selectedData = translationDatas[rowIndex];
+
+            var tempImage = (Image)currentImage.Clone();
+            using (Graphics g = Graphics.FromImage(tempImage))
+            {
+                var modData = GetModifyData();
+                int x = (int)(selectedData.X * modData.X_Multiply + modData.X_Addition - 1);
+                int y = (int)(selectedData.Y * modData.Y_Multiply + modData.Y_Addition - 1);
+                int w = (int)(selectedData.Width * modData.X_Multiply + 1);
+                int h = (int)(selectedData.Height * modData.Y_Multiply + 1);
+                g.DrawRectangle(new Pen(Color.Yellow, 2), x, y, w, h);
+            }
+            pictureBoxImage.Image = tempImage;
+        }
+
+        private void Form_ImageTranslator_Load(object sender, EventArgs e)
+        {
+            comboBoxAlign.SelectedIndex = 1;
+        }
+
+        private void сохранитьСкриптИВыполнитьToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (translationDatas == null || translationDatas.Count == 0 || comboBoxAlign.SelectedIndex == -1)
+                return;
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "jsx files|*.jsx";
+            saveFileDialog.DefaultExt = ".jsx";
+            saveFileDialog.FileName = Path.Combine(Path.GetDirectoryName(imgPath), Path.GetFileNameWithoutExtension(imgPath) + ".jsx");
+            if (saveFileDialog.ShowDialog() != DialogResult.OK)
+                return;
+            if (!SaveScript(saveFileDialog.FileName))
+            {
+                MessageBox.Show("Завершено с ошибками");
+                return;
+            }
+            string[] estkPathes = ["C:\\Program Files (x86)\\Adobe\\Adobe ExtendScript Toolkit CC\\ExtendScript Toolkit.exe"];
+            foreach (var item in estkPathes)
+            {
+                if (File.Exists(item))
+                {
+                    Process.Start(item, $" -run {saveFileDialog.FileName.Replace('\\', '/')}");
+                    return;
+                }
+            }
+            //MessageBox.Show("Завершено");
+        }
+
+        private CoordinateModifyData GetModifyData()
+        {
+            CoordinateModifyData data = new CoordinateModifyData();
+            data.X_Addition = (int)numericUpDownAdd_X.Value;
+            data.Y_Addition = (int)numericUpDownAdd_Y.Value;
+            data.X_Multiply = (float)numericUpDownMul_X.Value;
+            data.Y_Multiply = (float)numericUpDownMul_Y.Value;
+            return data;
+        }
+
+        private class CoordinateModifyData
+        {
+            public int X_Addition;
+            public int Y_Addition;
+            public float X_Multiply;
+            public float Y_Multiply;
+        }
+    }
+}
