@@ -59,5 +59,12 @@ namespace TranslatorApp
                 config.Save();
             }
         }
+
+        private void открытьќкно“абличногоѕереводаToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form_PreTranslator preTranslator = new Form_PreTranslator(new List<KeyValuePair<string, string>>());
+            preTranslator.ShowDialog();
+            preTranslator.Close();
+        }
     }
 }

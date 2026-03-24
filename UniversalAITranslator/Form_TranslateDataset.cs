@@ -240,7 +240,8 @@ namespace UniversalAITranslator
             //Меню временами не отрисовывается... почему?
             menuStrip1.Invalidate();
             menuStrip1.Refresh();
-
+            if (translator != null)
+                translator.ChatManager.ClearHistory();
             if (runTransAfterLoad)
             {
                 переводДиалоговToolStripMenuItem_Click(this, EventArgs.Empty);
@@ -961,7 +962,14 @@ namespace UniversalAITranslator
                                 continue;
                         }
                         if (currentConfiguration.NeedFixDirectSpeech && tType == StructuredTranslationData.TextType.FirstPerson)
-                            item.Text = DirectSpeechFixer.FixText(structuredTranslatorResult[index], currentConfiguration.DirectSpeechFixType);
+                        {
+                            if (!item.Text.Contains('「') && !item.Text.Contains('」'))
+                            {
+                                item.Text = structuredTranslatorResult[index];
+                            }
+                            else
+                                item.Text = DirectSpeechFixer.FixText(structuredTranslatorResult[index], currentConfiguration.DirectSpeechFixType);
+                        }
                         else
                             item.Text = structuredTranslatorResult[index];
                         index++;
@@ -1017,7 +1025,15 @@ namespace UniversalAITranslator
             fInput.textBoxInput.Text = 100.ToString();
             if (fInput.ShowDialog() != DialogResult.OK)
                 return;
-            int splitLineCount = Convert.ToInt32(fInput.textBoxInput.Text);
+            SplitOnLineCount(Convert.ToInt32(fInput.textBoxInput.Text));
+        }
+        /// <summary>
+        /// Добавляет разделители в набор данных по указанному количеству строк.
+        /// </summary>
+        /// <param name="lineCount"></param>
+        public void SplitOnLineCount(int lineCount)
+        {
+            int splitLineCount = lineCount;
             int splitCount = typedDataSet.Count / splitLineCount;
             if (typedDataSet.Count % splitLineCount > 0)
                 splitCount++;
@@ -1047,6 +1063,20 @@ namespace UniversalAITranslator
         {
             if (translator != null)
                 translator.ChatManager.ClearHistory();
+        }
+
+        private void подсветитьНезакрытыеДиалогиToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < dataGridViewDS.RowCount; i++)
+            {
+                if (typedDataSet[i].Type == TextType.Text)
+                {
+                    if (!typedDataSet[i].Text.StartsWith("「") || !typedDataSet[i].Text.EndsWith("」"))
+                    {
+                        dataGridViewDS.Rows[i].DefaultCellStyle.BackColor = Color.LightYellow;
+                    }
+                }
+            }
         }
     }
 }

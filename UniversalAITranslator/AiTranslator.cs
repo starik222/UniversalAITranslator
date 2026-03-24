@@ -285,8 +285,8 @@ namespace UniversalAITranslator
                 if (string.IsNullOrEmpty(result.Content[0].Text))
                     return null;
                 string responseWithoutThinking = RemoveThinking(result.Content[0].Text);
-                if (withContext)
-                    chatManager.AddAssistantResponse(responseWithoutThinking);
+                //if (withContext)
+                //    chatManager.AddAssistantResponse(responseWithoutThinking);
                 var lines = responseWithoutThinking.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
                 if (textData.TextData.Count != lines.Length)
                 {
@@ -315,12 +315,16 @@ namespace UniversalAITranslator
                     else
                     {
                         var res = fixTranslation.GetTranslation();
+                        if (withContext)
+                            chatManager.AddAssistantResponse(string.Join("\r\n", res));
                         fixTranslation.Close();
                         return res;
                     }
                 }
                 else
                 {
+                    if (withContext)
+                        chatManager.AddAssistantResponse(responseWithoutThinking);
                     return lines.Select(a => RemoveTags(a)).ToArray();
                 }
             }

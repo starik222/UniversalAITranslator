@@ -33,12 +33,19 @@
             сохранитьToolStripMenuItem = new ToolStripMenuItem();
             операцииToolStripMenuItem = new ToolStripMenuItem();
             заменитьВыделенныеToolStripMenuItem = new ToolStripMenuItem();
+            восстановитьВыделенныеToolStripMenuItem = new ToolStripMenuItem();
             toolStripSeparator1 = new ToolStripSeparator();
             перевестиВСтолбецПереводаToolStripMenuItem = new ToolStripMenuItem();
             перевестиВСтолбецПредпросмотраToolStripMenuItem = new ToolStripMenuItem();
+            toolStripSeparator2 = new ToolStripSeparator();
+            вставитьВВыделенныйСтолбецИзБуфераОбменаСНачалаToolStripMenuItem = new ToolStripMenuItem();
+            вставитьВВыделенныйСтолбецИзБуфераОбменаСВыделенияToolStripMenuItem = new ToolStripMenuItem();
+            вставитьДанныеСРазделителемСВыделенияToolStripMenuItem = new ToolStripMenuItem();
+            toolStripSeparator3 = new ToolStripSeparator();
+            вставитьВОригиналДанныеИзБуфераОбменаToolStripMenuItem = new ToolStripMenuItem();
             statusStrip1 = new StatusStrip();
             dataGridViewDS = new DataGridView();
-            восстановитьВыделенныеToolStripMenuItem = new ToolStripMenuItem();
+            вставитьДанныеСРазделителемСВыделенияНовыеДанныеToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridViewDS).BeginInit();
             SuspendLayout();
@@ -62,13 +69,13 @@
             // сохранитьToolStripMenuItem
             // 
             сохранитьToolStripMenuItem.Name = "сохранитьToolStripMenuItem";
-            сохранитьToolStripMenuItem.Size = new Size(180, 22);
+            сохранитьToolStripMenuItem.Size = new Size(133, 22);
             сохранитьToolStripMenuItem.Text = "Сохранить";
             сохранитьToolStripMenuItem.Click += сохранитьToolStripMenuItem_Click;
             // 
             // операцииToolStripMenuItem
             // 
-            операцииToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { заменитьВыделенныеToolStripMenuItem, восстановитьВыделенныеToolStripMenuItem, toolStripSeparator1, перевестиВСтолбецПереводаToolStripMenuItem, перевестиВСтолбецПредпросмотраToolStripMenuItem });
+            операцииToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { заменитьВыделенныеToolStripMenuItem, восстановитьВыделенныеToolStripMenuItem, toolStripSeparator1, перевестиВСтолбецПереводаToolStripMenuItem, перевестиВСтолбецПредпросмотраToolStripMenuItem, toolStripSeparator2, вставитьВВыделенныйСтолбецИзБуфераОбменаСНачалаToolStripMenuItem, вставитьВВыделенныйСтолбецИзБуфераОбменаСВыделенияToolStripMenuItem, вставитьДанныеСРазделителемСВыделенияToolStripMenuItem, toolStripSeparator3, вставитьВОригиналДанныеИзБуфераОбменаToolStripMenuItem, вставитьДанныеСРазделителемСВыделенияНовыеДанныеToolStripMenuItem });
             операцииToolStripMenuItem.Name = "операцииToolStripMenuItem";
             операцииToolStripMenuItem.Size = new Size(75, 20);
             операцииToolStripMenuItem.Text = "Операции";
@@ -76,28 +83,75 @@
             // заменитьВыделенныеToolStripMenuItem
             // 
             заменитьВыделенныеToolStripMenuItem.Name = "заменитьВыделенныеToolStripMenuItem";
-            заменитьВыделенныеToolStripMenuItem.Size = new Size(279, 22);
+            заменитьВыделенныеToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.R;
+            заменитьВыделенныеToolStripMenuItem.Size = new Size(571, 22);
             заменитьВыделенныеToolStripMenuItem.Text = "Заменить выделенные";
             заменитьВыделенныеToolStripMenuItem.Click += заменитьВыделенныеToolStripMenuItem_Click;
+            // 
+            // восстановитьВыделенныеToolStripMenuItem
+            // 
+            восстановитьВыделенныеToolStripMenuItem.Name = "восстановитьВыделенныеToolStripMenuItem";
+            восстановитьВыделенныеToolStripMenuItem.Size = new Size(571, 22);
+            восстановитьВыделенныеToolStripMenuItem.Text = "Восстановить выделенные";
+            восстановитьВыделенныеToolStripMenuItem.Click += восстановитьВыделенныеToolStripMenuItem_Click;
             // 
             // toolStripSeparator1
             // 
             toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(276, 6);
+            toolStripSeparator1.Size = new Size(568, 6);
             // 
             // перевестиВСтолбецПереводаToolStripMenuItem
             // 
             перевестиВСтолбецПереводаToolStripMenuItem.Name = "перевестиВСтолбецПереводаToolStripMenuItem";
-            перевестиВСтолбецПереводаToolStripMenuItem.Size = new Size(279, 22);
+            перевестиВСтолбецПереводаToolStripMenuItem.Size = new Size(571, 22);
             перевестиВСтолбецПереводаToolStripMenuItem.Text = "Перевести в столбец перевода";
             перевестиВСтолбецПереводаToolStripMenuItem.Click += перевестиВСтолбецПереводаToolStripMenuItem_Click;
             // 
             // перевестиВСтолбецПредпросмотраToolStripMenuItem
             // 
             перевестиВСтолбецПредпросмотраToolStripMenuItem.Name = "перевестиВСтолбецПредпросмотраToolStripMenuItem";
-            перевестиВСтолбецПредпросмотраToolStripMenuItem.Size = new Size(279, 22);
+            перевестиВСтолбецПредпросмотраToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.Q;
+            перевестиВСтолбецПредпросмотраToolStripMenuItem.Size = new Size(571, 22);
             перевестиВСтолбецПредпросмотраToolStripMenuItem.Text = "Перевести в столбец предпросмотра";
             перевестиВСтолбецПредпросмотраToolStripMenuItem.Click += перевестиВСтолбецПредпросмотраToolStripMenuItem_Click;
+            // 
+            // toolStripSeparator2
+            // 
+            toolStripSeparator2.Name = "toolStripSeparator2";
+            toolStripSeparator2.Size = new Size(568, 6);
+            // 
+            // вставитьВВыделенныйСтолбецИзБуфераОбменаСНачалаToolStripMenuItem
+            // 
+            вставитьВВыделенныйСтолбецИзБуфераОбменаСНачалаToolStripMenuItem.Name = "вставитьВВыделенныйСтолбецИзБуфераОбменаСНачалаToolStripMenuItem";
+            вставитьВВыделенныйСтолбецИзБуфераОбменаСНачалаToolStripMenuItem.Size = new Size(571, 22);
+            вставитьВВыделенныйСтолбецИзБуфераОбменаСНачалаToolStripMenuItem.Text = "Вставить в выделенный столбец из буфера обмена с начала (Существующие данные)";
+            вставитьВВыделенныйСтолбецИзБуфераОбменаСНачалаToolStripMenuItem.Click += вставитьВВыделенныйСтолбецИзБуфераОбменаСНачалаToolStripMenuItem_Click;
+            // 
+            // вставитьВВыделенныйСтолбецИзБуфераОбменаСВыделенияToolStripMenuItem
+            // 
+            вставитьВВыделенныйСтолбецИзБуфераОбменаСВыделенияToolStripMenuItem.Name = "вставитьВВыделенныйСтолбецИзБуфераОбменаСВыделенияToolStripMenuItem";
+            вставитьВВыделенныйСтолбецИзБуфераОбменаСВыделенияToolStripMenuItem.Size = new Size(571, 22);
+            вставитьВВыделенныйСтолбецИзБуфераОбменаСВыделенияToolStripMenuItem.Text = "Вставить в выделенный столбец из буфера обмена с выделения (Существующие данные)";
+            вставитьВВыделенныйСтолбецИзБуфераОбменаСВыделенияToolStripMenuItem.Click += вставитьВВыделенныйСтолбецИзБуфераОбменаСВыделенияToolStripMenuItem_Click;
+            // 
+            // вставитьДанныеСРазделителемСВыделенияToolStripMenuItem
+            // 
+            вставитьДанныеСРазделителемСВыделенияToolStripMenuItem.Name = "вставитьДанныеСРазделителемСВыделенияToolStripMenuItem";
+            вставитьДанныеСРазделителемСВыделенияToolStripMenuItem.Size = new Size(571, 22);
+            вставитьДанныеСРазделителемСВыделенияToolStripMenuItem.Text = "Вставить данные с разделителем с выделения (Существующие данные)";
+            вставитьДанныеСРазделителемСВыделенияToolStripMenuItem.Click += вставитьДанныеСРазделителемСВыделенияToolStripMenuItem_Click;
+            // 
+            // toolStripSeparator3
+            // 
+            toolStripSeparator3.Name = "toolStripSeparator3";
+            toolStripSeparator3.Size = new Size(568, 6);
+            // 
+            // вставитьВОригиналДанныеИзБуфераОбменаToolStripMenuItem
+            // 
+            вставитьВОригиналДанныеИзБуфераОбменаToolStripMenuItem.Name = "вставитьВОригиналДанныеИзБуфераОбменаToolStripMenuItem";
+            вставитьВОригиналДанныеИзБуфераОбменаToolStripMenuItem.Size = new Size(571, 22);
+            вставитьВОригиналДанныеИзБуфераОбменаToolStripMenuItem.Text = "Вставить в оригинал данные из буфера обмена";
+            вставитьВОригиналДанныеИзБуфераОбменаToolStripMenuItem.Click += вставитьВОригиналДанныеИзБуфераОбменаToolStripMenuItem_Click;
             // 
             // statusStrip1
             // 
@@ -119,12 +173,12 @@
             dataGridViewDS.TabIndex = 2;
             dataGridViewDS.CellDoubleClick += dataGridView1_CellDoubleClick;
             // 
-            // восстановитьВыделенныеToolStripMenuItem
+            // вставитьДанныеСРазделителемСВыделенияНовыеДанныеToolStripMenuItem
             // 
-            восстановитьВыделенныеToolStripMenuItem.Name = "восстановитьВыделенныеToolStripMenuItem";
-            восстановитьВыделенныеToolStripMenuItem.Size = new Size(279, 22);
-            восстановитьВыделенныеToolStripMenuItem.Text = "Восстановить выделенные";
-            восстановитьВыделенныеToolStripMenuItem.Click += восстановитьВыделенныеToolStripMenuItem_Click;
+            вставитьДанныеСРазделителемСВыделенияНовыеДанныеToolStripMenuItem.Name = "вставитьДанныеСРазделителемСВыделенияНовыеДанныеToolStripMenuItem";
+            вставитьДанныеСРазделителемСВыделенияНовыеДанныеToolStripMenuItem.Size = new Size(571, 22);
+            вставитьДанныеСРазделителемСВыделенияНовыеДанныеToolStripMenuItem.Text = "Вставить данные с разделителем (Новые данные)";
+            вставитьДанныеСРазделителемСВыделенияНовыеДанныеToolStripMenuItem.Click += вставитьДанныеСРазделителемСВыделенияНовыеДанныеToolStripMenuItem_Click;
             // 
             // Form_PreTranslator
             // 
@@ -160,5 +214,12 @@
         private ToolStripMenuItem перевестиВСтолбецПереводаToolStripMenuItem;
         private ToolStripMenuItem перевестиВСтолбецПредпросмотраToolStripMenuItem;
         private ToolStripMenuItem восстановитьВыделенныеToolStripMenuItem;
+        private ToolStripSeparator toolStripSeparator2;
+        private ToolStripMenuItem вставитьВВыделенныйСтолбецИзБуфераОбменаСНачалаToolStripMenuItem;
+        private ToolStripMenuItem вставитьВВыделенныйСтолбецИзБуфераОбменаСВыделенияToolStripMenuItem;
+        private ToolStripMenuItem вставитьДанныеСРазделителемСВыделенияToolStripMenuItem;
+        private ToolStripSeparator toolStripSeparator3;
+        private ToolStripMenuItem вставитьВОригиналДанныеИзБуфераОбменаToolStripMenuItem;
+        private ToolStripMenuItem вставитьДанныеСРазделителемСВыделенияНовыеДанныеToolStripMenuItem;
     }
 }

@@ -40,6 +40,8 @@
             menuStrip1 = new MenuStrip();
             подключениеToolStripMenuItem = new ToolStripMenuItem();
             настройкиToolStripMenuItem = new ToolStripMenuItem();
+            операцииToolStripMenuItem = new ToolStripMenuItem();
+            открытьОкноТабличногоПереводаToolStripMenuItem = new ToolStripMenuItem();
             tableLayoutPanel1.SuspendLayout();
             menuStrip1.SuspendLayout();
             SuspendLayout();
@@ -145,7 +147,7 @@
             // 
             // menuStrip1
             // 
-            menuStrip1.Items.AddRange(new ToolStripItem[] { подключениеToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { подключениеToolStripMenuItem, операцииToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Size = new Size(800, 24);
@@ -165,6 +167,20 @@
             настройкиToolStripMenuItem.Size = new Size(180, 22);
             настройкиToolStripMenuItem.Text = "Настройки";
             настройкиToolStripMenuItem.Click += настройкиToolStripMenuItem_Click;
+            // 
+            // операцииToolStripMenuItem
+            // 
+            операцииToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { открытьОкноТабличногоПереводаToolStripMenuItem });
+            операцииToolStripMenuItem.Name = "операцииToolStripMenuItem";
+            операцииToolStripMenuItem.Size = new Size(75, 20);
+            операцииToolStripMenuItem.Text = "Операции";
+            // 
+            // открытьОкноТабличногоПереводаToolStripMenuItem
+            // 
+            открытьОкноТабличногоПереводаToolStripMenuItem.Name = "открытьОкноТабличногоПереводаToolStripMenuItem";
+            открытьОкноТабличногоПереводаToolStripMenuItem.Size = new Size(273, 22);
+            открытьОкноТабличногоПереводаToolStripMenuItem.Text = "Открыть окно табличного перевода";
+            открытьОкноТабличногоПереводаToolStripMenuItem.Click += открытьОкноТабличногоПереводаToolStripMenuItem_Click;
             // 
             // Form1
             // 
@@ -203,5 +219,7 @@
         private MenuStrip menuStrip1;
         private ToolStripMenuItem подключениеToolStripMenuItem;
         private ToolStripMenuItem настройкиToolStripMenuItem;
+        private ToolStripMenuItem операцииToolStripMenuItem;
+        private ToolStripMenuItem открытьОкноТабличногоПереводаToolStripMenuItem;
     }
 }

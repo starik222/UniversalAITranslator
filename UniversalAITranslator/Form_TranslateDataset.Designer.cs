@@ -35,6 +35,7 @@
             настроитьПодключениеToolStripMenuItem = new ToolStripMenuItem();
             показатьскрытьНастройкиСистемногоПромптаToolStripMenuItem = new ToolStripMenuItem();
             показатьскрытьПоляИмениИПолаToolStripMenuItem = new ToolStripMenuItem();
+            отчиститьКонтекстToolStripMenuItem = new ToolStripMenuItem();
             toolStripSeparator2 = new ToolStripSeparator();
             сохранитьТекущийНаборДанныхToolStripMenuItem = new ToolStripMenuItem();
             загрузитьНаборДанныхИзФайлаToolStripMenuItem = new ToolStripMenuItem();
@@ -88,7 +89,8 @@
             textBoxPrompt = new TextBox();
             dataGridViewDS = new DataGridView();
             notifyIconTray = new NotifyIcon(components);
-            отчиститьКонтекстToolStripMenuItem = new ToolStripMenuItem();
+            подсветитьНезакрытыеДиалогиToolStripMenuItem = new ToolStripMenuItem();
+            toolStripSeparator9 = new ToolStripSeparator();
             menuStrip1.SuspendLayout();
             statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
@@ -139,6 +141,13 @@
             показатьскрытьПоляИмениИПолаToolStripMenuItem.Size = new Size(383, 22);
             показатьскрытьПоляИмениИПолаToolStripMenuItem.Text = "Показать/скрыть поля имени и пола";
             показатьскрытьПоляИмениИПолаToolStripMenuItem.Click += показатьскрытьПоляИмениИПолаToolStripMenuItem_Click;
+            // 
+            // отчиститьКонтекстToolStripMenuItem
+            // 
+            отчиститьКонтекстToolStripMenuItem.Name = "отчиститьКонтекстToolStripMenuItem";
+            отчиститьКонтекстToolStripMenuItem.Size = new Size(383, 22);
+            отчиститьКонтекстToolStripMenuItem.Text = "Отчистить контекст";
+            отчиститьКонтекстToolStripMenuItem.Click += отчиститьКонтекстToolStripMenuItem_Click;
             // 
             // toolStripSeparator2
             // 
@@ -318,7 +327,7 @@
             // 
             // инструментыToolStripMenuItem
             // 
-            инструментыToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { перевестиИзображениеToolStripMenuItem });
+            инструментыToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { перевестиИзображениеToolStripMenuItem, toolStripSeparator9, подсветитьНезакрытыеДиалогиToolStripMenuItem });
             инструментыToolStripMenuItem.Name = "инструментыToolStripMenuItem";
             инструментыToolStripMenuItem.Size = new Size(95, 20);
             инструментыToolStripMenuItem.Text = "Инструменты";
@@ -326,7 +335,7 @@
             // перевестиИзображениеToolStripMenuItem
             // 
             перевестиИзображениеToolStripMenuItem.Name = "перевестиИзображениеToolStripMenuItem";
-            перевестиИзображениеToolStripMenuItem.Size = new Size(209, 22);
+            перевестиИзображениеToolStripMenuItem.Size = new Size(254, 22);
             перевестиИзображениеToolStripMenuItem.Text = "Перевести изображение";
             перевестиИзображениеToolStripMenuItem.Click += перевестиИзображениеToolStripMenuItem_Click;
             // 
@@ -589,12 +598,17 @@
             notifyIconTray.Text = "ИИ переводчик";
             notifyIconTray.Visible = true;
             // 
-            // отчиститьКонтекстToolStripMenuItem
+            // подсветитьНезакрытыеДиалогиToolStripMenuItem
             // 
-            отчиститьКонтекстToolStripMenuItem.Name = "отчиститьКонтекстToolStripMenuItem";
-            отчиститьКонтекстToolStripMenuItem.Size = new Size(383, 22);
-            отчиститьКонтекстToolStripMenuItem.Text = "Отчистить контекст";
-            отчиститьКонтекстToolStripMenuItem.Click += отчиститьКонтекстToolStripMenuItem_Click;
+            подсветитьНезакрытыеДиалогиToolStripMenuItem.Name = "подсветитьНезакрытыеДиалогиToolStripMenuItem";
+            подсветитьНезакрытыеДиалогиToolStripMenuItem.Size = new Size(254, 22);
+            подсветитьНезакрытыеДиалогиToolStripMenuItem.Text = "Подсветить незакрытые диалоги";
+            подсветитьНезакрытыеДиалогиToolStripMenuItem.Click += подсветитьНезакрытыеДиалогиToolStripMenuItem_Click;
+            // 
+            // toolStripSeparator9
+            // 
+            toolStripSeparator9.Name = "toolStripSeparator9";
+            toolStripSeparator9.Size = new Size(251, 6);
             // 
             // Form_TranslateDataset
             // 
@@ -690,5 +704,7 @@
         private NotifyIcon notifyIconTray;
         private CheckBox checkBoxSaveContext;
         private ToolStripMenuItem отчиститьКонтекстToolStripMenuItem;
+        private ToolStripSeparator toolStripSeparator9;
+        private ToolStripMenuItem подсветитьНезакрытыеДиалогиToolStripMenuItem;
     }
 }

@@ -59,8 +59,8 @@ namespace UniversalAITranslator
                 return;
             }
             int caretPos = textBoxSelectedText.SelectionStart;
-            string s1 = textBoxSelectedText.Text.Substring(0, caretPos);
-            string s2 = textBoxSelectedText.Text.Substring(caretPos);
+            string s1 = textBoxSelectedText.Text.Substring(0, caretPos).Trim();
+            string s2 = textBoxSelectedText.Text.Substring(caretPos).Trim();
             bool first = true;
             string tempText = "";
             string tempName = "";

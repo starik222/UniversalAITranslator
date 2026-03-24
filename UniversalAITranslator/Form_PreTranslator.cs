@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.Common;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
@@ -119,9 +120,9 @@ namespace UniversalAITranslator
         public class TranslationData
         {
             public int Index { get; set; }
-            public string OriginalText { get; set; }
-            public string TranslatedText { get; set; }
-            public string PreviewText { get; set; }
+            public string OriginalText { get; set; } = "";
+            public string TranslatedText { get; set; } = "";
+            public string PreviewText { get; set; } = "";
         }
 
         private void dataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
@@ -173,6 +174,127 @@ namespace UniversalAITranslator
         private void восстановитьВыделенныеToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ReplaceTranslatedOnOriginal();
+        }
+
+        private void вставитьВВыделенныйСтолбецИзБуфераОбменаСНачалаToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            int colIndex = dataGridViewDS.Columns["OriginalText"].Index;
+            if (dataGridViewDS.SelectedCells.Count != 0)
+                colIndex = dataGridViewDS.SelectedCells[0].ColumnIndex;
+            PasteDataFromBufferInExistData(colIndex, 0);
+        }
+
+        private void PasteDataFromBufferInExistData(int columnIndex, int startIndex)
+        {
+            string data = Clipboard.GetText();
+            if (string.IsNullOrEmpty(data))
+                return;
+            string sp1 = "\r\n";
+            string sp2 = "\n";
+            string[] lines = data.Split(data.Contains(sp1) ? sp1 : sp2);
+            int lineIndex = 0;
+            for (int i = startIndex; i < dataGridViewDS.RowCount; i++)
+            {
+                dataGridViewDS[columnIndex, i].Value = lines[lineIndex++];
+            }
+        }
+
+        private void PasteOriginalDataFromBufferNewData()
+        {
+            string data = Clipboard.GetText();
+            if (string.IsNullOrEmpty(data))
+                return;
+            data = data.Trim();
+            string sp1 = "\r\n";
+            string sp2 = "\n";
+            string[] lines = data.Split(data.Contains(sp1) ? sp1 : sp2);
+            int lineIndex = 0;
+            DataSet.Clear();
+            foreach (var line in lines)
+            {
+                DataSet.Add(new TranslationData() { Index = lineIndex++, OriginalText = line });
+            }
+        }
+
+        private void PasteTwoPairDataFromBufferNewData()
+        {
+            string data = Clipboard.GetText();
+            if (string.IsNullOrEmpty(data))
+                return;
+            string sp1 = "\r\n";
+            string sp2 = "\n";
+            string[] lines = data.Split(data.Contains(sp1) ? sp1 : sp2);
+            int lineIndex = 0;
+            DataSet.Clear();
+            foreach (var line in lines)
+            {
+                if (line.Contains('=') || line.Contains('|') || line.Contains('\t'))
+                {
+                    string[] blocks = line.Split(['=', '|', '\t']);
+                    if (blocks.Length != 2)
+                    {
+                        statusStrip1.Text = "Вставляемая строка содержит более 2 блоков!";
+                        continue;
+                    }
+                    DataSet.Add(new TranslationData() { Index = lineIndex++, OriginalText = line });
+
+                }
+                else
+                    continue;
+            }
+        }
+
+        private void PasteTwoPairFromBuffer(int startIndex)
+        {
+            string data = Clipboard.GetText();
+            if (string.IsNullOrEmpty(data))
+                return;
+            string sp1 = "\r\n";
+            string sp2 = "\n";
+            string[] lines = data.Split(data.Contains(sp1) ? sp1 : sp2);
+            int lineIndex = 0;
+            for (int i = startIndex; i < dataGridViewDS.RowCount; i++)
+            {
+                string line = lines[lineIndex++];
+                if (line.Contains('=') || line.Contains('|'))
+                {
+                    string[] blocks = line.Split(['=', '|']);
+                    if (blocks.Length != 2)
+                    {
+                        statusStrip1.Text = "Вставляемая строка содержит более 2 блоков!";
+                        continue;
+                    }
+                    dataGridViewDS["OriginalText", i].Value = line[0];
+                    dataGridViewDS["TranslatedText", i].Value = line[1];
+
+                }
+                else
+                    continue;
+            }
+        }
+
+        private void вставитьВВыделенныйСтолбецИзБуфераОбменаСВыделенияToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (dataGridViewDS.SelectedCells.Count == 0)
+                return;
+            PasteDataFromBufferInExistData(dataGridViewDS.SelectedCells[0].ColumnIndex, dataGridViewDS.SelectedCells[0].RowIndex);
+        }
+
+        private void вставитьДанныеСРазделителемСВыделенияToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (dataGridViewDS.SelectedCells.Count == 0)
+                return;
+            PasteTwoPairFromBuffer(dataGridViewDS.SelectedCells[0].RowIndex);
+        }
+
+        private void вставитьВОригиналДанныеИзБуфераОбменаToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            PasteOriginalDataFromBufferNewData();
+        }
+
+        private void вставитьДанныеСРазделителемСВыделенияНовыеДанныеToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            PasteTwoPairDataFromBufferNewData();
         }
     }
 }
