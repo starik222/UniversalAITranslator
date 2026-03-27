@@ -189,11 +189,12 @@ namespace UniversalAITranslator
             string data = Clipboard.GetText();
             if (string.IsNullOrEmpty(data))
                 return;
+            data = data.Trim();
             string sp1 = "\r\n";
             string sp2 = "\n";
             string[] lines = data.Split(data.Contains(sp1) ? sp1 : sp2);
             int lineIndex = 0;
-            for (int i = startIndex; i < dataGridViewDS.RowCount; i++)
+            for (int i = startIndex; i < dataGridViewDS.RowCount && lineIndex < lines.Length; i++)
             {
                 dataGridViewDS[columnIndex, i].Value = lines[lineIndex++];
             }
@@ -223,7 +224,7 @@ namespace UniversalAITranslator
                 return;
             string sp1 = "\r\n";
             string sp2 = "\n";
-            string[] lines = data.Split(data.Contains(sp1) ? sp1 : sp2);
+            string[] lines = data.Trim().Split(data.Contains(sp1) ? sp1 : sp2);
             int lineIndex = 0;
             DataSet.Clear();
             foreach (var line in lines)
@@ -236,7 +237,7 @@ namespace UniversalAITranslator
                         statusStrip1.Text = "Вставляемая строка содержит более 2 блоков!";
                         continue;
                     }
-                    DataSet.Add(new TranslationData() { Index = lineIndex++, OriginalText = line });
+                    DataSet.Add(new TranslationData() { Index = lineIndex++, OriginalText = blocks[0], TranslatedText = blocks[1] });
 
                 }
                 else
@@ -251,9 +252,9 @@ namespace UniversalAITranslator
                 return;
             string sp1 = "\r\n";
             string sp2 = "\n";
-            string[] lines = data.Split(data.Contains(sp1) ? sp1 : sp2);
+            string[] lines = data.Trim().Split(data.Contains(sp1) ? sp1 : sp2);
             int lineIndex = 0;
-            for (int i = startIndex; i < dataGridViewDS.RowCount; i++)
+            for (int i = startIndex; i < dataGridViewDS.RowCount && lineIndex < lines.Length; i++)
             {
                 string line = lines[lineIndex++];
                 if (line.Contains('=') || line.Contains('|'))

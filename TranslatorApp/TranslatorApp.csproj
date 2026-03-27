@@ -12,4 +12,10 @@
     <ProjectReference Include="..\UniversalAITranslator\UniversalAITranslator.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="Translator">
+      <HintPath>..\..\..\Флешка\GoogleTranslate\GoogleTranslate\bin\Debug\Translator.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

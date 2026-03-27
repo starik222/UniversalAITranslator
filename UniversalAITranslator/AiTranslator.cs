@@ -435,9 +435,26 @@ namespace UniversalAITranslator
             List<ChatMessage> messages = new List<ChatMessage>();
             if (SystemPrompt != null)
                 messages.Add(SystemPrompt);
-
-            BinaryData bd = new BinaryData(await File.ReadAllBytesAsync(imagePath));
-            string contentType = GetContentTypeFromExtention(Path.GetExtension(imagePath));
+            byte[] imgData = null;
+            string imgExt = Path.GetExtension(imagePath).ToLower();
+            //Конвертация в png, если тип BMP
+            if (Path.GetExtension(imagePath).ToLower() == ".bmp")
+            {
+                Image img = Image.FromFile(imagePath);
+                MemoryStream tempMs = new MemoryStream();
+                img.Save(tempMs, System.Drawing.Imaging.ImageFormat.Png);
+                imgData = tempMs.ToArray();
+                tempMs.Close();
+                img.Dispose();
+                imgExt = ".png";
+            }
+            else
+            {
+                imgData = await File.ReadAllBytesAsync(imagePath);
+            }
+            //----
+            BinaryData bd = new BinaryData(imgData);
+            string contentType = GetContentTypeFromExtention(imgExt);
             ChatMessageContentPart partImage = ChatMessageContentPart.CreateImagePart(bd, contentType);
 
             ChatOptions.ResponseFormat = ChatResponseFormat.CreateJsonObjectFormat();

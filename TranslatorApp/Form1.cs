@@ -62,9 +62,16 @@ namespace TranslatorApp
 
         private void открытьќкно“абличногоѕереводаToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Form_PreTranslator preTranslator = new Form_PreTranslator(new List<KeyValuePair<string, string>>());
+
+            Form_PreTranslator preTranslator = new Form_PreTranslator(Program.Tools.RepText.Select(a => new KeyValuePair<string, string>(a.orig_name, a.translit_name)).ToList());
             preTranslator.ShowDialog();
             preTranslator.Close();
+        }
+
+        private void открытьќкноѕереводчикаToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form_TranslateDataset translateDataset = new Form_TranslateDataset();
+            translateDataset.ShowDialog();
         }
     }
 }

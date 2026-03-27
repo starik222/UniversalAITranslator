@@ -30,10 +30,19 @@
         {
             menuStrip1 = new MenuStrip();
             файлToolStripMenuItem = new ToolStripMenuItem();
+            перевестиИзображенияToolStripMenuItem = new ToolStripMenuItem();
+            toolStripSeparator1 = new ToolStripSeparator();
             сохранитьСкриптДляPhotoshopToolStripMenuItem = new ToolStripMenuItem();
             сохранитьСкриптИВыполнитьToolStripMenuItem = new ToolStripMenuItem();
+            toolStripSeparator2 = new ToolStripSeparator();
+            сохранитьСкриптыДляВсехИзображенийToolStripMenuItem = new ToolStripMenuItem();
+            toolStripSeparator3 = new ToolStripSeparator();
+            повторитьПереводДляИзображенияToolStripMenuItem = new ToolStripMenuItem();
             splitContainer1 = new SplitContainer();
+            dataGridViewImages = new DataGridView();
+            ImagePath = new DataGridViewTextBoxColumn();
             groupBox2 = new GroupBox();
+            checkBoxChangeSize = new CheckBox();
             numericUpDownMul_Y = new NumericUpDown();
             numericUpDownAdd_Y = new NumericUpDown();
             label13 = new Label();
@@ -63,11 +72,14 @@
             buttonFontColor = new Button();
             label3 = new Label();
             pictureBoxImage = new PictureBox();
+            statusStrip1 = new StatusStrip();
+            StatusLabel = new ToolStripStatusLabel();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
             splitContainer1.Panel2.SuspendLayout();
             splitContainer1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dataGridViewImages).BeginInit();
             groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numericUpDownMul_Y).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDownAdd_Y).BeginInit();
@@ -79,6 +91,7 @@
             ((System.ComponentModel.ISupportInitialize)numericUpDownFontSize).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDownStrokeSize).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBoxImage).BeginInit();
+            statusStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // menuStrip1
@@ -92,24 +105,60 @@
             // 
             // файлToolStripMenuItem
             // 
-            файлToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { сохранитьСкриптДляPhotoshopToolStripMenuItem, сохранитьСкриптИВыполнитьToolStripMenuItem });
+            файлToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { перевестиИзображенияToolStripMenuItem, toolStripSeparator1, сохранитьСкриптДляPhotoshopToolStripMenuItem, сохранитьСкриптИВыполнитьToolStripMenuItem, toolStripSeparator2, сохранитьСкриптыДляВсехИзображенийToolStripMenuItem, toolStripSeparator3, повторитьПереводДляИзображенияToolStripMenuItem });
             файлToolStripMenuItem.Name = "файлToolStripMenuItem";
             файлToolStripMenuItem.Size = new Size(48, 20);
             файлToolStripMenuItem.Text = "Файл";
             // 
+            // перевестиИзображенияToolStripMenuItem
+            // 
+            перевестиИзображенияToolStripMenuItem.Name = "перевестиИзображенияToolStripMenuItem";
+            перевестиИзображенияToolStripMenuItem.Size = new Size(310, 22);
+            перевестиИзображенияToolStripMenuItem.Text = "Перевести изображения...";
+            перевестиИзображенияToolStripMenuItem.Click += перевестиИзображенияToolStripMenuItem_Click;
+            // 
+            // toolStripSeparator1
+            // 
+            toolStripSeparator1.Name = "toolStripSeparator1";
+            toolStripSeparator1.Size = new Size(307, 6);
+            // 
             // сохранитьСкриптДляPhotoshopToolStripMenuItem
             // 
             сохранитьСкриптДляPhotoshopToolStripMenuItem.Name = "сохранитьСкриптДляPhotoshopToolStripMenuItem";
-            сохранитьСкриптДляPhotoshopToolStripMenuItem.Size = new Size(257, 22);
+            сохранитьСкриптДляPhotoshopToolStripMenuItem.Size = new Size(310, 22);
             сохранитьСкриптДляPhotoshopToolStripMenuItem.Text = "Сохранить скрипт для Photoshop";
             сохранитьСкриптДляPhotoshopToolStripMenuItem.Click += сохранитьСкриптДляPhotoshopToolStripMenuItem_Click;
             // 
             // сохранитьСкриптИВыполнитьToolStripMenuItem
             // 
             сохранитьСкриптИВыполнитьToolStripMenuItem.Name = "сохранитьСкриптИВыполнитьToolStripMenuItem";
-            сохранитьСкриптИВыполнитьToolStripMenuItem.Size = new Size(257, 22);
+            сохранитьСкриптИВыполнитьToolStripMenuItem.Size = new Size(310, 22);
             сохранитьСкриптИВыполнитьToolStripMenuItem.Text = "Сохранить скрипт и выполнить";
             сохранитьСкриптИВыполнитьToolStripMenuItem.Click += сохранитьСкриптИВыполнитьToolStripMenuItem_Click;
+            // 
+            // toolStripSeparator2
+            // 
+            toolStripSeparator2.Name = "toolStripSeparator2";
+            toolStripSeparator2.Size = new Size(307, 6);
+            // 
+            // сохранитьСкриптыДляВсехИзображенийToolStripMenuItem
+            // 
+            сохранитьСкриптыДляВсехИзображенийToolStripMenuItem.Name = "сохранитьСкриптыДляВсехИзображенийToolStripMenuItem";
+            сохранитьСкриптыДляВсехИзображенийToolStripMenuItem.Size = new Size(310, 22);
+            сохранитьСкриптыДляВсехИзображенийToolStripMenuItem.Text = "Сохранить скрипты для всех изображений";
+            сохранитьСкриптыДляВсехИзображенийToolStripMenuItem.Click += сохранитьСкриптыДляВсехИзображенийToolStripMenuItem_Click;
+            // 
+            // toolStripSeparator3
+            // 
+            toolStripSeparator3.Name = "toolStripSeparator3";
+            toolStripSeparator3.Size = new Size(307, 6);
+            // 
+            // повторитьПереводДляИзображенияToolStripMenuItem
+            // 
+            повторитьПереводДляИзображенияToolStripMenuItem.Name = "повторитьПереводДляИзображенияToolStripMenuItem";
+            повторитьПереводДляИзображенияToolStripMenuItem.Size = new Size(310, 22);
+            повторитьПереводДляИзображенияToolStripMenuItem.Text = "Повторить перевод для изображения";
+            повторитьПереводДляИзображенияToolStripMenuItem.Click += повторитьПереводДляИзображенияToolStripMenuItem_Click;
             // 
             // splitContainer1
             // 
@@ -119,6 +168,7 @@
             // 
             // splitContainer1.Panel1
             // 
+            splitContainer1.Panel1.Controls.Add(dataGridViewImages);
             splitContainer1.Panel1.Controls.Add(groupBox2);
             splitContainer1.Panel1.Controls.Add(dataGridViewTranslationData);
             splitContainer1.Panel1.Controls.Add(groupBox1);
@@ -126,13 +176,35 @@
             // splitContainer1.Panel2
             // 
             splitContainer1.Panel2.Controls.Add(pictureBoxImage);
-            splitContainer1.Size = new Size(1080, 705);
+            splitContainer1.Size = new Size(1080, 683);
             splitContainer1.SplitterDistance = 501;
             splitContainer1.TabIndex = 1;
+            // 
+            // dataGridViewImages
+            // 
+            dataGridViewImages.AllowUserToAddRows = false;
+            dataGridViewImages.AllowUserToDeleteRows = false;
+            dataGridViewImages.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            dataGridViewImages.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewImages.Columns.AddRange(new DataGridViewColumn[] { ImagePath });
+            dataGridViewImages.Location = new Point(3, 288);
+            dataGridViewImages.Name = "dataGridViewImages";
+            dataGridViewImages.ReadOnly = true;
+            dataGridViewImages.Size = new Size(495, 176);
+            dataGridViewImages.TabIndex = 16;
+            dataGridViewImages.SelectionChanged += dataGridViewImages_SelectionChanged;
+            // 
+            // ImagePath
+            // 
+            ImagePath.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            ImagePath.HeaderText = "Image";
+            ImagePath.Name = "ImagePath";
+            ImagePath.ReadOnly = true;
             // 
             // groupBox2
             // 
             groupBox2.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            groupBox2.Controls.Add(checkBoxChangeSize);
             groupBox2.Controls.Add(numericUpDownMul_Y);
             groupBox2.Controls.Add(numericUpDownAdd_Y);
             groupBox2.Controls.Add(label13);
@@ -143,12 +215,22 @@
             groupBox2.Controls.Add(label10);
             groupBox2.Controls.Add(label9);
             groupBox2.Controls.Add(label8);
-            groupBox2.Location = new Point(12, 492);
+            groupBox2.Location = new Point(12, 470);
             groupBox2.Name = "groupBox2";
             groupBox2.Size = new Size(486, 83);
             groupBox2.TabIndex = 15;
             groupBox2.TabStop = false;
             groupBox2.Text = "Модификатор";
+            // 
+            // checkBoxChangeSize
+            // 
+            checkBoxChangeSize.AutoSize = true;
+            checkBoxChangeSize.Location = new Point(336, 15);
+            checkBoxChangeSize.Name = "checkBoxChangeSize";
+            checkBoxChangeSize.Size = new Size(144, 19);
+            checkBoxChangeSize.TabIndex = 4;
+            checkBoxChangeSize.Text = "Изменение размеров";
+            checkBoxChangeSize.UseVisualStyleBackColor = true;
             // 
             // numericUpDownMul_Y
             // 
@@ -245,8 +327,9 @@
             dataGridViewTranslationData.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridViewTranslationData.Location = new Point(3, 3);
             dataGridViewTranslationData.Name = "dataGridViewTranslationData";
-            dataGridViewTranslationData.Size = new Size(495, 360);
+            dataGridViewTranslationData.Size = new Size(495, 279);
             dataGridViewTranslationData.TabIndex = 14;
+            dataGridViewTranslationData.CellValueChanged += dataGridViewTranslationData_CellValueChanged;
             dataGridViewTranslationData.SelectionChanged += dataGridViewTranslationData_SelectionChanged;
             // 
             // groupBox1
@@ -268,7 +351,7 @@
             groupBox1.Controls.Add(label5);
             groupBox1.Controls.Add(buttonFontColor);
             groupBox1.Controls.Add(label3);
-            groupBox1.Location = new Point(12, 581);
+            groupBox1.Location = new Point(12, 559);
             groupBox1.Name = "groupBox1";
             groupBox1.Size = new Size(486, 112);
             groupBox1.TabIndex = 13;
@@ -427,10 +510,28 @@
             pictureBoxImage.Dock = DockStyle.Fill;
             pictureBoxImage.Location = new Point(0, 0);
             pictureBoxImage.Name = "pictureBoxImage";
-            pictureBoxImage.Size = new Size(575, 705);
+            pictureBoxImage.Size = new Size(575, 683);
             pictureBoxImage.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBoxImage.TabIndex = 0;
             pictureBoxImage.TabStop = false;
+            pictureBoxImage.MouseDown += pictureBoxImage_MouseDown;
+            pictureBoxImage.MouseMove += pictureBoxImage_MouseMove;
+            pictureBoxImage.MouseUp += pictureBoxImage_MouseUp;
+            // 
+            // statusStrip1
+            // 
+            statusStrip1.Items.AddRange(new ToolStripItem[] { StatusLabel });
+            statusStrip1.Location = new Point(0, 707);
+            statusStrip1.Name = "statusStrip1";
+            statusStrip1.Size = new Size(1080, 22);
+            statusStrip1.TabIndex = 2;
+            statusStrip1.Text = "statusStrip1";
+            // 
+            // StatusLabel
+            // 
+            StatusLabel.Name = "StatusLabel";
+            StatusLabel.Size = new Size(12, 17);
+            StatusLabel.Text = "-";
             // 
             // Form_ImageTranslator
             // 
@@ -439,18 +540,23 @@
             ClientSize = new Size(1080, 729);
             Controls.Add(splitContainer1);
             Controls.Add(menuStrip1);
+            Controls.Add(statusStrip1);
+            KeyPreview = true;
             MainMenuStrip = menuStrip1;
             Name = "Form_ImageTranslator";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Form_ImageTranslator";
             FormClosing += Form_ImageTranslator_FormClosing;
             Load += Form_ImageTranslator_Load;
+            KeyDown += Form_ImageTranslator_KeyDown;
+            KeyUp += Form_ImageTranslator_KeyUp;
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
             splitContainer1.Panel1.ResumeLayout(false);
             splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();
             splitContainer1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)dataGridViewImages).EndInit();
             groupBox2.ResumeLayout(false);
             groupBox2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)numericUpDownMul_Y).EndInit();
@@ -464,6 +570,8 @@
             ((System.ComponentModel.ISupportInitialize)numericUpDownFontSize).EndInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDownStrokeSize).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBoxImage).EndInit();
+            statusStrip1.ResumeLayout(false);
+            statusStrip1.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -505,5 +613,16 @@
         private Label label13;
         private NumericUpDown numericUpDownMul_X;
         private Label label12;
+        private DataGridView dataGridViewImages;
+        private ToolStripMenuItem перевестиИзображенияToolStripMenuItem;
+        private ToolStripSeparator toolStripSeparator1;
+        private StatusStrip statusStrip1;
+        private ToolStripStatusLabel StatusLabel;
+        private DataGridViewTextBoxColumn ImagePath;
+        private ToolStripSeparator toolStripSeparator2;
+        private ToolStripMenuItem сохранитьСкриптыДляВсехИзображенийToolStripMenuItem;
+        private ToolStripSeparator toolStripSeparator3;
+        private ToolStripMenuItem повторитьПереводДляИзображенияToolStripMenuItem;
+        private CheckBox checkBoxChangeSize;
     }
 }

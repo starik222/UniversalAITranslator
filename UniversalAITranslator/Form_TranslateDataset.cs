@@ -9,7 +9,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
 using System.Windows.Forms;
-using static UniversalAITranslator.DirectSpeechFixer;
 
 namespace UniversalAITranslator
 {
@@ -996,27 +995,24 @@ namespace UniversalAITranslator
             return result;
         }
 
-        private async void перевестиИзображениеToolStripMenuItem_Click(object sender, EventArgs e)
+        private void перевестиИзображениеToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            if (openFileDialog.ShowDialog() != DialogResult.OK)
-                return;
-            SetStatus("Идет перевод...");
             translator.SetSystemPrompt(textBoxPrompt.Text);
-            var result = await translator.TranslateImage(openFileDialog.FileName);
-            if (result.data != null)
-            {
-                Form_ImageTranslator imgTranslator = new Form_ImageTranslator();
-                imgTranslator.SetTranslationData(openFileDialog.FileName, result.data);
-                imgTranslator.ShowDialog();
-                imgTranslator.Close();
-                SetStatus("Перевод завершен");
-            }
-            else
-            {
-                ErrorLogged?.Invoke("Перевод завершен c ошибками:\n" + result.errText);
-                SetStatus("Перевод завершен c ошибками:\n" + result.errText);
-            }
+            Form_ImageTranslator imgTranslator = new Form_ImageTranslator(translator);
+            imgTranslator.ErrorLogged += ImgTranslator_ErrorLogged;
+            imgTranslator.TranslationCompleted += ImgTranslator_TranslationCompleted;
+            imgTranslator.ShowDialog();
+            imgTranslator.Close();
+        }
+
+        private void ImgTranslator_TranslationCompleted(bool value)
+        {
+            TranslationCompleted?.Invoke(value);
+        }
+
+        private void ImgTranslator_ErrorLogged(string text)
+        {
+            ErrorLogged?.Invoke(text);
         }
 
         private void разбитьПоКоличествуСтрокToolStripMenuItem_Click(object sender, EventArgs e)

@@ -42,6 +42,7 @@
             настройкиToolStripMenuItem = new ToolStripMenuItem();
             операцииToolStripMenuItem = new ToolStripMenuItem();
             открытьОкноТабличногоПереводаToolStripMenuItem = new ToolStripMenuItem();
+            открытьОкноПереводчикаToolStripMenuItem = new ToolStripMenuItem();
             tableLayoutPanel1.SuspendLayout();
             menuStrip1.SuspendLayout();
             SuspendLayout();
@@ -164,13 +165,13 @@
             // настройкиToolStripMenuItem
             // 
             настройкиToolStripMenuItem.Name = "настройкиToolStripMenuItem";
-            настройкиToolStripMenuItem.Size = new Size(180, 22);
+            настройкиToolStripMenuItem.Size = new Size(134, 22);
             настройкиToolStripMenuItem.Text = "Настройки";
             настройкиToolStripMenuItem.Click += настройкиToolStripMenuItem_Click;
             // 
             // операцииToolStripMenuItem
             // 
-            операцииToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { открытьОкноТабличногоПереводаToolStripMenuItem });
+            операцииToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { открытьОкноТабличногоПереводаToolStripMenuItem, открытьОкноПереводчикаToolStripMenuItem });
             операцииToolStripMenuItem.Name = "операцииToolStripMenuItem";
             операцииToolStripMenuItem.Size = new Size(75, 20);
             операцииToolStripMenuItem.Text = "Операции";
@@ -181,6 +182,13 @@
             открытьОкноТабличногоПереводаToolStripMenuItem.Size = new Size(273, 22);
             открытьОкноТабличногоПереводаToolStripMenuItem.Text = "Открыть окно табличного перевода";
             открытьОкноТабличногоПереводаToolStripMenuItem.Click += открытьОкноТабличногоПереводаToolStripMenuItem_Click;
+            // 
+            // открытьОкноПереводчикаToolStripMenuItem
+            // 
+            открытьОкноПереводчикаToolStripMenuItem.Name = "открытьОкноПереводчикаToolStripMenuItem";
+            открытьОкноПереводчикаToolStripMenuItem.Size = new Size(273, 22);
+            открытьОкноПереводчикаToolStripMenuItem.Text = "Открыть окно переводчика";
+            открытьОкноПереводчикаToolStripMenuItem.Click += открытьОкноПереводчикаToolStripMenuItem_Click;
             // 
             // Form1
             // 
@@ -221,5 +229,6 @@
         private ToolStripMenuItem настройкиToolStripMenuItem;
         private ToolStripMenuItem операцииToolStripMenuItem;
         private ToolStripMenuItem открытьОкноТабличногоПереводаToolStripMenuItem;
+        private ToolStripMenuItem открытьОкноПереводчикаToolStripMenuItem;
     }
 }
