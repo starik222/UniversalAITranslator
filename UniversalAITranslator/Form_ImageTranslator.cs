@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using UniversalAITranslator.Utils;
+using System.Runtime.InteropServices;
 
 namespace UniversalAITranslator
 {
@@ -117,6 +118,26 @@ namespace UniversalAITranslator
             MessageBox.Show("Завершено");
         }
 
+        public static void RunJsxWithoutWarning(string jsxFilePath)
+        {
+            try
+            {
+                // Получаем запущенный Photoshop или запускаем его
+                Type psType = Type.GetTypeFromProgID("Photoshop.Application");
+                if (psType == null) throw new Exception("Photoshop не установлен.");
+
+                dynamic psApp = Activator.CreateInstance(psType);
+
+                // Передаем скрипт на выполнение
+                // Этот метод игнорирует окно "Trusted Source"
+                psApp.DoJavaScriptFile(jsxFilePath);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Ошибка при отправке скрипта: " + ex.Message);
+            }
+        }
+
         private bool SaveScript(string imagePath, string savePath)
         {
             try
@@ -146,6 +167,12 @@ namespace UniversalAITranslator
                     //layer.X = item.X;
                     int fontSize = Convert.ToInt32(numericUpDownFontSize.Value);
                     layer.Y = y + ((item.Height * modData.Y_Multiply) / 2f + fontSize / 3f);
+                    if (checkBoxImageCenter.Checked)
+                    {
+                        var imgSize = item.GetImageSize();
+                        layer.X = imgSize.Width / 2f;
+                        layer.Y = imgSize.Height / 2f + fontSize / 3f;
+                    }
                     layer.FontName = textBoxFont.Text;
                     layer.FontSize = Convert.ToInt32(numericUpDownFontSize.Value);
                     layer.Color = buttonFontColor.BackColor.ToHex();
@@ -155,9 +182,10 @@ namespace UniversalAITranslator
                     layer.StrokeSize = Convert.ToInt32(numericUpDownStrokeSize.Value);
                     layer.Justification = comboBoxAlign.SelectedItem.ToString();
                     layer.StrokeOpacity = Convert.ToInt32(numericUpDownOpacity.Value);
+                    layer.Leading = numericUpDownLeading.Value == 0 ? null : (double)numericUpDownLeading.Value;
                     layers.Add(layer);
                 }
-                ScriptGenerator.GenerateJSX(imgPath, layers, savePath);
+                ScriptGenerator.GenerateJSX(imagePath, layers, savePath, checkBoxSaveBMP.Checked, checkBoxSavePSD.Checked);
                 return true;
             }
             catch (Exception ex)
@@ -208,15 +236,17 @@ namespace UniversalAITranslator
                 MessageBox.Show("Завершено с ошибками");
                 return;
             }
-            string[] estkPathes = ["C:\\Program Files (x86)\\Adobe\\Adobe ExtendScript Toolkit CC\\ExtendScript Toolkit.exe"];
-            foreach (var item in estkPathes)
-            {
-                if (File.Exists(item))
-                {
-                    Process.Start(item, $" -run {saveFileDialog.FileName.Replace('\\', '/')}");
-                    return;
-                }
-            }
+
+            RunJsxWithoutWarning(saveFileDialog.FileName.Replace('\\', '/'));
+            //string[] estkPathes = ["C:\\Program Files (x86)\\Adobe\\Adobe ExtendScript Toolkit CC\\ExtendScript Toolkit.exe"];
+            //foreach (var item in estkPathes)
+            //{
+            //    if (File.Exists(item))
+            //    {
+            //        Process.Start(item, $" -run {saveFileDialog.FileName.Replace('\\', '/')}");
+            //        return;
+            //    }
+            //}
             //MessageBox.Show("Завершено");
         }
 
@@ -344,6 +374,8 @@ namespace UniversalAITranslator
         private void pictureBoxImage_MouseUp(object sender, MouseEventArgs e)
         {
             startMove = false;
+            if(currentTransData==null) 
+                return;
             Point subData = new Point(startCoordinates.X - e.Location.X, startCoordinates.Y - e.Location.Y);
             if (checkBoxChangeSize.Checked)
             {
@@ -355,7 +387,7 @@ namespace UniversalAITranslator
                 currentTransData.X -= subData.X;
                 currentTransData.Y -= subData.Y;
             }
-                currentTransData.UpdateOriginal();
+            currentTransData.UpdateOriginal();
             dataGridViewTranslationData.Refresh();
         }
 
@@ -399,6 +431,22 @@ namespace UniversalAITranslator
         {
             if (e.KeyData == Keys.ControlKey)
                 checkBoxChangeSize.Checked = false;
+        }
+
+        private void сохранитьИВыполнитьВсеСкриптыToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (dataSet.Count == 0 || comboBoxAlign.SelectedIndex == -1)
+                return;
+            SetStatus("Идет сохранение...");
+            foreach (var item in dataSet)
+            {
+                string fName = Path.Combine(Path.GetDirectoryName(item.Key), Path.GetFileNameWithoutExtension(item.Key) + ".jsx");
+                if (SaveScript(item.Key, fName))
+                {
+                    RunJsxWithoutWarning(fName.Replace('\\', '/'));
+                }
+            }
+            SetStatus("Завершено");
         }
     }
 }

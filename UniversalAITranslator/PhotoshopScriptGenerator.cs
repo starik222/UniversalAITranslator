@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
 namespace UniversalAITranslator.Utils
 {
@@ -25,11 +21,14 @@ namespace UniversalAITranslator.Utils
 
         // НОВОЕ: Выравнивание текста (left, center, right)
         public string Justification { get; set; } = "center";
+
+        // НОВОЕ: Интерлиньяж (межстрочное расстояние). Если null — используется авто-интерлиньяж
+        public double? Leading { get; set; } = null;
     }
 
     public class ScriptGenerator
     {
-        public static string GenerateJSX(string imagePath, List<TextLayer> textLayers, string outputJsxPath)
+        public static string GenerateJSX(string imagePath, List<TextLayer> textLayers, string outputJsxPath, bool saveBMP, bool savePSD)
         {
             if (!File.Exists(imagePath))
             {
@@ -45,13 +44,21 @@ namespace UniversalAITranslator.Utils
 
             // Функция для создания текстового слоя с обводкой и выравниванием
             jsx.AppendLine(@"// Функция для создания текстового слоя
-function createTextLayer(doc, text, x, y, fontSize, fontName, hexColor, strokeEnabled, strokeSize, strokeColor, strokeOpacity, strokePosition, justification) {
+function createTextLayer(doc, text, x, y, fontSize, fontName, hexColor, strokeEnabled, strokeSize, strokeColor, strokeOpacity, strokePosition, justification, leading) {
     var textLayer = doc.artLayers.add();
     textLayer.kind = LayerKind.TEXT;
     
     var textItem = textLayer.textItem;
     textItem.contents = text;
     textItem.size = fontSize;
+
+    // НОВОЕ: Установка интерлиньяжа (межстрочного расстояния)
+    if (leading !== null && leading !== undefined) {
+        textItem.useAutoLeading = false;
+        textItem.leading = leading;
+    } else {
+        textItem.useAutoLeading = true;
+    }
     
     // Установка выравнивания текста
     switch(justification.toLowerCase()) {
@@ -182,9 +189,10 @@ function applyStroke(layer, size, hexColor, opacity, position) {
             for (int i = 0; i < textLayers.Count; i++)
             {
                 var layer = textLayers[i];
+                string leadingValue = layer.Leading.HasValue ? layer.Leading.Value.ToString(System.Globalization.CultureInfo.InvariantCulture): "null";
                 jsx.AppendLine($"        createTextLayer(doc, \"{EscapeJSString(layer.Text)}\", " +
-                    $"{layer.X.ToString().Replace(",", ".")}, " +
-                    $"{layer.Y.ToString().Replace(",", ".")}, " +
+                    $"{layer.X.ToString(System.Globalization.CultureInfo.InvariantCulture)}, " +
+                    $"{layer.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)}, " +
                     $"{layer.FontSize}, " +
                     $"\"{layer.FontName}\", " +
                     $"\"{layer.Color}\", " +
@@ -193,11 +201,38 @@ function applyStroke(layer, size, hexColor, opacity, position) {
                     $"\"{layer.StrokeColor}\", " +
                     $"\"{layer.StrokeOpacity}\", " +
                     $"\"{layer.StrokePosition}\", " +
-                    $"\"{layer.Justification}\");");
+                    $"\"{layer.Justification}\", " +
+                    $"{leadingValue});"); // НОВОЕ: Передаем значение интерлиньяжа
+            }
+
+            // НОВОЕ: Логика сохранения в форматах PSD и BMP
+            if (savePSD)
+            {
+                string psdPath = Path.ChangeExtension(imagePath, ".psd").Replace("\\", "/");
+                jsx.AppendLine("        ");
+                jsx.AppendLine("        // Сохранение в формат PSD");
+                jsx.AppendLine($"        var psdFile = new File(\"{psdPath}\");");
+                jsx.AppendLine("        var psdSaveOptions = new PhotoshopSaveOptions();");
+                jsx.AppendLine("        psdSaveOptions.layers = true;");
+                jsx.AppendLine("        psdSaveOptions.embedColorProfile = true;");
+                jsx.AppendLine("        doc.saveAs(psdFile, psdSaveOptions, true, Extension.LOWERCASE);");
+            }
+
+            if (saveBMP)
+            {
+                string bmpPath = Path.ChangeExtension(imagePath, ".bmp").Replace("\\", "/");
+                jsx.AppendLine("        ");
+                jsx.AppendLine("        // Сохранение в формат BMP");
+                jsx.AppendLine($"        var bmpFile = new File(\"{bmpPath}\");");
+                jsx.AppendLine("        var bmpSaveOptions = new BMPSaveOptions();");
+                jsx.AppendLine("        bmpSaveOptions.depth = BMPDepthType.THIRTYTWO; // 32-bit цвет");
+                jsx.AppendLine("        BMPSaveOptions.alphaChannels = true;");
+                jsx.AppendLine("        bmpSaveOptions.osType = OperatingSystem.WINDOWS;");
+                jsx.AppendLine("        doc.saveAs(bmpFile, bmpSaveOptions, true, Extension.LOWERCASE);");
             }
 
             jsx.AppendLine("        ");
-            jsx.AppendLine("        alert('Скрипт успешно выполнен! Создано слоев: " + textLayers.Count + "');");
+            //jsx.AppendLine("        alert('Скрипт успешно выполнен! Создано слоев: " + textLayers.Count + "');");
             jsx.AppendLine("    }");
             jsx.AppendLine("} catch (e) {");
             jsx.AppendLine("    alert('Ошибка: ' + e.message + '\\nСтрока: ' + e.line);");
@@ -219,200 +254,4 @@ function applyStroke(layer, size, hexColor, opacity, position) {
                 .Replace("\t", "\\t");
         }
     }
-
-    //    // Класс для хранения данных о текстовом слое
-    //    public class TextLayer
-    //    {
-    //        public string Text { get; set; }
-    //        public double X { get; set; }
-    //        public double Y { get; set; }
-    //        public int FontSize { get; set; } = 24;
-    //        public string FontName { get; set; } = "ArialMT";
-    //        public string Color { get; set; } = "000000"; // HEX цвет текста
-
-    //        // НОВОЕ: Параметры обводки
-    //        public bool StrokeEnabled { get; set; } = false;
-    //        public int StrokeSize { get; set; } = 3; // пиксели
-    //        public string StrokeColor { get; set; } = "FFFFFF"; // HEX цвет обводки
-    //        public string StrokePosition { get; set; } = "outside"; // outside, inside, center
-    //    }
-
-    //    public class ScriptGenerator
-    //    {
-    //        public static string GenerateJSX(string imagePath, List<TextLayer> textLayers, string outputJsxPath)
-    //        {
-    //            if (!File.Exists(imagePath))
-    //            {
-    //                throw new FileNotFoundException($"Изображение не найдено: {imagePath}");
-    //            }
-
-    //            string jsxImagePath = imagePath.Replace("\\", "/");
-    //            StringBuilder jsx = new StringBuilder();
-
-    //            jsx.AppendLine("// Автоматически сгенерированный скрипт для Adobe Photoshop");
-    //            jsx.AppendLine("// Дата создания: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-    //            jsx.AppendLine();
-
-    //            // Функция для создания текстового слоя с обводкой
-    //            jsx.AppendLine(@"// Функция для создания текстового слоя
-    //function createTextLayer(doc, text, x, y, fontSize, fontName, hexColor, strokeEnabled, strokeSize, strokeColor, strokePosition) {
-    //    var textLayer = doc.artLayers.add();
-    //    textLayer.kind = LayerKind.TEXT;
-
-    //    var textItem = textLayer.textItem;
-    //    textItem.contents = text;
-    //    textItem.position = [x, y];
-    //    textItem.size = fontSize;
-
-    //    // Установка шрифта с проверкой
-    //    try {
-    //        var fontFound = false;
-    //        for (var i = 0; i < app.fonts.length; i++) {
-    //            if (app.fonts[i].postScriptName == fontName || app.fonts[i].name == fontName) {
-    //                textItem.font = app.fonts[i].postScriptName;
-    //                fontFound = true;
-    //                break;
-    //            }
-    //        }
-    //        if (!fontFound) {
-    //            textItem.font = 'ArialMT';
-    //        }
-    //    } catch(e) {
-    //        textItem.font = 'ArialMT';
-    //    }
-
-    //    // Установка цвета текста
-    //    var color = new SolidColor();
-    //    color.rgb.hexValue = hexColor;
-    //    textItem.color = color;
-
-    //    textLayer.name = text.substring(0, Math.min(text.length, 30));
-
-    //    // НОВОЕ: Применение обводки если включена
-    //    if (strokeEnabled) {
-    //        applyStroke(textLayer, strokeSize, strokeColor, strokePosition);
-    //    }
-
-    //    return textLayer;
-    //}
-
-    //// НОВАЯ функция для применения обводки к слою
-    //function applyStroke(layer, size, hexColor, position) {
-    //    // Делаем слой активным
-    //    app.activeDocument.activeLayer = layer;
-
-    //    // Конвертируем HEX в RGB
-    //    var r = parseInt(hexColor.substring(0, 2), 16);
-    //    var g = parseInt(hexColor.substring(2, 4), 16);
-    //    var b = parseInt(hexColor.substring(4, 6), 16);
-
-    //    // Определяем позицию обводки
-    //    var strokeStyle;
-    //    switch(position.toLowerCase()) {
-    //        case 'inside':
-    //            strokeStyle = 'InsF'; // insetFrame
-    //            break;
-    //        case 'center':
-    //            strokeStyle = 'CtrF'; // centeredFrame
-    //            break;
-    //        case 'outside':
-    //        default:
-    //            strokeStyle = 'OutF'; // outsetFrame
-    //            break;
-    //    }
-
-    //    try {
-    //        // Создаем дескриптор для эффекта обводки
-    //        var desc = new ActionDescriptor();
-    //        var desc2 = new ActionDescriptor();
-    //        var desc3 = new ActionDescriptor();
-    //        var desc4 = new ActionDescriptor();
-    //        var ref = new ActionReference();
-
-    //        ref.putProperty(charIDToTypeID('Prpr'), charIDToTypeID('Lefx'));
-    //        ref.putEnumerated(charIDToTypeID('Lyr '), charIDToTypeID('Ordn'), charIDToTypeID('Trgt'));
-    //        desc.putReference(charIDToTypeID('null'), ref);
-
-    //        // Настройки обводки
-    //        desc3.putUnitDouble(charIDToTypeID('Sz  '), charIDToTypeID('#Pxl'), size);
-    //        desc3.putEnumerated(charIDToTypeID('PntT'), charIDToTypeID('FrFl'), charIDToTypeID(strokeStyle));
-    //        desc3.putEnumerated(charIDToTypeID('Md  '), charIDToTypeID('BlnM'), charIDToTypeID('Nrml'));
-    //        desc3.putUnitDouble(charIDToTypeID('Opct'), charIDToTypeID('#Prc'), 100);
-
-    //        // Цвет обводки
-    //        desc4.putDouble(charIDToTypeID('Rd  '), r);
-    //        desc4.putDouble(charIDToTypeID('Grn '), g);
-    //        desc4.putDouble(charIDToTypeID('Bl  '), b);
-    //        desc3.putObject(charIDToTypeID('Clr '), charIDToTypeID('RGBC'), desc4);
-
-    //        desc3.putBoolean(charIDToTypeID('enab'), true);
-    //        desc2.putObject(charIDToTypeID('FrFX'), charIDToTypeID('FrFX'), desc3);
-    //        desc.putObject(charIDToTypeID('T   '), charIDToTypeID('Lefx'), desc2);
-
-    //        executeAction(charIDToTypeID('setd'), desc, DialogModes.NO);
-    //    } catch(e) {
-    //        // Альтернативный метод через Layer Style
-    //        try {
-    //            var desc = new ActionDescriptor();
-    //            desc.putInteger(stringIDToTypeID('strokeSize'), size);
-    //            desc.putString(stringIDToTypeID('strokeColor'), hexColor);
-    //            executeAction(stringIDToTypeID('applyStroke'), desc, DialogModes.NO);
-    //        } catch(e2) {
-    //            // Игнорируем ошибку, если не удалось применить обводку
-    //        }
-    //    }
-    //}
-    //");
-
-    //            jsx.AppendLine("// Основной код");
-    //            jsx.AppendLine("try {");
-    //            jsx.AppendLine($"    var imageFile = new File(\"{jsxImagePath}\");");
-    //            jsx.AppendLine("    ");
-    //            jsx.AppendLine("    if (!imageFile.exists) {");
-    //            jsx.AppendLine("        alert('Файл изображения не найден: ' + imageFile.fsName);");
-    //            jsx.AppendLine("    } else {");
-    //            jsx.AppendLine("        var doc = app.open(imageFile);");
-    //            jsx.AppendLine("        ");
-    //            jsx.AppendLine("        // Создаем текстовые слои");
-
-    //            // Добавляем каждый текстовый слой
-    //            for (int i = 0; i < textLayers.Count; i++)
-    //            {
-    //                var layer = textLayers[i];
-    //                jsx.AppendLine($"        createTextLayer(doc, \"{EscapeJSString(layer.Text)}\", " +
-    //                    $"{layer.X.ToString().Replace(",", ".")}, " +
-    //                    $"{layer.Y.ToString().Replace(",", ".")}, " +
-    //                    $"{layer.FontSize}, " +
-    //                    $"\"{layer.FontName}\", " +
-    //                    $"\"{layer.Color}\", " +
-    //                    $"{layer.StrokeEnabled.ToString().ToLower()}, " +
-    //                    $"{layer.StrokeSize}, " +
-    //                    $"\"{layer.StrokeColor}\", " +
-    //                    $"\"{layer.StrokePosition}\");");
-    //            }
-
-    //            jsx.AppendLine("        ");
-    //            jsx.AppendLine("        alert('Скрипт успешно выполнен! Создано слоев: " + textLayers.Count + "');");
-    //            jsx.AppendLine("    }");
-    //            jsx.AppendLine("} catch (e) {");
-    //            jsx.AppendLine("    alert('Ошибка: ' + e.message + '\\nСтрока: ' + e.line);");
-    //            jsx.AppendLine("}");
-
-    //            string jsxContent = jsx.ToString();
-    //            File.WriteAllText(outputJsxPath, jsxContent, Encoding.UTF8);
-
-    //            return jsxContent;
-    //        }
-
-    //        private static string EscapeJSString(string input)
-    //        {
-    //            return input
-    //                .Replace("\\", "\\\\")
-    //                .Replace("\"", "\\\"")
-    //                .Replace("\n", "\\n")
-    //                .Replace("\r", "\\r")
-    //                .Replace("\t", "\\t");
-    //        }
-    //    }
-
 }

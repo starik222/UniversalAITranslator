@@ -36,6 +36,7 @@
             сохранитьСкриптИВыполнитьToolStripMenuItem = new ToolStripMenuItem();
             toolStripSeparator2 = new ToolStripSeparator();
             сохранитьСкриптыДляВсехИзображенийToolStripMenuItem = new ToolStripMenuItem();
+            сохранитьИВыполнитьВсеСкриптыToolStripMenuItem = new ToolStripMenuItem();
             toolStripSeparator3 = new ToolStripSeparator();
             повторитьПереводДляИзображенияToolStripMenuItem = new ToolStripMenuItem();
             splitContainer1 = new SplitContainer();
@@ -55,6 +56,10 @@
             label8 = new Label();
             dataGridViewTranslationData = new DataGridView();
             groupBox1 = new GroupBox();
+            checkBoxSavePSD = new CheckBox();
+            checkBoxSaveBMP = new CheckBox();
+            numericUpDownLeading = new NumericUpDown();
+            label14 = new Label();
             numericUpDownOpacity = new NumericUpDown();
             label7 = new Label();
             comboBoxAlign = new ComboBox();
@@ -74,6 +79,7 @@
             pictureBoxImage = new PictureBox();
             statusStrip1 = new StatusStrip();
             StatusLabel = new ToolStripStatusLabel();
+            checkBoxImageCenter = new CheckBox();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
@@ -87,6 +93,7 @@
             ((System.ComponentModel.ISupportInitialize)numericUpDownAdd_X).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dataGridViewTranslationData).BeginInit();
             groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)numericUpDownLeading).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDownOpacity).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDownFontSize).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDownStrokeSize).BeginInit();
@@ -105,7 +112,7 @@
             // 
             // файлToolStripMenuItem
             // 
-            файлToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { перевестиИзображенияToolStripMenuItem, toolStripSeparator1, сохранитьСкриптДляPhotoshopToolStripMenuItem, сохранитьСкриптИВыполнитьToolStripMenuItem, toolStripSeparator2, сохранитьСкриптыДляВсехИзображенийToolStripMenuItem, toolStripSeparator3, повторитьПереводДляИзображенияToolStripMenuItem });
+            файлToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { перевестиИзображенияToolStripMenuItem, toolStripSeparator1, сохранитьСкриптДляPhotoshopToolStripMenuItem, сохранитьСкриптИВыполнитьToolStripMenuItem, toolStripSeparator2, сохранитьСкриптыДляВсехИзображенийToolStripMenuItem, сохранитьИВыполнитьВсеСкриптыToolStripMenuItem, toolStripSeparator3, повторитьПереводДляИзображенияToolStripMenuItem });
             файлToolStripMenuItem.Name = "файлToolStripMenuItem";
             файлToolStripMenuItem.Size = new Size(48, 20);
             файлToolStripMenuItem.Text = "Файл";
@@ -148,6 +155,13 @@
             сохранитьСкриптыДляВсехИзображенийToolStripMenuItem.Text = "Сохранить скрипты для всех изображений";
             сохранитьСкриптыДляВсехИзображенийToolStripMenuItem.Click += сохранитьСкриптыДляВсехИзображенийToolStripMenuItem_Click;
             // 
+            // сохранитьИВыполнитьВсеСкриптыToolStripMenuItem
+            // 
+            сохранитьИВыполнитьВсеСкриптыToolStripMenuItem.Name = "сохранитьИВыполнитьВсеСкриптыToolStripMenuItem";
+            сохранитьИВыполнитьВсеСкриптыToolStripMenuItem.Size = new Size(310, 22);
+            сохранитьИВыполнитьВсеСкриптыToolStripMenuItem.Text = "Сохранить и выполнить все скрипты";
+            сохранитьИВыполнитьВсеСкриптыToolStripMenuItem.Click += сохранитьИВыполнитьВсеСкриптыToolStripMenuItem_Click;
+            // 
             // toolStripSeparator3
             // 
             toolStripSeparator3.Name = "toolStripSeparator3";
@@ -176,7 +190,7 @@
             // splitContainer1.Panel2
             // 
             splitContainer1.Panel2.Controls.Add(pictureBoxImage);
-            splitContainer1.Size = new Size(1080, 683);
+            splitContainer1.Size = new Size(1080, 725);
             splitContainer1.SplitterDistance = 501;
             splitContainer1.TabIndex = 1;
             // 
@@ -187,7 +201,7 @@
             dataGridViewImages.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             dataGridViewImages.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridViewImages.Columns.AddRange(new DataGridViewColumn[] { ImagePath });
-            dataGridViewImages.Location = new Point(3, 288);
+            dataGridViewImages.Location = new Point(3, 293);
             dataGridViewImages.Name = "dataGridViewImages";
             dataGridViewImages.ReadOnly = true;
             dataGridViewImages.Size = new Size(495, 176);
@@ -215,7 +229,7 @@
             groupBox2.Controls.Add(label10);
             groupBox2.Controls.Add(label9);
             groupBox2.Controls.Add(label8);
-            groupBox2.Location = new Point(12, 470);
+            groupBox2.Location = new Point(12, 475);
             groupBox2.Name = "groupBox2";
             groupBox2.Size = new Size(486, 83);
             groupBox2.TabIndex = 15;
@@ -327,7 +341,7 @@
             dataGridViewTranslationData.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridViewTranslationData.Location = new Point(3, 3);
             dataGridViewTranslationData.Name = "dataGridViewTranslationData";
-            dataGridViewTranslationData.Size = new Size(495, 279);
+            dataGridViewTranslationData.Size = new Size(495, 284);
             dataGridViewTranslationData.TabIndex = 14;
             dataGridViewTranslationData.CellValueChanged += dataGridViewTranslationData_CellValueChanged;
             dataGridViewTranslationData.SelectionChanged += dataGridViewTranslationData_SelectionChanged;
@@ -335,6 +349,11 @@
             // groupBox1
             // 
             groupBox1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            groupBox1.Controls.Add(checkBoxImageCenter);
+            groupBox1.Controls.Add(checkBoxSavePSD);
+            groupBox1.Controls.Add(checkBoxSaveBMP);
+            groupBox1.Controls.Add(numericUpDownLeading);
+            groupBox1.Controls.Add(label14);
             groupBox1.Controls.Add(numericUpDownOpacity);
             groupBox1.Controls.Add(label7);
             groupBox1.Controls.Add(comboBoxAlign);
@@ -351,12 +370,50 @@
             groupBox1.Controls.Add(label5);
             groupBox1.Controls.Add(buttonFontColor);
             groupBox1.Controls.Add(label3);
-            groupBox1.Location = new Point(12, 559);
+            groupBox1.Location = new Point(12, 564);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(486, 112);
+            groupBox1.Size = new Size(486, 158);
             groupBox1.TabIndex = 13;
             groupBox1.TabStop = false;
             groupBox1.Text = "Настройка генерации";
+            // 
+            // checkBoxSavePSD
+            // 
+            checkBoxSavePSD.AutoSize = true;
+            checkBoxSavePSD.Location = new Point(6, 131);
+            checkBoxSavePSD.Name = "checkBoxSavePSD";
+            checkBoxSavePSD.Size = new Size(108, 19);
+            checkBoxSavePSD.TabIndex = 20;
+            checkBoxSavePSD.Text = "Сохранять PSD";
+            checkBoxSavePSD.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxSaveBMP
+            // 
+            checkBoxSaveBMP.AutoSize = true;
+            checkBoxSaveBMP.Location = new Point(6, 106);
+            checkBoxSaveBMP.Name = "checkBoxSaveBMP";
+            checkBoxSaveBMP.Size = new Size(112, 19);
+            checkBoxSaveBMP.TabIndex = 19;
+            checkBoxSaveBMP.Text = "Сохранять BMP";
+            checkBoxSaveBMP.UseVisualStyleBackColor = true;
+            // 
+            // numericUpDownLeading
+            // 
+            numericUpDownLeading.DecimalPlaces = 1;
+            numericUpDownLeading.Location = new Point(401, 16);
+            numericUpDownLeading.Name = "numericUpDownLeading";
+            numericUpDownLeading.Size = new Size(65, 23);
+            numericUpDownLeading.TabIndex = 18;
+            numericUpDownLeading.Value = new decimal(new int[] { 12, 0, 0, 0 });
+            // 
+            // label14
+            // 
+            label14.AutoSize = true;
+            label14.Location = new Point(305, 19);
+            label14.Name = "label14";
+            label14.Size = new Size(90, 15);
+            label14.TabIndex = 17;
+            label14.Text = "Межстр. расст.";
             // 
             // numericUpDownOpacity
             // 
@@ -415,7 +472,7 @@
             // 
             textBoxFont.Location = new Point(43, 16);
             textBoxFont.Name = "textBoxFont";
-            textBoxFont.Size = new Size(265, 23);
+            textBoxFont.Size = new Size(175, 23);
             textBoxFont.TabIndex = 2;
             textBoxFont.Text = "Franklin Gothic Medium Cond";
             // 
@@ -429,7 +486,7 @@
             // 
             // button1
             // 
-            button1.Location = new Point(314, 15);
+            button1.Location = new Point(224, 15);
             button1.Name = "button1";
             button1.Size = new Size(75, 23);
             button1.TabIndex = 3;
@@ -510,7 +567,7 @@
             pictureBoxImage.Dock = DockStyle.Fill;
             pictureBoxImage.Location = new Point(0, 0);
             pictureBoxImage.Name = "pictureBoxImage";
-            pictureBoxImage.Size = new Size(575, 683);
+            pictureBoxImage.Size = new Size(575, 725);
             pictureBoxImage.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBoxImage.TabIndex = 0;
             pictureBoxImage.TabStop = false;
@@ -521,7 +578,7 @@
             // statusStrip1
             // 
             statusStrip1.Items.AddRange(new ToolStripItem[] { StatusLabel });
-            statusStrip1.Location = new Point(0, 707);
+            statusStrip1.Location = new Point(0, 749);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Size = new Size(1080, 22);
             statusStrip1.TabIndex = 2;
@@ -533,11 +590,21 @@
             StatusLabel.Size = new Size(12, 17);
             StatusLabel.Text = "-";
             // 
+            // checkBoxImageCenter
+            // 
+            checkBoxImageCenter.AutoSize = true;
+            checkBoxImageCenter.Location = new Point(118, 106);
+            checkBoxImageCenter.Name = "checkBoxImageCenter";
+            checkBoxImageCenter.Size = new Size(124, 34);
+            checkBoxImageCenter.TabIndex = 21;
+            checkBoxImageCenter.Text = "Центрировать по \r\nизображению";
+            checkBoxImageCenter.UseVisualStyleBackColor = true;
+            // 
             // Form_ImageTranslator
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1080, 729);
+            ClientSize = new Size(1080, 771);
             Controls.Add(splitContainer1);
             Controls.Add(menuStrip1);
             Controls.Add(statusStrip1);
@@ -566,6 +633,7 @@
             ((System.ComponentModel.ISupportInitialize)dataGridViewTranslationData).EndInit();
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)numericUpDownLeading).EndInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDownOpacity).EndInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDownFontSize).EndInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDownStrokeSize).EndInit();
@@ -624,5 +692,11 @@
         private ToolStripSeparator toolStripSeparator3;
         private ToolStripMenuItem повторитьПереводДляИзображенияToolStripMenuItem;
         private CheckBox checkBoxChangeSize;
+        private NumericUpDown numericUpDownLeading;
+        private Label label14;
+        private CheckBox checkBoxSavePSD;
+        private CheckBox checkBoxSaveBMP;
+        private ToolStripMenuItem сохранитьИВыполнитьВсеСкриптыToolStripMenuItem;
+        private CheckBox checkBoxImageCenter;
     }
 }

@@ -98,5 +98,10 @@ namespace UniversalAITranslator
             originalData.Coordinates.Width = (int)Math.Round((Width * 1000f) / imgWidth);
             originalData.Coordinates.Height = (int)Math.Round((Height * 1000f) / imgHeight);
         }
+
+        public Size GetImageSize()
+        {
+            return new Size(imgWidth, imgHeight);
+        }
     }
 }
