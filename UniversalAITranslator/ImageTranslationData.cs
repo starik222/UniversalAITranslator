@@ -106,7 +106,7 @@ namespace UniversalAITranslator
         public int FontSize { get; set; } = 18;
         public Color Color { get; set; } = Color.White;
         public bool StrokeEnabled { get; set; } = false;
-        public int StrokeSize { get; set; } = 3; // пиксели
+        public int StrokeSize { get; set; } = 2; // пиксели
         public Color StrokeColor { get; set; } = Color.Black; // HEX цвет обводки
         public int StrokeOpacity { get; set; } = 100; // Видимость
         public string StrokePosition { get; set; } = "outside"; // outside, inside, center

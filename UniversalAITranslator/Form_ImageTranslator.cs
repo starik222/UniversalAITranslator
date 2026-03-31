@@ -203,16 +203,16 @@ namespace UniversalAITranslator
                             break;
                     }
                     int fontSize = item.FontSettings.FontSize;
-                    layer.Y = y + (item.Height / 2f + fontSize / 2f);
+                    layer.Y = y + (item.Height / 2f);
                     if (item.FontSettings.CenterOnX)
                     {
                         var imgSize = item.GetImageSize();
                         layer.X = imgSize.Width / 2f;
                     }
-                    if (item.FontSettings.CenterOnX)
+                    if (item.FontSettings.CenterOnY)
                     {
                         var imgSize = item.GetImageSize();
-                        layer.Y = imgSize.Height / 2f + fontSize / 2f;
+                        layer.Y = imgSize.Height / 2f;
                     }
                     layer.FontName = item.FontSettings.FontName;
                     layer.FontSize = fontSize;

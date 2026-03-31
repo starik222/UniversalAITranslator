@@ -61,7 +61,7 @@ namespace UniversalAITranslator.Utils
     textLayer.kind = LayerKind.TEXT;
     
     var textItem = textLayer.textItem;
-    textItem.contents = text;
+    textItem.contents = text.replace(""\\n"",""\r"");
     textItem.size = fontSize;
 
     if (leading !== null && leading !== undefined) {
@@ -107,6 +107,29 @@ namespace UniversalAITranslator.Utils
     textItem.color = color;
     
     textLayer.name = text.substring(0, Math.min(text.length, 30));
+
+    // НОВОЕ: Вертикальное центрирование на основе визуальных границ (Bounding Box)
+    if (text !== '') {
+        try {
+            // Получаем физические границы отрисованного текста [left, top, right, bottom]
+            var bounds = textLayer.bounds; 
+            var top = bounds[1].value;
+            var bottom = bounds[3].value;
+            
+            // Вычисляем текущий визуальный центр текста по оси Y
+            var textCenterY = (top + bottom) / 2;
+            
+            // Вычисляем, на сколько пикселей нужно сдвинуть слой, чтобы он совпал с переданным y
+            var offsetY = y - textCenterY;
+            
+            // Сдвигаем слой (X не трогаем, Y сдвигаем)
+            if (offsetY !== 0) {
+                textLayer.translate(0, offsetY);
+            }
+        } catch(e) {
+            // Игнорируем ошибку (например, если текст состоит только из пробелов)
+        }
+    }
     
     if (strokeEnabled) {
         applyStroke(textLayer, strokeSize, strokeColor, strokeOpacity, strokePosition);
