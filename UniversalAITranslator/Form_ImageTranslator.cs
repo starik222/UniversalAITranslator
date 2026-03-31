@@ -11,7 +11,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using UniversalAITranslator.Utils;
-using static UniversalAITranslator.Form_PreTranslator;
 
 namespace UniversalAITranslator
 {
@@ -42,6 +41,7 @@ namespace UniversalAITranslator
             dataGridViewTranslationData.Columns["Height"].Width = 50;
             RegisterFontSettingsChangedEvents();
             RegisterRectangleSettingsChangedEvents();
+            comboBoxGradientAngle.SelectedIndex = 0;
         }
 
         private void RegisterFontSettingsChangedEvents()
@@ -234,6 +234,10 @@ namespace UniversalAITranslator
                         rectLayer.Width = item.Width;
                         rectLayer.Height = item.Height;
                         rectLayer.Color = item.RectangleSettings.Color.ToHex();
+                        rectLayer.UseGradient = item.RectangleSettings.UseGradient;
+                        rectLayer.GradientStartColor = item.RectangleSettings.GradientStartColor.ToHex();
+                        rectLayer.GradientEndColor = item.RectangleSettings.GradientEndColor.ToHex();
+                        rectLayer.GradientAngle = item.RectangleSettings.GradientAngle;
                         rects.Add(rectLayer);
                     }
                 }
@@ -528,6 +532,10 @@ namespace UniversalAITranslator
             RectangleData data = new RectangleData();
             data.Visible = checkBoxIsRect.Checked;
             data.Color = buttonRectColor.BackColor;
+            data.UseGradient = checkBoxUseGradient.Checked;
+            data.GradientStartColor = buttonGrStartColor.BackColor;
+            data.GradientEndColor = buttonGrEndColor.BackColor;
+            data.GradientAngle = Convert.ToDouble(comboBoxGradientAngle.SelectedItem);
             return data;
         }
 
@@ -535,6 +543,10 @@ namespace UniversalAITranslator
         {
             checkBoxIsRect.Checked = data.Visible;
             buttonRectColor.BackColor = data.Color;
+            checkBoxUseGradient.Checked = data.UseGradient;
+            buttonGrStartColor.BackColor = data.GradientStartColor;
+            buttonGrEndColor.BackColor = data.GradientEndColor;
+            comboBoxGradientAngle.SelectedItem = (int)data.GradientAngle;
         }
 
         private void buttonRectColor_Click(object sender, EventArgs e)
@@ -555,8 +567,24 @@ namespace UniversalAITranslator
                 {
                     foreach (var textData in imageData.Value)
                     {
-                        Color bgColor = BackgroundColorDetector.GetBackgroundColor((Bitmap)img, new Rectangle((int)textData.X, (int)textData.Y, (int)textData.Width, (int)textData.Height), 3);
-                        textData.RectangleSettings.Color = bgColor;
+                        bool isGradient = BackgroundColorDetector.CheckIfGradientAndGetColors((Bitmap)img,
+                            new Rectangle((int)textData.X, (int)textData.Y, (int)textData.Width, (int)textData.Height),
+                            out Color topBg,
+                            out Color bottomBg,
+                            3,
+                            20,
+                            35);
+                        if (isGradient)
+                        {
+                            textData.RectangleSettings.UseGradient = true;
+                            textData.RectangleSettings.GradientStartColor = topBg;
+                            textData.RectangleSettings.GradientEndColor = bottomBg;
+                        }
+                        else
+                        {
+                            textData.RectangleSettings.UseGradient = false;
+                            textData.RectangleSettings.Color = topBg;
+                        }
                         textData.RectangleSettings.Visible = true;
                     }
                 }
@@ -580,6 +608,24 @@ namespace UniversalAITranslator
                 translationDatas.Remove(item);
                 dataSet[img].Remove(item);
             }
+        }
+
+        private void buttonGrStartColor_Click(object sender, EventArgs e)
+        {
+            ColorDialog colorDialog = new ColorDialog();
+            colorDialog.Color = buttonGrStartColor.BackColor;
+            if (colorDialog.ShowDialog() != DialogResult.OK)
+                return;
+            buttonGrStartColor.BackColor = colorDialog.Color;
+        }
+
+        private void buttonGrEndColor_Click(object sender, EventArgs e)
+        {
+            ColorDialog colorDialog = new ColorDialog();
+            colorDialog.Color = buttonGrEndColor.BackColor;
+            if (colorDialog.ShowDialog() != DialogResult.OK)
+                return;
+            buttonGrEndColor.BackColor = colorDialog.Color;
         }
     }
 }

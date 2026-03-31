@@ -41,6 +41,8 @@
             повторитьПереводДляИзображенияToolStripMenuItem = new ToolStripMenuItem();
             операцииToolStripMenuItem = new ToolStripMenuItem();
             автоматическиОбнаружитьЦветФонаToolStripMenuItem = new ToolStripMenuItem();
+            текстовыеДанныеToolStripMenuItem = new ToolStripMenuItem();
+            удалитьВыделенноеToolStripMenuItem = new ToolStripMenuItem();
             splitContainer1 = new SplitContainer();
             tabControl1 = new TabControl();
             tabPageFont = new TabPage();
@@ -65,6 +67,10 @@
             label6 = new Label();
             label3 = new Label();
             tabPageRectangle = new TabPage();
+            comboBoxGradientAngle = new ComboBox();
+            buttonGrEndColor = new Button();
+            buttonGrStartColor = new Button();
+            checkBoxUseGradient = new CheckBox();
             checkBoxIsRect = new CheckBox();
             buttonRectColor = new Button();
             tabPageGeneral = new TabPage();
@@ -77,8 +83,6 @@
             pictureBoxImage = new PictureBox();
             statusStrip1 = new StatusStrip();
             StatusLabel = new ToolStripStatusLabel();
-            текстовыеДанныеToolStripMenuItem = new ToolStripMenuItem();
-            удалитьВыделенноеToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
@@ -184,6 +188,20 @@
             автоматическиОбнаружитьЦветФонаToolStripMenuItem.Size = new Size(288, 22);
             автоматическиОбнаружитьЦветФонаToolStripMenuItem.Text = "Автоматически обнаружить цвет фона";
             автоматическиОбнаружитьЦветФонаToolStripMenuItem.Click += автоматическиОбнаружитьЦветФонаToolStripMenuItem_Click;
+            // 
+            // текстовыеДанныеToolStripMenuItem
+            // 
+            текстовыеДанныеToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { удалитьВыделенноеToolStripMenuItem });
+            текстовыеДанныеToolStripMenuItem.Name = "текстовыеДанныеToolStripMenuItem";
+            текстовыеДанныеToolStripMenuItem.Size = new Size(120, 20);
+            текстовыеДанныеToolStripMenuItem.Text = "Текстовые данные";
+            // 
+            // удалитьВыделенноеToolStripMenuItem
+            // 
+            удалитьВыделенноеToolStripMenuItem.Name = "удалитьВыделенноеToolStripMenuItem";
+            удалитьВыделенноеToolStripMenuItem.Size = new Size(188, 22);
+            удалитьВыделенноеToolStripMenuItem.Text = "Удалить выделенное";
+            удалитьВыделенноеToolStripMenuItem.Click += удалитьВыделенноеToolStripMenuItem_Click;
             // 
             // splitContainer1
             // 
@@ -433,6 +451,10 @@
             // 
             // tabPageRectangle
             // 
+            tabPageRectangle.Controls.Add(comboBoxGradientAngle);
+            tabPageRectangle.Controls.Add(buttonGrEndColor);
+            tabPageRectangle.Controls.Add(buttonGrStartColor);
+            tabPageRectangle.Controls.Add(checkBoxUseGradient);
             tabPageRectangle.Controls.Add(checkBoxIsRect);
             tabPageRectangle.Controls.Add(buttonRectColor);
             tabPageRectangle.Location = new Point(4, 24);
@@ -442,6 +464,46 @@
             tabPageRectangle.TabIndex = 1;
             tabPageRectangle.Text = "Прямоугольник";
             tabPageRectangle.UseVisualStyleBackColor = true;
+            // 
+            // comboBoxGradientAngle
+            // 
+            comboBoxGradientAngle.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboBoxGradientAngle.FormattingEnabled = true;
+            comboBoxGradientAngle.Items.AddRange(new object[] { "-90", "90", "-180", "180" });
+            comboBoxGradientAngle.Location = new Point(334, 35);
+            comboBoxGradientAngle.Name = "comboBoxGradientAngle";
+            comboBoxGradientAngle.Size = new Size(121, 23);
+            comboBoxGradientAngle.TabIndex = 6;
+            // 
+            // buttonGrEndColor
+            // 
+            buttonGrEndColor.BackColor = Color.Black;
+            buttonGrEndColor.Location = new Point(253, 35);
+            buttonGrEndColor.Name = "buttonGrEndColor";
+            buttonGrEndColor.Size = new Size(75, 23);
+            buttonGrEndColor.TabIndex = 5;
+            buttonGrEndColor.UseVisualStyleBackColor = false;
+            buttonGrEndColor.Click += buttonGrEndColor_Click;
+            // 
+            // buttonGrStartColor
+            // 
+            buttonGrStartColor.BackColor = Color.Black;
+            buttonGrStartColor.Location = new Point(172, 35);
+            buttonGrStartColor.Name = "buttonGrStartColor";
+            buttonGrStartColor.Size = new Size(75, 23);
+            buttonGrStartColor.TabIndex = 4;
+            buttonGrStartColor.UseVisualStyleBackColor = false;
+            buttonGrStartColor.Click += buttonGrStartColor_Click;
+            // 
+            // checkBoxUseGradient
+            // 
+            checkBoxUseGradient.AutoSize = true;
+            checkBoxUseGradient.Location = new Point(5, 38);
+            checkBoxUseGradient.Name = "checkBoxUseGradient";
+            checkBoxUseGradient.Size = new Size(155, 19);
+            checkBoxUseGradient.TabIndex = 3;
+            checkBoxUseGradient.Text = "Использовать градиент";
+            checkBoxUseGradient.UseVisualStyleBackColor = true;
             // 
             // checkBoxIsRect
             // 
@@ -565,20 +627,6 @@
             StatusLabel.Size = new Size(12, 17);
             StatusLabel.Text = "-";
             // 
-            // текстовыеДанныеToolStripMenuItem
-            // 
-            текстовыеДанныеToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { удалитьВыделенноеToolStripMenuItem });
-            текстовыеДанныеToolStripMenuItem.Name = "текстовыеДанныеToolStripMenuItem";
-            текстовыеДанныеToolStripMenuItem.Size = new Size(120, 20);
-            текстовыеДанныеToolStripMenuItem.Text = "Текстовые данные";
-            // 
-            // удалитьВыделенноеToolStripMenuItem
-            // 
-            удалитьВыделенноеToolStripMenuItem.Name = "удалитьВыделенноеToolStripMenuItem";
-            удалитьВыделенноеToolStripMenuItem.Size = new Size(188, 22);
-            удалитьВыделенноеToolStripMenuItem.Text = "Удалить выделенное";
-            удалитьВыделенноеToolStripMenuItem.Click += удалитьВыделенноеToolStripMenuItem_Click;
-            // 
             // Form_ImageTranslator
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -675,5 +723,9 @@
         private ToolStripMenuItem автоматическиОбнаружитьЦветФонаToolStripMenuItem;
         private ToolStripMenuItem текстовыеДанныеToolStripMenuItem;
         private ToolStripMenuItem удалитьВыделенноеToolStripMenuItem;
+        private ComboBox comboBoxGradientAngle;
+        private Button buttonGrEndColor;
+        private Button buttonGrStartColor;
+        private CheckBox checkBoxUseGradient;
     }
 }

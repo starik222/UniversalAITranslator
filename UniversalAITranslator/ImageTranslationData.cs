@@ -154,11 +154,20 @@ namespace UniversalAITranslator
     {
         public bool Visible { get; set; } = false;
         public Color Color { get; set; } = Color.Black;
+        public bool UseGradient { get; set; } = false; // Включить градиент
+        public Color GradientStartColor { get; set; } = Color.Black;
+        public Color GradientEndColor { get; set; } = Color.Black;
+        public double GradientAngle { get; set; } = -90.0; // -90 = сверху вниз по оси Y
 
         public void Update(RectangleData data)
         {
             Visible = data.Visible;
             Color = data.Color;
+            UseGradient = data.UseGradient;
+            GradientStartColor = data.GradientStartColor;
+            GradientEndColor = data.GradientEndColor;
+            GradientAngle = data.GradientAngle;
+
         }
 
         public RectangleData Clone()
@@ -166,6 +175,10 @@ namespace UniversalAITranslator
             RectangleData data = new RectangleData();
             data.Visible = Visible;
             data.Color = Color;
+            data.UseGradient = UseGradient;
+            data.GradientStartColor = GradientStartColor;
+            data.GradientEndColor = GradientEndColor;
+            data.GradientAngle = GradientAngle;
             return data;
         }
     }

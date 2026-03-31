@@ -1,8 +1,10 @@
-﻿using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
 
 namespace UniversalAITranslator.Utils
 {
-    // Класс для хранения данных о текстовом слое
     public class TextLayer
     {
         public string Text { get; set; }
@@ -10,35 +12,35 @@ namespace UniversalAITranslator.Utils
         public double Y { get; set; }
         public int FontSize { get; set; } = 24;
         public string FontName { get; set; } = "ArialMT";
-        public string Color { get; set; } = "000000"; // HEX цвет текста
+        public string Color { get; set; } = "000000";
 
-        // Параметры обводки
         public bool StrokeEnabled { get; set; } = false;
-        public int StrokeSize { get; set; } = 3; // пиксели
-        public string StrokeColor { get; set; } = "FFFFFF"; // HEX цвет обводки
-        public int StrokeOpacity { get; set; } = 100; // Видимость
-        public string StrokePosition { get; set; } = "outside"; // outside, inside, center
+        public int StrokeSize { get; set; } = 3;
+        public string StrokeColor { get; set; } = "FFFFFF";
+        public int StrokeOpacity { get; set; } = 100;
+        public string StrokePosition { get; set; } = "outside";
 
-        // Выравнивание текста (left, center, right)
         public string Justification { get; set; } = "center";
-
-        // Интерлиньяж (межстрочное расстояние). Если null — используется авто-интерлиньяж
         public double? Leading { get; set; } = null;
     }
 
-    // НОВОЕ: Класс для прямоугольников (подложек)
     public class RectangleLayer
     {
         public double X { get; set; }
         public double Y { get; set; }
         public double Width { get; set; }
         public double Height { get; set; }
-        public string Color { get; set; } = "FFFFFF"; // HEX цвет заливки
+
+        public string Color { get; set; } = "FFFFFF";
+
+        public bool UseGradient { get; set; } = false;
+        public string GradientStartColor { get; set; } = "FFFFFF";
+        public string GradientEndColor { get; set; } = "000000";
+        public double GradientAngle { get; set; } = -90.0;
     }
 
     public class ScriptGenerator
     {
-        // ОБНОВЛЕНО: добавлен параметр List<RectangleLayer> rectangleLayers
         public static string GenerateJSX(string imagePath, List<TextLayer> textLayers, List<RectangleLayer> rectangleLayers, string outputJsxPath, bool saveBMP, bool savePSD)
         {
             if (!File.Exists(imagePath))
@@ -52,10 +54,9 @@ namespace UniversalAITranslator.Utils
             jsx.AppendLine("// Автоматически сгенерированный скрипт для Adobe Photoshop");
             jsx.AppendLine("// Дата создания: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             jsx.AppendLine();
-            jsx.AppendLine("app.preferences.rulerUnits = Units.PIXELS; // Гарантируем работу в пикселях");
+            jsx.AppendLine("app.preferences.rulerUnits = Units.PIXELS;");
             jsx.AppendLine();
 
-            // Функция для создания текстового слоя
             jsx.AppendLine(@"function createTextLayer(doc, text, x, y, fontSize, fontName, hexColor, strokeEnabled, strokeSize, strokeColor, strokeOpacity, strokePosition, justification, leading) {
     var textLayer = doc.artLayers.add();
     textLayer.kind = LayerKind.TEXT;
@@ -91,92 +92,203 @@ namespace UniversalAITranslator.Utils
         for (var i = 0; i < app.fonts.length; i++) {
             if (app.fonts[i].postScriptName == fontName || app.fonts[i].name == fontName) {
                 textItem.font = app.fonts[i].postScriptName;
-                fontFound = true;
-                break;
+                fontFound = true; break;
             }
         }
-        if (!fontFound) {
-            textItem.font = 'ArialMT';
-        }
-    } catch(e) {
-        textItem.font = 'ArialMT';
-    }
+        if (!fontFound) textItem.font = 'ArialMT';
+    } catch(e) { textItem.font = 'ArialMT'; }
     
+    hexColor = hexColor.replace('#', '');
     var color = new SolidColor();
     color.rgb.hexValue = hexColor;
     textItem.color = color;
     
     textLayer.name = text.substring(0, Math.min(text.length, 30));
 
-    // НОВОЕ: Вертикальное центрирование на основе визуальных границ (Bounding Box)
     if (text !== '') {
         try {
-            // Получаем физические границы отрисованного текста [left, top, right, bottom]
             var bounds = textLayer.bounds; 
             var top = bounds[1].value;
             var bottom = bounds[3].value;
-            
-            // Вычисляем текущий визуальный центр текста по оси Y
             var textCenterY = (top + bottom) / 2;
-            
-            // Вычисляем, на сколько пикселей нужно сдвинуть слой, чтобы он совпал с переданным y
             var offsetY = y - textCenterY;
-            
-            // Сдвигаем слой (X не трогаем, Y сдвигаем)
-            if (offsetY !== 0) {
-                textLayer.translate(0, offsetY);
-            }
-        } catch(e) {
-            // Игнорируем ошибку (например, если текст состоит только из пробелов)
-        }
+            if (offsetY !== 0) textLayer.translate(0, offsetY);
+        } catch(e) {}
     }
     
-    if (strokeEnabled) {
-        applyStroke(textLayer, strokeSize, strokeColor, strokeOpacity, strokePosition);
-    }
+    if (strokeEnabled) applyStroke(textLayer, strokeSize, strokeColor, strokeOpacity, strokePosition);
     
     return textLayer;
 }
 
-// НОВОЕ: Функция для создания прямоугольника
-function createRectangleLayer(doc, x, y, width, height, hexColor) {
+function createRectangleLayer(doc, x, y, width, height, hexColor, useGradient, gradStart, gradEnd, gradAngle) {
     var rectLayer = doc.artLayers.add();
     rectLayer.kind = LayerKind.NORMAL;
     rectLayer.name = 'Rectangle Background';
 
-    // Создаем прямоугольное выделение
-    var shape = [
-        [x, y],
-        [x + width, y],[x + width, y + height],
-        [x, y + height]
-    ];
-    
+    var shape = [ [x, y], [x + width, y], [x + width, y + height], [x, y + height] ];
     doc.selection.select(shape);
 
-    // Конвертируем HEX цвет заливки
+    hexColor = hexColor.replace('#', '');
     var fillColor = new SolidColor();
     fillColor.rgb.hexValue = hexColor;
 
-    // Выполняем заливку и снимаем выделение (без обводки по умолчанию)
     doc.selection.fill(fillColor);
     doc.selection.deselect();
     
+    if (useGradient) {
+        applyGradientOverlay(rectLayer, gradStart, gradEnd, gradAngle);
+    }
+    
     return rectLayer;
+}
+
+// ПЕРЕПИСАННАЯ ФУНКЦИЯ: Точная структура ActionManager (исправлен баг с типами данных)
+function applyGradientOverlay(layer, hex1, hex2, angle) {
+    app.activeDocument.activeLayer = layer;
+    
+    hex1 = hex1.replace('#', '');
+    hex2 = hex2.replace('#', '');
+    
+    var r1 = parseInt(hex1.substring(0, 2), 16) || 0;
+    var g1 = parseInt(hex1.substring(2, 4), 16) || 0;
+    var b1 = parseInt(hex1.substring(4, 6), 16) || 0;
+    
+    var r2 = parseInt(hex2.substring(0, 2), 16) || 0;
+    var g2 = parseInt(hex2.substring(2, 4), 16) || 0;
+    var b2 = parseInt(hex2.substring(4, 6), 16) || 0;
+
+    var idsetd = charIDToTypeID( 'setd' );
+    var desc1 = new ActionDescriptor();
+    var idnull = charIDToTypeID( 'null' );
+    var ref1 = new ActionReference();
+    var idPrpr = charIDToTypeID( 'Prpr' );
+    var idLefx = charIDToTypeID( 'Lefx' );
+    ref1.putProperty( idPrpr, idLefx );
+    var idLyr = charIDToTypeID( 'Lyr ' );
+    var idOrdn = charIDToTypeID( 'Ordn' );
+    var idTrgt = charIDToTypeID( 'Trgt' );
+    ref1.putEnumerated( idLyr, idOrdn, idTrgt );
+    desc1.putReference( idnull, ref1 );
+    
+    var idT = charIDToTypeID( 'T   ' );
+    var desc2 = new ActionDescriptor();
+    var idScl = charIDToTypeID( 'Scl ' );
+    var idPrc = charIDToTypeID( '#Prc' );
+    desc2.putUnitDouble( idScl, idPrc, 100.0 );
+    
+    var idGrFl = charIDToTypeID( 'GrFl' );
+    var desc3 = new ActionDescriptor();
+    var idenab = charIDToTypeID( 'enab' );
+    desc3.putBoolean( idenab, true );
+    var idMd = charIDToTypeID( 'Md  ' );
+    var idBlnM = charIDToTypeID( 'BlnM' );
+    var idNrml = charIDToTypeID( 'Nrml' );
+    desc3.putEnumerated( idMd, idBlnM, idNrml );
+    var idOpct = charIDToTypeID( 'Opct' );
+    desc3.putUnitDouble( idOpct, idPrc, 100.0 );
+    
+    var idGrad = charIDToTypeID( 'Grad' );
+    var desc4 = new ActionDescriptor();
+    var idNm = charIDToTypeID( 'Nm  ' );
+    desc4.putString( idNm, 'Custom Gradient' );
+    var idGrdF = charIDToTypeID( 'GrdF' );
+    var idCstS = charIDToTypeID( 'CstS' );
+    desc4.putEnumerated( idGrdF, idGrdF, idCstS );
+    var idIntr = charIDToTypeID( 'Intr' );
+    desc4.putDouble( idIntr, 4096.0 );
+    
+    var idClrs = charIDToTypeID( 'Clrs' );
+    var list1 = new ActionList();
+    
+    // --- ПЕРВЫЙ ЦВЕТ ---
+    var desc5 = new ActionDescriptor();
+    var idType = charIDToTypeID( 'Type' );
+    var idClry = charIDToTypeID( 'Clry' );
+    var idUsrS = charIDToTypeID( 'UsrS' );
+    // ИСПРАВЛЕНИЕ ТУТ: Photoshop требует Enumerated (UsrS), а не Integer
+    desc5.putEnumerated( idType, idClry, idUsrS ); 
+    var idLctn = charIDToTypeID( 'Lctn' );
+    desc5.putInteger( idLctn, 0 );
+    var idMdpn = charIDToTypeID( 'Mdpn' );
+    desc5.putInteger( idMdpn, 50 );
+    var idClr = charIDToTypeID( 'Clr ' );
+    var desc6 = new ActionDescriptor();
+    var idRd = charIDToTypeID( 'Rd  ' );
+    desc6.putDouble( idRd, r1 );
+    var idGrn = charIDToTypeID( 'Grn ' );
+    desc6.putDouble( idGrn, g1 );
+    var idBl = charIDToTypeID( 'Bl  ' );
+    desc6.putDouble( idBl, b1 );
+    var idRGBC = charIDToTypeID( 'RGBC' );
+    desc5.putObject( idClr, idRGBC, desc6 );
+    var idClrt = charIDToTypeID( 'Clrt' );
+    list1.putObject( idClrt, desc5 );
+    
+    // --- ВТОРОЙ ЦВЕТ ---
+    var desc7 = new ActionDescriptor();
+    desc7.putEnumerated( idType, idClry, idUsrS ); // ИСПРАВЛЕНИЕ ТУТ
+    desc7.putInteger( idLctn, 4096 );
+    desc7.putInteger( idMdpn, 50 );
+    var desc8 = new ActionDescriptor();
+    desc8.putDouble( idRd, r2 );
+    desc8.putDouble( idGrn, g2 );
+    desc8.putDouble( idBl, b2 );
+    desc7.putObject( idClr, idRGBC, desc8 );
+    list1.putObject( idClrt, desc7 );
+    
+    desc4.putList( idClrs, list1 );
+    
+    var idTrns = charIDToTypeID( 'Trns' );
+    var list2 = new ActionList();
+    
+    // Прозрачность 1
+    var desc9 = new ActionDescriptor();
+    desc9.putUnitDouble( idOpct, idPrc, 100.0 );
+    desc9.putInteger( idLctn, 0 );
+    desc9.putInteger( idMdpn, 50 );
+    var idTrnS = charIDToTypeID( 'TrnS' );
+    list2.putObject( idTrnS, desc9 );
+    
+    // Прозрачность 2
+    var desc10 = new ActionDescriptor();
+    desc10.putUnitDouble( idOpct, idPrc, 100.0 );
+    desc10.putInteger( idLctn, 4096 );
+    desc10.putInteger( idMdpn, 50 );
+    list2.putObject( idTrnS, desc10 );
+    
+    desc4.putList( idTrns, list2 );
+    
+    var idGrdn = charIDToTypeID( 'Grdn' );
+    desc3.putObject( idGrad, idGrdn, desc4 );
+    
+    var idAngl = charIDToTypeID( 'Angl' );
+    var idAng = charIDToTypeID( '#Ang' );
+    desc3.putUnitDouble( idAngl, idAng, angle );
+    
+    var idGrdT = charIDToTypeID( 'GrdT' );
+    var idLnr = charIDToTypeID( 'Lnr ' );
+    desc3.putEnumerated( idType, idGrdT, idLnr );
+    
+    desc2.putObject( idGrFl, idGrFl, desc3 );
+    desc1.putObject( idT, idLefx, desc2 );
+    
+    executeAction( idsetd, desc1, DialogModes.NO );
 }
 
 function applyStroke(layer, size, hexColor, opacity, position) {
     app.activeDocument.activeLayer = layer;
     
-    var r = parseInt(hexColor.substring(0, 2), 16);
-    var g = parseInt(hexColor.substring(2, 4), 16);
-    var b = parseInt(hexColor.substring(4, 6), 16);
+    hexColor = hexColor.replace('#', '');
+    var r = parseInt(hexColor.substring(0, 2), 16) || 0;
+    var g = parseInt(hexColor.substring(2, 4), 16) || 0;
+    var b = parseInt(hexColor.substring(4, 6), 16) || 0;
 
     var strokeStyle;
     switch(position.toLowerCase()) {
         case 'inside': strokeStyle = 'InsF'; break;
         case 'center': strokeStyle = 'CtrF'; break;
-        case 'outside':
-        default: strokeStyle = 'OutF'; break;
+        case 'outside': default: strokeStyle = 'OutF'; break;
     }
     
     try {
@@ -185,7 +297,10 @@ function applyStroke(layer, size, hexColor, opacity, position) {
         ref190.putProperty( charIDToTypeID( 'Prpr' ), charIDToTypeID( 'Lefx' ) );
         ref190.putEnumerated( charIDToTypeID( 'Lyr ' ), charIDToTypeID( 'Ordn' ), charIDToTypeID( 'Trgt' ) );
         desc.putReference( charIDToTypeID( 'null' ), ref190 );
+        
         var fxDesc = new ActionDescriptor();
+        fxDesc.putUnitDouble(charIDToTypeID('Scl '), charIDToTypeID('#Prc'), 100.0);
+        
         var fxPropDesc = new ActionDescriptor();
         fxPropDesc.putBoolean( charIDToTypeID( 'enab' ), true );
         fxPropDesc.putBoolean( stringIDToTypeID( 'present' ), true );
@@ -195,23 +310,18 @@ function applyStroke(layer, size, hexColor, opacity, position) {
         fxPropDesc.putEnumerated( charIDToTypeID( 'Md  ' ), charIDToTypeID( 'BlnM' ), charIDToTypeID( 'Nrml' ) );
         fxPropDesc.putUnitDouble( charIDToTypeID( 'Opct' ), charIDToTypeID( '#Prc' ), opacity );
         fxPropDesc.putUnitDouble( charIDToTypeID( 'Sz  ' ), charIDToTypeID( '#Pxl') , size );
+        
         var colorDesc = new ActionDescriptor();
         colorDesc.putDouble( charIDToTypeID( 'Rd  ' ), r);
         colorDesc.putDouble( charIDToTypeID( 'Grn ' ), g );
         colorDesc.putDouble( charIDToTypeID( 'Bl  ' ), b );
+        
         fxPropDesc.putObject( charIDToTypeID( 'Clr ' ), charIDToTypeID( 'RGBC' ), colorDesc );
-        fxPropDesc.putBoolean( stringIDToTypeID( 'overprint' ), false );
         fxDesc.putObject( charIDToTypeID( 'FrFX' ), charIDToTypeID( 'FrFX' ), fxPropDesc );
         desc.putObject( charIDToTypeID( 'T   ' ), charIDToTypeID( 'Lefx' ), fxDesc );
+        
         executeAction( charIDToTypeID( 'setd' ), desc, DialogModes.NO );
-    } catch(e) {
-        try {
-            var desc = new ActionDescriptor();
-            desc.putInteger(stringIDToTypeID('strokeSize'), size);
-            desc.putString(stringIDToTypeID('strokeColor'), hexColor);
-            executeAction(stringIDToTypeID('applyStroke'), desc, DialogModes.NO);
-        } catch(e2) {}
-    }
+    } catch(e) { }
 }
 ");
 
@@ -226,7 +336,6 @@ function applyStroke(layer, size, hexColor, opacity, position) {
             jsx.AppendLine("        var doc = app.open(imageFile);");
             jsx.AppendLine("        ");
 
-            // НОВОЕ: СНАЧАЛА создаем прямоугольники (чтобы они оказались внизу, под текстом)
             if (rectangleLayers != null && rectangleLayers.Count > 0)
             {
                 jsx.AppendLine("        // Создаем слои с прямоугольниками (подложки)");
@@ -238,12 +347,15 @@ function applyStroke(layer, size, hexColor, opacity, position) {
                         $"{rect.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)}, " +
                         $"{rect.Width.ToString(System.Globalization.CultureInfo.InvariantCulture)}, " +
                         $"{rect.Height.ToString(System.Globalization.CultureInfo.InvariantCulture)}, " +
-                        $"\"{rect.Color}\");");
+                        $"\"{rect.Color}\", " +
+                        $"{rect.UseGradient.ToString().ToLower()}, " +
+                        $"\"{rect.GradientStartColor}\", " +
+                        $"\"{rect.GradientEndColor}\", " +
+                        $"{rect.GradientAngle.ToString(System.Globalization.CultureInfo.InvariantCulture)});");
                 }
                 jsx.AppendLine("        ");
             }
 
-            // ЗАТЕМ создаем текстовые слои
             if (textLayers != null && textLayers.Count > 0)
             {
                 jsx.AppendLine("        // Создаем текстовые слои (они будут поверх прямоугольников)");
@@ -268,7 +380,6 @@ function applyStroke(layer, size, hexColor, opacity, position) {
                 }
             }
 
-            // Логика сохранения
             if (savePSD)
             {
                 string psdPath = Path.ChangeExtension(imagePath, ".psd").Replace("\\", "/");

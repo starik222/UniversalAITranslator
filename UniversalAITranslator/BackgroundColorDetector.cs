@@ -5,56 +5,118 @@ using System.Linq;
 
 namespace UniversalAITranslator
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Drawing;
+    using System.Linq;
+
     public class BackgroundColorDetector
     {
         /// <summary>
-        /// Определяет цвет фона внутри указанных координат путем анализа периметра.
+        /// Определяет общий цвет фона внутри указанных координат путем анализа всего периметра.
         /// </summary>
-        /// <param name="image">Исходное изображение</param>
-        /// <param name="bounds">Координаты текста</param>
-        /// <param name="padding">Отступ наружу от границ текста (рекомендуется 1-2, если текст касается краев)</param>
-        /// <param name="colorTolerance">Допуск схожести цветов (0-255). Обычно 15-30 достаточно для JPEG.</param>
-        /// <returns>Преобладающий цвет фона</returns>
         public static Color GetBackgroundColor(Bitmap image, Rectangle bounds, int padding = 1, int colorTolerance = 20)
         {
-            // 1. Расширяем рамку на величину padding и проверяем, чтобы не выйти за края картинки
             int left = Math.Max(0, bounds.Left - padding);
             int top = Math.Max(0, bounds.Top - padding);
             int right = Math.Min(image.Width - 1, bounds.Right + padding);
             int bottom = Math.Min(image.Height - 1, bounds.Bottom + padding);
 
-            List<Color> perimeterColors = new List<Color>();
+            List<Color> perimeterPixels = new List<Color>();
 
-            // 2. Собираем пиксели по верхней и нижней границе
+            // Собираем пиксели по всему периметру
             for (int x = left; x <= right; x++)
             {
-                perimeterColors.Add(image.GetPixel(x, top));
-                if (top != bottom)
-                    perimeterColors.Add(image.GetPixel(x, bottom));
+                perimeterPixels.Add(image.GetPixel(x, top));
+                if (top != bottom) perimeterPixels.Add(image.GetPixel(x, bottom));
             }
-
-            // 3. Собираем пиксели по левой и правой границе (исключая углы, которые уже взяли)
             for (int y = top + 1; y < bottom; y++)
             {
-                perimeterColors.Add(image.GetPixel(left, y));
-                if (left != right)
-                    perimeterColors.Add(image.GetPixel(right, y));
+                perimeterPixels.Add(image.GetPixel(left, y));
+                if (left != right) perimeterPixels.Add(image.GetPixel(right, y));
             }
 
-            if (perimeterColors.Count == 0) return Color.White; // Фолбэк
+            return GetDominantColor(perimeterPixels, colorTolerance);
+        }
 
-            // 4. Группируем похожие цвета (Кластеризация)
+        /// <summary>
+        /// Возвращает цвета фона раздельно для верхней и нижней границы текста.
+        /// </summary>
+        public static (Color TopColor, Color BottomColor) GetTopAndBottomColors(Bitmap image, Rectangle bounds, int padding = 1, int colorTolerance = 20)
+        {
+            int left = Math.Max(0, bounds.Left - padding);
+            int top = Math.Max(0, bounds.Top - padding);
+            int right = Math.Min(image.Width - 1, bounds.Right + padding);
+            int bottom = Math.Min(image.Height - 1, bounds.Bottom + padding);
+
+            List<Color> topPixels = new List<Color>();
+            List<Color> bottomPixels = new List<Color>();
+
+            // Собираем пиксели только с верхней и нижней линии
+            for (int x = left; x <= right; x++)
+            {
+                topPixels.Add(image.GetPixel(x, top));
+                if (top != bottom)
+                    bottomPixels.Add(image.GetPixel(x, bottom));
+            }
+
+            Color topColor = GetDominantColor(topPixels, colorTolerance);
+            Color bottomColor = GetDominantColor(bottomPixels, colorTolerance); // Если высота 1px, вернет белый, но это краевой случай
+
+            // Если высота рамки 1 пиксель, нижний цвет приравниваем к верхнему
+            if (top == bottom) bottomColor = topColor;
+
+            return (topColor, bottomColor);
+        }
+
+        /// <summary>
+        /// Определяет, является ли фон вертикальным градиентом, сравнивая верхний и нижний цвета.
+        /// </summary>
+        /// <param name="gradientThreshold">Порог разницы цветов (обычно 30-50). Чем больше, тем сильнее должны отличаться цвета.</param>
+        public static bool IsVerticalGradient(Color topColor, Color bottomColor, int gradientThreshold = 30)
+        {
+            // Вычисляем евклидово расстояние между двумя цветами
+            int rDiff = topColor.R - bottomColor.R;
+            int gDiff = topColor.G - bottomColor.G;
+            int bDiff = topColor.B - bottomColor.B;
+
+            double distance = Math.Sqrt((rDiff * rDiff) + (gDiff * gDiff) + (bDiff * bDiff));
+
+            // Если расстояние больше порога - это градиент
+            return distance > gradientThreshold;
+        }
+
+        /// <summary>
+        /// Комплексный метод: получает цвета верха/низа и сразу определяет, градиент ли это.
+        /// </summary>
+        public static bool CheckIfGradientAndGetColors(Bitmap image, Rectangle bounds, out Color topColor, out Color bottomColor, int padding = 1, int colorTolerance = 20, int gradientThreshold = 30)
+        {
+            var colors = GetTopAndBottomColors(image, bounds, padding, colorTolerance);
+            topColor = colors.TopColor;
+            bottomColor = colors.BottomColor;
+
+            return IsVerticalGradient(topColor, bottomColor, gradientThreshold);
+        }
+
+        // --- Приватный вспомогательный функционал ---
+
+        /// <summary>
+        /// Кластеризует пиксели и находит усредненный цвет самой большой группы
+        /// </summary>
+        private static Color GetDominantColor(IEnumerable<Color> pixels, int colorTolerance)
+        {
+            if (!pixels.Any()) return Color.White;
+
             List<ColorGroup> groups = new List<ColorGroup>();
-            int toleranceSquared = colorTolerance * colorTolerance * 3; // Ускоренное вычисление дистанции
+            int toleranceSquared = colorTolerance * colorTolerance * 3;
 
-            foreach (Color color in perimeterColors)
+            foreach (Color color in pixels)
             {
                 bool addedToGroup = false;
                 foreach (var group in groups)
                 {
                     Color avgColor = group.GetAverageColor();
 
-                    // Вычисляем квадрат евклидова расстояния между цветами
                     int rDiff = color.R - avgColor.R;
                     int gDiff = color.G - avgColor.G;
                     int bDiff = color.B - avgColor.B;
@@ -74,13 +136,10 @@ namespace UniversalAITranslator
                 }
             }
 
-            // 5. Находим группу с наибольшим количеством пикселей (самый частый цвет)
             var dominantGroup = groups.OrderByDescending(g => g.Count).First();
-
             return dominantGroup.GetAverageColor();
         }
 
-        // Вспомогательный класс для накопления и усреднения похожих цветов
         private class ColorGroup
         {
             public int Count { get; private set; }
