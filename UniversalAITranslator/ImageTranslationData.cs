@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -16,7 +17,7 @@ namespace UniversalAITranslator
         public BindingImageTranslationData CreateBinding(int imageWidth, int imageHeight)
         {
             var rect = Coordinates.ToRectangle(imageWidth, imageHeight);
-            BindingImageTranslationData result = new BindingImageTranslationData(this, imageWidth, imageHeight);
+            BindingImageTranslationData result = new BindingImageTranslationData(imageWidth, imageHeight);
             result.OriginalText = OriginalText;
             result.TranslatedText = TranslatedText;
             result.X = rect.X;
@@ -39,7 +40,7 @@ namespace UniversalAITranslator
                 }
             }
             var rect = Coordinates.ToRectangle(width, height);
-            BindingImageTranslationData result = new BindingImageTranslationData(this, width, height);
+            BindingImageTranslationData result = new BindingImageTranslationData(width, height);
             result.OriginalText = OriginalText;
             result.TranslatedText = TranslatedText;
             result.X = rect.X;
@@ -76,32 +77,96 @@ namespace UniversalAITranslator
         public float Y { get; set; }
         public float Width { get; set; }
         public float Height { get; set; }
+        [Browsable(false)]
+        public int ImageWidth { get; set; }
+        [Browsable(false)]
+        public int ImageHeight { get; set; }
+        [Browsable(false)]
+        public TextFontData FontSettings { get; set; }
+        [Browsable(false)]
+        public RectangleData RectangleSettings { get; set; }
 
-        private int imgWidth;
-        private int imgHeight;
-
-        private ImageTranslationData originalData;
-
-        public BindingImageTranslationData(ImageTranslationData origData, int imageWidth, int imageHeight)
+        public BindingImageTranslationData(int imageWidth, int imageHeight)
         {
-            originalData = origData;
-            imgHeight = imageHeight;
-            imgWidth = imageWidth;
-        }
-
-        public void UpdateOriginal()
-        {
-            originalData.OriginalText = OriginalText;
-            originalData.TranslatedText = TranslatedText;
-            originalData.Coordinates.X = (int)Math.Round(((X * 1000f) / imgWidth));
-            originalData.Coordinates.Y = (int)Math.Round((Y * 1000f) / imgHeight);
-            originalData.Coordinates.Width = (int)Math.Round((Width * 1000f) / imgWidth);
-            originalData.Coordinates.Height = (int)Math.Round((Height * 1000f) / imgHeight);
+            ImageHeight = imageHeight;
+            ImageWidth = imageWidth;
+            FontSettings = new TextFontData();
+            RectangleSettings = new RectangleData();
         }
 
         public Size GetImageSize()
         {
-            return new Size(imgWidth, imgHeight);
+            return new Size(ImageWidth, ImageHeight);
+        }
+    }
+
+    public class TextFontData
+    {
+        public string FontName { get; set; } = "Franklin Gothic Medium Cond";
+        public int FontSize { get; set; } = 18;
+        public Color Color { get; set; } = Color.White;
+        public bool StrokeEnabled { get; set; } = false;
+        public int StrokeSize { get; set; } = 3; // пиксели
+        public Color StrokeColor { get; set; } = Color.Black; // HEX цвет обводки
+        public int StrokeOpacity { get; set; } = 100; // Видимость
+        public string StrokePosition { get; set; } = "outside"; // outside, inside, center
+        // Выравнивание текста (left, center, right)
+        public string Justification { get; set; } = "center";
+        // Интерлиньяж (межстрочное расстояние). Если null — используется авто-интерлиньяж
+        public double? Leading { get; set; } = 12;
+        public bool CenterOnX { get; set; } = false;
+        public bool CenterOnY { get; set; } = false;
+
+        public void Update(TextFontData data)
+        {
+            FontName = data.FontName;
+            FontSize = data.FontSize;
+            Color = data.Color;
+            StrokeEnabled = data.StrokeEnabled;
+            StrokeColor = data.StrokeColor;
+            StrokeOpacity = data.StrokeOpacity;
+            StrokePosition = data.StrokePosition;
+            Justification = data.Justification;
+            Leading = data.Leading;
+            CenterOnX = data.CenterOnX;
+            CenterOnY = data.CenterOnY;
+        }
+
+        public TextFontData Clone()
+        {
+            TextFontData data = new TextFontData();
+            data.FontName = FontName;
+            data.FontSize = FontSize;
+            data.Color = Color;
+            data.StrokeEnabled = StrokeEnabled;
+            data.StrokeColor = StrokeColor;
+            data.StrokeOpacity = StrokeOpacity;
+            data.StrokePosition = StrokePosition;
+            data.Justification = Justification;
+            data.Leading = Leading;
+            data.CenterOnX = CenterOnX;
+            data.CenterOnY = CenterOnY;
+            return data;
+        }
+    }
+
+    public class RectangleData
+    {
+        public bool Visible { get; set; } = false;
+        public Color Color { get; set; } = Color.Black;
+
+        public void Update(RectangleData data)
+        {
+            Visible = data.Visible;
+            Color = data.Color;
+        }
+
+        public RectangleData Clone()
+        {
+            RectangleData data = new RectangleData();
+            data.Visible = Visible;
+            data.Color = Color;
+            return data;
         }
     }
 }

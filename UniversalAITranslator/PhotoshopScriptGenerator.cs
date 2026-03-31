@@ -19,16 +19,27 @@ namespace UniversalAITranslator.Utils
         public int StrokeOpacity { get; set; } = 100; // Видимость
         public string StrokePosition { get; set; } = "outside"; // outside, inside, center
 
-        // НОВОЕ: Выравнивание текста (left, center, right)
+        // Выравнивание текста (left, center, right)
         public string Justification { get; set; } = "center";
 
-        // НОВОЕ: Интерлиньяж (межстрочное расстояние). Если null — используется авто-интерлиньяж
+        // Интерлиньяж (межстрочное расстояние). Если null — используется авто-интерлиньяж
         public double? Leading { get; set; } = null;
+    }
+
+    // НОВОЕ: Класс для прямоугольников (подложек)
+    public class RectangleLayer
+    {
+        public double X { get; set; }
+        public double Y { get; set; }
+        public double Width { get; set; }
+        public double Height { get; set; }
+        public string Color { get; set; } = "FFFFFF"; // HEX цвет заливки
     }
 
     public class ScriptGenerator
     {
-        public static string GenerateJSX(string imagePath, List<TextLayer> textLayers, string outputJsxPath, bool saveBMP, bool savePSD)
+        // ОБНОВЛЕНО: добавлен параметр List<RectangleLayer> rectangleLayers
+        public static string GenerateJSX(string imagePath, List<TextLayer> textLayers, List<RectangleLayer> rectangleLayers, string outputJsxPath, bool saveBMP, bool savePSD)
         {
             if (!File.Exists(imagePath))
             {
@@ -41,10 +52,11 @@ namespace UniversalAITranslator.Utils
             jsx.AppendLine("// Автоматически сгенерированный скрипт для Adobe Photoshop");
             jsx.AppendLine("// Дата создания: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             jsx.AppendLine();
+            jsx.AppendLine("app.preferences.rulerUnits = Units.PIXELS; // Гарантируем работу в пикселях");
+            jsx.AppendLine();
 
-            // Функция для создания текстового слоя с обводкой и выравниванием
-            jsx.AppendLine(@"// Функция для создания текстового слоя
-function createTextLayer(doc, text, x, y, fontSize, fontName, hexColor, strokeEnabled, strokeSize, strokeColor, strokeOpacity, strokePosition, justification, leading) {
+            // Функция для создания текстового слоя
+            jsx.AppendLine(@"function createTextLayer(doc, text, x, y, fontSize, fontName, hexColor, strokeEnabled, strokeSize, strokeColor, strokeOpacity, strokePosition, justification, leading) {
     var textLayer = doc.artLayers.add();
     textLayer.kind = LayerKind.TEXT;
     
@@ -52,7 +64,6 @@ function createTextLayer(doc, text, x, y, fontSize, fontName, hexColor, strokeEn
     textItem.contents = text;
     textItem.size = fontSize;
 
-    // НОВОЕ: Установка интерлиньяжа (межстрочного расстояния)
     if (leading !== null && leading !== undefined) {
         textItem.useAutoLeading = false;
         textItem.leading = leading;
@@ -60,7 +71,6 @@ function createTextLayer(doc, text, x, y, fontSize, fontName, hexColor, strokeEn
         textItem.useAutoLeading = true;
     }
     
-    // Установка выравнивания текста
     switch(justification.toLowerCase()) {
         case 'left':
             textItem.justification = Justification.LEFT;
@@ -74,10 +84,8 @@ function createTextLayer(doc, text, x, y, fontSize, fontName, hexColor, strokeEn
             break;
     }
     
-    // Установка позиции (для центрированного текста x будет центральной точкой)
     textItem.position = [x, y];
     
-    // Установка шрифта с проверкой
     try {
         var fontFound = false;
         for (var i = 0; i < app.fonts.length; i++) {
@@ -94,14 +102,12 @@ function createTextLayer(doc, text, x, y, fontSize, fontName, hexColor, strokeEn
         textItem.font = 'ArialMT';
     }
     
-    // Установка цвета текста
     var color = new SolidColor();
     color.rgb.hexValue = hexColor;
     textItem.color = color;
     
     textLayer.name = text.substring(0, Math.min(text.length, 30));
     
-    // Применение обводки если включена
     if (strokeEnabled) {
         applyStroke(textLayer, strokeSize, strokeColor, strokeOpacity, strokePosition);
     }
@@ -109,32 +115,48 @@ function createTextLayer(doc, text, x, y, fontSize, fontName, hexColor, strokeEn
     return textLayer;
 }
 
-// Функция для применения обводки к слою
+// НОВОЕ: Функция для создания прямоугольника
+function createRectangleLayer(doc, x, y, width, height, hexColor) {
+    var rectLayer = doc.artLayers.add();
+    rectLayer.kind = LayerKind.NORMAL;
+    rectLayer.name = 'Rectangle Background';
+
+    // Создаем прямоугольное выделение
+    var shape = [
+        [x, y],
+        [x + width, y],[x + width, y + height],
+        [x, y + height]
+    ];
+    
+    doc.selection.select(shape);
+
+    // Конвертируем HEX цвет заливки
+    var fillColor = new SolidColor();
+    fillColor.rgb.hexValue = hexColor;
+
+    // Выполняем заливку и снимаем выделение (без обводки по умолчанию)
+    doc.selection.fill(fillColor);
+    doc.selection.deselect();
+    
+    return rectLayer;
+}
+
 function applyStroke(layer, size, hexColor, opacity, position) {
-    // Делаем слой активным
     app.activeDocument.activeLayer = layer;
     
-    // Конвертируем HEX в RGB
     var r = parseInt(hexColor.substring(0, 2), 16);
     var g = parseInt(hexColor.substring(2, 4), 16);
     var b = parseInt(hexColor.substring(4, 6), 16);
 
     var strokeStyle;
     switch(position.toLowerCase()) {
-        case 'inside':
-            strokeStyle = 'InsF'; // InsetFrame для внутренней обводки
-            break;
-        case 'center':
-            strokeStyle = 'CtrF'; // CenteredFrame для центральной обводки
-            break;
+        case 'inside': strokeStyle = 'InsF'; break;
+        case 'center': strokeStyle = 'CtrF'; break;
         case 'outside':
-        default:
-            strokeStyle = 'OutF'; // OutsetFrame для внешней обводки
-            break;
+        default: strokeStyle = 'OutF'; break;
     }
     
     try {
-        // Создаем дескриптор для эффекта обводки
         var desc = new ActionDescriptor();
         var ref190 = new ActionReference();
         ref190.putProperty( charIDToTypeID( 'Prpr' ), charIDToTypeID( 'Lefx' ) );
@@ -160,15 +182,12 @@ function applyStroke(layer, size, hexColor, opacity, position) {
         desc.putObject( charIDToTypeID( 'T   ' ), charIDToTypeID( 'Lefx' ), fxDesc );
         executeAction( charIDToTypeID( 'setd' ), desc, DialogModes.NO );
     } catch(e) {
-        // Альтернативный метод через Layer Style
         try {
             var desc = new ActionDescriptor();
             desc.putInteger(stringIDToTypeID('strokeSize'), size);
             desc.putString(stringIDToTypeID('strokeColor'), hexColor);
             executeAction(stringIDToTypeID('applyStroke'), desc, DialogModes.NO);
-        } catch(e2) {
-            // Игнорируем ошибку, если не удалось применить обводку
-        }
+        } catch(e2) {}
     }
 }
 ");
@@ -183,29 +202,50 @@ function applyStroke(layer, size, hexColor, opacity, position) {
             jsx.AppendLine("    } else {");
             jsx.AppendLine("        var doc = app.open(imageFile);");
             jsx.AppendLine("        ");
-            jsx.AppendLine("        // Создаем текстовые слои");
 
-            // Добавляем каждый текстовый слой
-            for (int i = 0; i < textLayers.Count; i++)
+            // НОВОЕ: СНАЧАЛА создаем прямоугольники (чтобы они оказались внизу, под текстом)
+            if (rectangleLayers != null && rectangleLayers.Count > 0)
             {
-                var layer = textLayers[i];
-                string leadingValue = layer.Leading.HasValue ? layer.Leading.Value.ToString(System.Globalization.CultureInfo.InvariantCulture): "null";
-                jsx.AppendLine($"        createTextLayer(doc, \"{EscapeJSString(layer.Text)}\", " +
-                    $"{layer.X.ToString(System.Globalization.CultureInfo.InvariantCulture)}, " +
-                    $"{layer.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)}, " +
-                    $"{layer.FontSize}, " +
-                    $"\"{layer.FontName}\", " +
-                    $"\"{layer.Color}\", " +
-                    $"{layer.StrokeEnabled.ToString().ToLower()}, " +
-                    $"{layer.StrokeSize}, " +
-                    $"\"{layer.StrokeColor}\", " +
-                    $"\"{layer.StrokeOpacity}\", " +
-                    $"\"{layer.StrokePosition}\", " +
-                    $"\"{layer.Justification}\", " +
-                    $"{leadingValue});"); // НОВОЕ: Передаем значение интерлиньяжа
+                jsx.AppendLine("        // Создаем слои с прямоугольниками (подложки)");
+                for (int i = 0; i < rectangleLayers.Count; i++)
+                {
+                    var rect = rectangleLayers[i];
+                    jsx.AppendLine($"        createRectangleLayer(doc, " +
+                        $"{rect.X.ToString(System.Globalization.CultureInfo.InvariantCulture)}, " +
+                        $"{rect.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)}, " +
+                        $"{rect.Width.ToString(System.Globalization.CultureInfo.InvariantCulture)}, " +
+                        $"{rect.Height.ToString(System.Globalization.CultureInfo.InvariantCulture)}, " +
+                        $"\"{rect.Color}\");");
+                }
+                jsx.AppendLine("        ");
             }
 
-            // НОВОЕ: Логика сохранения в форматах PSD и BMP
+            // ЗАТЕМ создаем текстовые слои
+            if (textLayers != null && textLayers.Count > 0)
+            {
+                jsx.AppendLine("        // Создаем текстовые слои (они будут поверх прямоугольников)");
+                for (int i = 0; i < textLayers.Count; i++)
+                {
+                    var layer = textLayers[i];
+                    string leadingValue = layer.Leading.HasValue ? layer.Leading.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) : "null";
+
+                    jsx.AppendLine($"        createTextLayer(doc, \"{EscapeJSString(layer.Text)}\", " +
+                        $"{layer.X.ToString(System.Globalization.CultureInfo.InvariantCulture)}, " +
+                        $"{layer.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)}, " +
+                        $"{layer.FontSize}, " +
+                        $"\"{layer.FontName}\", " +
+                        $"\"{layer.Color}\", " +
+                        $"{layer.StrokeEnabled.ToString().ToLower()}, " +
+                        $"{layer.StrokeSize}, " +
+                        $"\"{layer.StrokeColor}\", " +
+                        $"\"{layer.StrokeOpacity}\", " +
+                        $"\"{layer.StrokePosition}\", " +
+                        $"\"{layer.Justification}\", " +
+                        $"{leadingValue});");
+                }
+            }
+
+            // Логика сохранения
             if (savePSD)
             {
                 string psdPath = Path.ChangeExtension(imagePath, ".psd").Replace("\\", "/");
@@ -225,14 +265,13 @@ function applyStroke(layer, size, hexColor, opacity, position) {
                 jsx.AppendLine("        // Сохранение в формат BMP");
                 jsx.AppendLine($"        var bmpFile = new File(\"{bmpPath}\");");
                 jsx.AppendLine("        var bmpSaveOptions = new BMPSaveOptions();");
-                jsx.AppendLine("        bmpSaveOptions.depth = BMPDepthType.THIRTYTWO; // 32-bit цвет");
-                jsx.AppendLine("        BMPSaveOptions.alphaChannels = true;");
+                jsx.AppendLine("        bmpSaveOptions.depth = BMPDepthType.THIRTYTWO;");
+                jsx.AppendLine("        bmpSaveOptions.alphaChannels = true;");
                 jsx.AppendLine("        bmpSaveOptions.osType = OperatingSystem.WINDOWS;");
                 jsx.AppendLine("        doc.saveAs(bmpFile, bmpSaveOptions, true, Extension.LOWERCASE);");
             }
 
             jsx.AppendLine("        ");
-            //jsx.AppendLine("        alert('Скрипт успешно выполнен! Создано слоев: " + textLayers.Count + "');");
             jsx.AppendLine("    }");
             jsx.AppendLine("} catch (e) {");
             jsx.AppendLine("    alert('Ошибка: ' + e.message + '\\nСтрока: ' + e.line);");

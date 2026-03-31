@@ -5,46 +5,78 @@ using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Reflection.Emit;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using UniversalAITranslator.Utils;
-using System.Runtime.InteropServices;
+using static UniversalAITranslator.Form_PreTranslator;
 
 namespace UniversalAITranslator
 {
     public partial class Form_ImageTranslator : Form
     {
-        private Dictionary<string, List<ImageTranslationData>> dataSet;
+        private Dictionary<string, List<BindingImageTranslationData>> dataSet;
         private BindingList<BindingImageTranslationData> translationDatas;
+        private BindingImageTranslationData currentTranslationData;
         private Image currentImage;
         private string imgPath;
         private AiTranslator translator;
         public event Extensions.TextDelegate ErrorLogged;
         public event Extensions.BoolDelegate TranslationCompleted;
+        private bool selectionChanging = false;
         public Form_ImageTranslator(AiTranslator aiTranslator)
         {
             InitializeComponent();
-            dataSet = new Dictionary<string, List<ImageTranslationData>>();
+            dataSet = new Dictionary<string, List<BindingImageTranslationData>>();
             translator = aiTranslator;
             translationDatas = new BindingList<BindingImageTranslationData>();
             dataGridViewTranslationData.DataSource = translationDatas;
             dataGridViewTranslationData.Refresh();
-            translationDatas.ListChanged += TranslationDatas_ListChanged;
             dataGridViewTranslationData.Columns["OriginalText"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
             dataGridViewTranslationData.Columns["TranslatedText"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
             dataGridViewTranslationData.Columns["X"].Width = 50;
             dataGridViewTranslationData.Columns["Y"].Width = 50;
             dataGridViewTranslationData.Columns["Width"].Width = 50;
             dataGridViewTranslationData.Columns["Height"].Width = 50;
+            RegisterFontSettingsChangedEvents();
+            RegisterRectangleSettingsChangedEvents();
         }
 
-        private void TranslationDatas_ListChanged(object? sender, ListChangedEventArgs e)
+        private void RegisterFontSettingsChangedEvents()
         {
-            if (e.ListChangedType == ListChangedType.ItemChanged)
-            {
-                translationDatas[e.OldIndex].UpdateOriginal();
-            }
+            textBoxFont.TextChanged += FontSettingsChanged;
+            numericUpDownFontSize.ValueChanged += FontSettingsChanged;
+            buttonFontColor.BackColorChanged += FontSettingsChanged;
+            comboBoxAlign.SelectedValueChanged += FontSettingsChanged;
+            numericUpDownLeading.ValueChanged += FontSettingsChanged;
+            checkBoxIsStroke.CheckedChanged += FontSettingsChanged;
+            numericUpDownStrokeSize.ValueChanged += FontSettingsChanged;
+            buttonStrokeColor.BackColorChanged += FontSettingsChanged;
+            numericUpDownOpacity.ValueChanged += FontSettingsChanged;
+            checkBoxImageCenterX.CheckedChanged += FontSettingsChanged;
+            checkBoxImageCenterY.CheckedChanged += FontSettingsChanged;
+        }
+
+        private void RegisterRectangleSettingsChangedEvents()
+        {
+            checkBoxIsRect.CheckedChanged += RectangleSettingsChanged;
+            buttonRectColor.BackColorChanged += RectangleSettingsChanged;
+        }
+
+        private void FontSettingsChanged(object? sender, EventArgs e)
+        {
+            if (currentTranslationData == null || selectionChanging)
+                return;
+            currentTranslationData.FontSettings.Update(GetTextFontDataFromControls());
+        }
+
+        private void RectangleSettingsChanged(object? sender, EventArgs e)
+        {
+            if (currentTranslationData == null || selectionChanging)
+                return;
+            currentTranslationData.RectangleSettings.Update(GetRectangleDataFromControls());
         }
 
         private void Form_ImageTranslator_Load(object sender, EventArgs e)
@@ -100,8 +132,14 @@ namespace UniversalAITranslator
             currentImage = Image.FromStream(new MemoryStream(File.ReadAllBytes(imgPath)));
             pictureBoxImage.Image = currentImage;
             translationDatas.Clear();
-            dataSet[imagePath].ForEach(a => translationDatas.Add(a.CreateBinding(pictureBoxImage.Image.Size.Width, pictureBoxImage.Image.Size.Height)));
+            //translationDatas = new BindingList<BindingImageTranslationData>(dataSet[imagePath]);
+            //dataSet[imagePath].ForEach(a => translationDatas.Add(a.CreateBinding(pictureBoxImage.Image.Size.Width, pictureBoxImage.Image.Size.Height)));
+            foreach (var item in dataSet[imagePath])
+            {
+                translationDatas.Add(item);
+            }
             dataGridViewTranslationData.Refresh();
+
         }
 
         private void сохранитьСкриптДляPhotoshopToolStripMenuItem_Click(object sender, EventArgs e)
@@ -143,49 +181,63 @@ namespace UniversalAITranslator
             try
             {
                 List<TextLayer> layers = new List<TextLayer>();
-                var modData = GetModifyData();
-                foreach (var item in dataSet[imagePath].Select(a => a.CreateBinding(imagePath)))
+                List<RectangleLayer> rects = new List<RectangleLayer>();
+                foreach (var item in dataSet[imagePath])
                 {
                     TextLayer layer = new TextLayer();
                     layer.Text = item.TranslatedText;
 
-                    int x = (int)(item.X * modData.X_Multiply + modData.X_Addition);
-                    int y = (int)(item.Y * modData.Y_Multiply + modData.Y_Addition);
+                    float x = item.X;
+                    float y = item.Y;
 
-                    switch (comboBoxAlign.SelectedItem.ToString())
+                    switch (item.FontSettings.Justification)
                     {
                         case "left":
                             layer.X = x;
                             break;
                         case "center":
-                            layer.X = x + (item.Width * modData.X_Multiply) / 2;
+                            layer.X = x + item.Width / 2f;
                             break;
                         case "right":
-                            layer.X = x + (item.Width * modData.X_Multiply);
+                            layer.X = x + item.Width;
                             break;
                     }
-                    //layer.X = item.X;
-                    int fontSize = Convert.ToInt32(numericUpDownFontSize.Value);
-                    layer.Y = y + ((item.Height * modData.Y_Multiply) / 2f + fontSize / 3f);
-                    if (checkBoxImageCenter.Checked)
+                    int fontSize = item.FontSettings.FontSize;
+                    layer.Y = y + (item.Height / 2f + fontSize / 2f);
+                    if (item.FontSettings.CenterOnX)
                     {
                         var imgSize = item.GetImageSize();
                         layer.X = imgSize.Width / 2f;
-                        layer.Y = imgSize.Height / 2f + fontSize / 3f;
                     }
-                    layer.FontName = textBoxFont.Text;
-                    layer.FontSize = Convert.ToInt32(numericUpDownFontSize.Value);
-                    layer.Color = buttonFontColor.BackColor.ToHex();
-                    layer.StrokeEnabled = checkBoxIsStroke.Checked;
-                    layer.StrokePosition = "outside";
-                    layer.StrokeColor = buttonStrokeColor.BackColor.ToHex();
-                    layer.StrokeSize = Convert.ToInt32(numericUpDownStrokeSize.Value);
-                    layer.Justification = comboBoxAlign.SelectedItem.ToString();
-                    layer.StrokeOpacity = Convert.ToInt32(numericUpDownOpacity.Value);
-                    layer.Leading = numericUpDownLeading.Value == 0 ? null : (double)numericUpDownLeading.Value;
+                    if (item.FontSettings.CenterOnX)
+                    {
+                        var imgSize = item.GetImageSize();
+                        layer.Y = imgSize.Height / 2f + fontSize / 2f;
+                    }
+                    layer.FontName = item.FontSettings.FontName;
+                    layer.FontSize = fontSize;
+                    layer.Color = item.FontSettings.Color.ToHex();
+                    layer.StrokeEnabled = item.FontSettings.StrokeEnabled;
+                    layer.StrokePosition = item.FontSettings.StrokePosition;
+                    layer.StrokeColor = item.FontSettings.StrokeColor.ToHex();
+                    layer.StrokeSize = item.FontSettings.StrokeSize;
+                    layer.Justification = item.FontSettings.Justification;
+                    layer.StrokeOpacity = item.FontSettings.StrokeOpacity;
+                    layer.Leading = item.FontSettings.Leading;
                     layers.Add(layer);
+
+                    if (item.RectangleSettings.Visible)
+                    {
+                        RectangleLayer rectLayer = new RectangleLayer();
+                        rectLayer.X = item.X;
+                        rectLayer.Y = item.Y;
+                        rectLayer.Width = item.Width;
+                        rectLayer.Height = item.Height;
+                        rectLayer.Color = item.RectangleSettings.Color.ToHex();
+                        rects.Add(rectLayer);
+                    }
                 }
-                ScriptGenerator.GenerateJSX(imagePath, layers, savePath, checkBoxSaveBMP.Checked, checkBoxSavePSD.Checked);
+                ScriptGenerator.GenerateJSX(imagePath, layers, rects, savePath, checkBoxSaveBMP.Checked, checkBoxSavePSD.Checked);
                 return true;
             }
             catch (Exception ex)
@@ -196,7 +248,9 @@ namespace UniversalAITranslator
 
         private void dataGridViewTranslationData_SelectionChanged(object sender, EventArgs e)
         {
+            selectionChanging = true;
             UpdateImagePreview();
+            selectionChanging = false;
         }
 
         private void UpdateImagePreview()
@@ -204,16 +258,16 @@ namespace UniversalAITranslator
             if (dataGridViewTranslationData.SelectedCells.Count == 0)
                 return;
             int rowIndex = dataGridViewTranslationData.SelectedCells[0].RowIndex;
-            var selectedData = translationDatas[rowIndex];
-
+            currentTranslationData = translationDatas[rowIndex];
+            SetTextFontDataToControls(currentTranslationData.FontSettings);
+            SetRectangleDataToControls(currentTranslationData.RectangleSettings);
             var tempImage = (Image)currentImage.Clone();
             using (Graphics g = Graphics.FromImage(tempImage))
             {
-                var modData = GetModifyData();
-                int x = (int)(selectedData.X * modData.X_Multiply + modData.X_Addition - 1);
-                int y = (int)(selectedData.Y * modData.Y_Multiply + modData.Y_Addition - 1);
-                int w = (int)(selectedData.Width * modData.X_Multiply + 1);
-                int h = (int)(selectedData.Height * modData.Y_Multiply + 1);
+                int x = (int)(currentTranslationData.X - 1);
+                int y = (int)(currentTranslationData.Y - 1);
+                int w = (int)(currentTranslationData.Width + 1);
+                int h = (int)(currentTranslationData.Height + 1);
                 g.DrawRectangle(new Pen(Color.Yellow, 2), x, y, w, h);
             }
             pictureBoxImage.Image = tempImage;
@@ -250,23 +304,6 @@ namespace UniversalAITranslator
             //MessageBox.Show("Завершено");
         }
 
-        private CoordinateModifyData GetModifyData()
-        {
-            CoordinateModifyData data = new CoordinateModifyData();
-            data.X_Addition = (int)numericUpDownAdd_X.Value;
-            data.Y_Addition = (int)numericUpDownAdd_Y.Value;
-            data.X_Multiply = (float)numericUpDownMul_X.Value;
-            data.Y_Multiply = (float)numericUpDownMul_Y.Value;
-            return data;
-        }
-
-        private class CoordinateModifyData
-        {
-            public int X_Addition;
-            public int Y_Addition;
-            public float X_Multiply;
-            public float Y_Multiply;
-        }
 
         private async void перевестиИзображенияToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -285,23 +322,33 @@ namespace UniversalAITranslator
                 currentImage.Dispose();
             dataSet.Clear();
             dataGridViewImages.Rows.Clear();
+            var defFont = GetTextFontDataFromControls();
+            var defRect = GetRectangleDataFromControls();
             foreach (var item in openFileDialog.FileNames)
             {
-                await TranslateImage(item);
+                await TranslateImage(item, defFont, defRect);
                 dataGridViewImages.Rows.Add(item);
             }
 
             SetStatus("Завершено!");
         }
 
-        private async Task TranslateImage(string imagePath)
+        private async Task TranslateImage(string imagePath, TextFontData defFont, RectangleData defRect)
         {
             try
             {
                 var result = await translator.TranslateImage(imagePath);
                 if (result.data != null)
                 {
-                    dataSet[imagePath] = result.data;
+                    List<BindingImageTranslationData> resLst = new List<BindingImageTranslationData>();
+                    foreach (var item in result.data)
+                    {
+                        var data = item.CreateBinding(imagePath);
+                        data.FontSettings = defFont.Clone();
+                        data.RectangleSettings = defRect.Clone();
+                        resLst.Add(data);
+                    }
+                    dataSet[imagePath] = resLst;
                 }
                 else
                 {
@@ -347,17 +394,13 @@ namespace UniversalAITranslator
                 return;
             MessageBox.Show("Идет перевод...");
             string img = (string)dataGridViewImages["ImagePath", dataGridViewImages.SelectedCells[0].RowIndex].Value;
-            await TranslateImage(img); SetTranslationData(img);
+            var defFont = GetTextFontDataFromControls();
+            var defRect = GetRectangleDataFromControls();
+            await TranslateImage(img, defFont, defRect);
+            SetTranslationData(img);
             MessageBox.Show("Завершено");
         }
 
-        private void dataGridViewTranslationData_CellValueChanged(object sender, DataGridViewCellEventArgs e)
-        {
-            foreach (var item in translationDatas)
-            {
-                item.UpdateOriginal();
-            }
-        }
         private Point startCoordinates;
         private bool startMove = false;
         private BindingImageTranslationData currentTransData;
@@ -374,7 +417,7 @@ namespace UniversalAITranslator
         private void pictureBoxImage_MouseUp(object sender, MouseEventArgs e)
         {
             startMove = false;
-            if(currentTransData==null) 
+            if (currentTransData == null)
                 return;
             Point subData = new Point(startCoordinates.X - e.Location.X, startCoordinates.Y - e.Location.Y);
             if (checkBoxChangeSize.Checked)
@@ -387,7 +430,6 @@ namespace UniversalAITranslator
                 currentTransData.X -= subData.X;
                 currentTransData.Y -= subData.Y;
             }
-            currentTransData.UpdateOriginal();
             dataGridViewTranslationData.Refresh();
         }
 
@@ -399,21 +441,20 @@ namespace UniversalAITranslator
                 Point subData = new Point(startCoordinates.X - e.Location.X, startCoordinates.Y - e.Location.Y);
                 using (Graphics g = Graphics.FromImage(tempImage))
                 {
-                    var modData = GetModifyData();
                     if (checkBoxChangeSize.Checked)
                     {
-                        int x = (int)(currentTransData.X * modData.X_Multiply + modData.X_Addition - 1);
-                        int y = (int)(currentTransData.Y * modData.Y_Multiply + modData.Y_Addition - 1);
-                        int w = (int)(currentTransData.Width * modData.X_Multiply + 1) - subData.X;
-                        int h = (int)(currentTransData.Height * modData.Y_Multiply + 1) - subData.Y;
+                        int x = (int)(currentTransData.X - 1);
+                        int y = (int)(currentTransData.Y - 1);
+                        int w = (int)(currentTransData.Width + 1) - subData.X;
+                        int h = (int)(currentTransData.Height + 1) - subData.Y;
                         g.DrawRectangle(new Pen(Color.Yellow, 2), x, y, w, h);
                     }
                     else
                     {
-                        int x = (int)(currentTransData.X * modData.X_Multiply + modData.X_Addition - 1) - subData.X;
-                        int y = (int)(currentTransData.Y * modData.Y_Multiply + modData.Y_Addition - 1) - subData.Y;
-                        int w = (int)(currentTransData.Width * modData.X_Multiply + 1);
-                        int h = (int)(currentTransData.Height * modData.Y_Multiply + 1);
+                        int x = (int)(currentTransData.X - 1) - subData.X;
+                        int y = (int)(currentTransData.Y - 1) - subData.Y;
+                        int w = (int)(currentTransData.Width + 1);
+                        int h = (int)(currentTransData.Height + 1);
                         g.DrawRectangle(new Pen(Color.Yellow, 2), x, y, w, h);
                     }
                 }
@@ -447,6 +488,98 @@ namespace UniversalAITranslator
                 }
             }
             SetStatus("Завершено");
+        }
+
+        public TextFontData GetTextFontDataFromControls()
+        {
+            TextFontData data = new TextFontData();
+            data.FontName = textBoxFont.Text;
+            data.FontSize = Convert.ToInt32(numericUpDownFontSize.Value);
+            data.Color = buttonFontColor.BackColor;
+            data.StrokeEnabled = checkBoxIsStroke.Checked;
+            data.StrokePosition = "outside";
+            data.StrokeColor = buttonStrokeColor.BackColor;
+            data.StrokeSize = Convert.ToInt32(numericUpDownStrokeSize.Value);
+            data.Justification = comboBoxAlign.SelectedItem.ToString();
+            data.StrokeOpacity = Convert.ToInt32(numericUpDownOpacity.Value);
+            data.Leading = numericUpDownLeading.Value == 0 ? null : (double)numericUpDownLeading.Value;
+            data.CenterOnX = checkBoxImageCenterX.Checked;
+            data.CenterOnY = checkBoxImageCenterY.Checked;
+            return data;
+        }
+
+        public void SetTextFontDataToControls(TextFontData data)
+        {
+            textBoxFont.Text = data.FontName;
+            numericUpDownFontSize.Value = data.FontSize;
+            buttonFontColor.BackColor = data.Color;
+            checkBoxIsStroke.Checked = data.StrokeEnabled;
+            buttonStrokeColor.BackColor = buttonStrokeColor.BackColor;
+            numericUpDownStrokeSize.Value = data.StrokeSize;
+            comboBoxAlign.SelectedItem = data.Justification;
+            numericUpDownOpacity.Value = data.StrokeOpacity;
+            numericUpDownLeading.Value = data.Leading == null ? 0 : (decimal)data.Leading.Value;
+            checkBoxImageCenterX.Checked = data.CenterOnX;
+            checkBoxImageCenterY.Checked = data.CenterOnY;
+        }
+
+        public RectangleData GetRectangleDataFromControls()
+        {
+            RectangleData data = new RectangleData();
+            data.Visible = checkBoxIsRect.Checked;
+            data.Color = buttonRectColor.BackColor;
+            return data;
+        }
+
+        public void SetRectangleDataToControls(RectangleData data)
+        {
+            checkBoxIsRect.Checked = data.Visible;
+            buttonRectColor.BackColor = data.Color;
+        }
+
+        private void buttonRectColor_Click(object sender, EventArgs e)
+        {
+            ColorDialog colorDialog = new ColorDialog();
+            colorDialog.Color = buttonRectColor.BackColor;
+            if (colorDialog.ShowDialog() != DialogResult.OK)
+                return;
+            buttonRectColor.BackColor = colorDialog.Color;
+        }
+
+        private void автоматическиОбнаружитьЦветФонаToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SetStatus("Идет определение цвета фона...");
+            foreach (var imageData in dataSet)
+            {
+                using (Image img = Image.FromFile(imageData.Key))
+                {
+                    foreach (var textData in imageData.Value)
+                    {
+                        Color bgColor = BackgroundColorDetector.GetBackgroundColor((Bitmap)img, new Rectangle((int)textData.X, (int)textData.Y, (int)textData.Width, (int)textData.Height), 3);
+                        textData.RectangleSettings.Color = bgColor;
+                        textData.RectangleSettings.Visible = true;
+                    }
+                }
+            }
+            SetStatus("Завершено!");
+        }
+
+        private void удалитьВыделенноеToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (dataGridViewTranslationData.SelectedCells.Count == 0)
+                return;
+            List<BindingImageTranslationData> toDelete = new List<BindingImageTranslationData>();
+            for (int i = 0; i < dataGridViewTranslationData.SelectedCells.Count; i++)
+            {
+                toDelete.Add(translationDatas[dataGridViewTranslationData.SelectedCells[i].RowIndex]);
+            }
+            toDelete = toDelete.Distinct().ToList();
+            string img = (string)dataGridViewImages["ImagePath", dataGridViewImages.SelectedCells[0].RowIndex].Value;
+            foreach (var item in toDelete)
+            {
+                translationDatas.Remove(item);
+                dataSet[img].Remove(item);
+            }
         }
     }
 }
