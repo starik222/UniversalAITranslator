@@ -18,7 +18,7 @@ namespace UniversalAITranslator
     {
         private Dictionary<string, List<BindingImageTranslationData>> dataSet;
         private BindingList<BindingImageTranslationData> translationDatas;
-        private BindingImageTranslationData currentTranslationData;
+        //private BindingImageTranslationData currentTranslationData;
         private Image currentImage;
         private string imgPath;
         private AiTranslator translator;
@@ -67,16 +67,25 @@ namespace UniversalAITranslator
 
         private void FontSettingsChanged(object? sender, EventArgs e)
         {
-            if (currentTranslationData == null || selectionChanging)
+            if (dataGridViewTranslationData.SelectedCells.Count == 0 || selectionChanging)
                 return;
-            currentTranslationData.FontSettings.Update(GetTextFontDataFromControls());
+            for (int i = 0; i < dataGridViewTranslationData.SelectedCells.Count; i++)
+            {
+                int rowIndex = dataGridViewTranslationData.SelectedCells[i].RowIndex;
+                translationDatas[rowIndex].FontSettings.Update(GetTextFontDataFromControls());
+            }
+
         }
 
         private void RectangleSettingsChanged(object? sender, EventArgs e)
         {
-            if (currentTranslationData == null || selectionChanging)
+            if (dataGridViewTranslationData.SelectedCells.Count == 0 || selectionChanging)
                 return;
-            currentTranslationData.RectangleSettings.Update(GetRectangleDataFromControls());
+            for (int i = 0; i < dataGridViewTranslationData.SelectedCells.Count; i++)
+            {
+                int rowIndex = dataGridViewTranslationData.SelectedCells[i].RowIndex;
+                translationDatas[rowIndex].RectangleSettings.Update(GetRectangleDataFromControls());
+            }
         }
 
         private void Form_ImageTranslator_Load(object sender, EventArgs e)
@@ -262,7 +271,7 @@ namespace UniversalAITranslator
             if (dataGridViewTranslationData.SelectedCells.Count == 0)
                 return;
             int rowIndex = dataGridViewTranslationData.SelectedCells[0].RowIndex;
-            currentTranslationData = translationDatas[rowIndex];
+            var currentTranslationData = translationDatas[rowIndex];
             SetTextFontDataToControls(currentTranslationData.FontSettings);
             SetRectangleDataToControls(currentTranslationData.RectangleSettings);
             var tempImage = (Image)currentImage.Clone();
@@ -410,6 +419,8 @@ namespace UniversalAITranslator
         private BindingImageTranslationData currentTransData;
         private void pictureBoxImage_MouseDown(object sender, MouseEventArgs e)
         {
+            if (e.Button != MouseButtons.Left)
+                return;
             if (dataGridViewTranslationData.SelectedCells.Count == 0)
                 return;
             int rowIndex = dataGridViewTranslationData.SelectedCells[0].RowIndex;
@@ -420,6 +431,8 @@ namespace UniversalAITranslator
 
         private void pictureBoxImage_MouseUp(object sender, MouseEventArgs e)
         {
+            if (e.Button != MouseButtons.Left)
+                return;
             startMove = false;
             if (currentTransData == null)
                 return;
@@ -439,6 +452,8 @@ namespace UniversalAITranslator
 
         private void pictureBoxImage_MouseMove(object sender, MouseEventArgs e)
         {
+            if (e.Button != MouseButtons.Left)
+                return;
             if (startMove)
             {
                 var tempImage = (Image)currentImage.Clone();
@@ -626,6 +641,185 @@ namespace UniversalAITranslator
             if (colorDialog.ShowDialog() != DialogResult.OK)
                 return;
             buttonGrEndColor.BackColor = colorDialog.Color;
+        }
+
+        private PkmColorType GetCurrentPkmControl()
+        {
+            if (radioButtonRect.Checked)
+                return PkmColorType.RectangleColor;
+            else if (radioButtonRectGrTop.Checked)
+                return PkmColorType.RectangleGradStart;
+            else if (radioButtonRectGrDown.Checked)
+                return PkmColorType.RectangleGradEnd;
+            else if (radioButtonFont.Checked)
+                return PkmColorType.FontColor;
+            else
+                return PkmColorType.FontStrokeColor;
+        }
+
+        private void SetColorByPkmColorType(Color c, PkmColorType type)
+        {
+            switch (type)
+            {
+                case PkmColorType.RectangleColor:
+                    buttonRectColor.BackColor = c;
+                    RectangleSettingsChanged(this, EventArgs.Empty);
+                    break;
+                case PkmColorType.RectangleGradStart:
+                    buttonGrStartColor.BackColor = c;
+                    RectangleSettingsChanged(this, EventArgs.Empty);
+                    break;
+                case PkmColorType.RectangleGradEnd:
+                    buttonGrEndColor.BackColor = c;
+                    RectangleSettingsChanged(this, EventArgs.Empty);
+                    break;
+                case PkmColorType.FontColor:
+                    buttonFontColor.BackColor = c;
+                    FontSettingsChanged(this, EventArgs.Empty);
+                    break;
+                case PkmColorType.FontStrokeColor:
+                    buttonStrokeColor.BackColor = c;
+                    FontSettingsChanged(this, EventArgs.Empty);
+                    break;
+                default:
+                    throw new Exception("Тип не реализован!");
+            }
+        }
+
+        private void SetRadioCheckedByPkmColorType(PkmColorType type)
+        {
+            radioButtonFont.Checked = false;
+            radioButtonFontContur.Checked = false;
+            radioButtonRect.Checked = false;
+            radioButtonRectGrDown.Checked = false;
+            radioButtonRectGrTop.Checked = false;
+            switch (type)
+            {
+                case PkmColorType.RectangleColor:
+                    radioButtonRect.Checked = true;
+                    break;
+                case PkmColorType.RectangleGradStart:
+                    radioButtonRectGrTop.Checked = true;
+                    break;
+                case PkmColorType.RectangleGradEnd:
+                    radioButtonRectGrDown.Checked = true;
+                    break;
+                case PkmColorType.FontColor:
+                    radioButtonFont.Checked = true;
+                    break;
+                case PkmColorType.FontStrokeColor:
+                    radioButtonFontContur.Checked = true;
+                    break;
+                default:
+                    throw new Exception("Тип не реализован!");
+            }
+        }
+
+        /// <summary>
+        /// Вычисляет реальные координаты пикселя на изображении для PictureBox с режимом Zoom
+        /// </summary>
+        private Point? GetImageCoordinates(PictureBox picBox, Point mouseLocation)
+        {
+            Image img = picBox.Image;
+
+            // Используем ClientSize, так как Width/Height могут включать рамки (BorderStyle)
+            int controlWidth = picBox.ClientSize.Width;
+            int controlHeight = picBox.ClientSize.Height;
+
+            int imageWidth = img.Width;
+            int imageHeight = img.Height;
+
+            // Вычисляем коэффициенты масштабирования по осям
+            float ratioX = (float)controlWidth / imageWidth;
+            float ratioY = (float)controlHeight / imageHeight;
+
+            // В режиме Zoom используется минимальный коэффициент, чтобы картинка влезла целиком
+            float scale = Math.Min(ratioX, ratioY);
+
+            // Вычисляем реальные размеры отображаемой картинки на экране
+            float displayWidth = imageWidth * scale;
+            float displayHeight = imageHeight * scale;
+
+            // Вычисляем отступы (пустые области), так как картинка центрируется
+            float offsetX = (controlWidth - displayWidth) / 2f;
+            float offsetY = (controlHeight - displayHeight) / 2f;
+
+            // Вычисляем координаты клика относительно самой картинки (убираем отступы)
+            float relativeX = mouseLocation.X - offsetX;
+            float relativeY = mouseLocation.Y - offsetY;
+
+            // Проверяем, не кликнул ли пользователь по пустой области вокруг картинки
+            if (relativeX < 0 || relativeX >= displayWidth ||
+                relativeY < 0 || relativeY >= displayHeight)
+            {
+                return null; // Клик за пределами изображения
+            }
+
+            // Переводим экранные координаты в координаты оригинального изображения
+            int actualX = (int)(relativeX / scale);
+            int actualY = (int)(relativeY / scale);
+
+            // Защита от выхода за границы массива (из-за округления)
+            actualX = Math.Max(0, Math.Min(actualX, imageWidth - 1));
+            actualY = Math.Max(0, Math.Min(actualY, imageHeight - 1));
+
+            return new Point(actualX, actualY);
+        }
+
+        private void pictureBoxImage_MouseClick(object sender, MouseEventArgs e)
+        {
+            // Проверяем, что нажата именно правая кнопка мыши
+            if (e.Button != MouseButtons.Right)
+                return;
+
+            // Проверяем, есть ли вообще картинка
+            if (pictureBoxImage.Image == null || currentImage == null)
+                return;
+
+            // Получаем координаты пикселя
+            Point? imagePoint = GetImageCoordinates(pictureBoxImage, e.Location);
+
+            if (imagePoint.HasValue)
+            {
+                int x = imagePoint.Value.X;
+                int y = imagePoint.Value.Y;
+                Color pixelColor = ((Bitmap)currentImage).GetPixel(x, y);
+                SetColorByPkmColorType(pixelColor, GetCurrentPkmControl());
+            }
+        }
+
+        private void пКМЦветПрямоугольникаToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SetRadioCheckedByPkmColorType(PkmColorType.RectangleColor);
+        }
+
+        private void пКМЦветНачалаГрадиентаToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SetRadioCheckedByPkmColorType(PkmColorType.RectangleGradStart);
+        }
+
+        private void пКМЦветКонцаГрадиентаToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SetRadioCheckedByPkmColorType(PkmColorType.RectangleGradEnd);
+        }
+
+        private void пКМЦветШрифтаToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SetRadioCheckedByPkmColorType(PkmColorType.FontColor);
+        }
+
+        private void пКМЦветОбводкиToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SetRadioCheckedByPkmColorType(PkmColorType.FontStrokeColor);
+        }
+
+        private enum PkmColorType
+        {
+            RectangleColor,
+            RectangleGradStart,
+            RectangleGradEnd,
+            FontColor,
+            FontStrokeColor
         }
     }
 }

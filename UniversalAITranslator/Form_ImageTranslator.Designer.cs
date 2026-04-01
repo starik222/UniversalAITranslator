@@ -43,6 +43,12 @@
             автоматическиОбнаружитьЦветФонаToolStripMenuItem = new ToolStripMenuItem();
             текстовыеДанныеToolStripMenuItem = new ToolStripMenuItem();
             удалитьВыделенноеToolStripMenuItem = new ToolStripMenuItem();
+            toolStripSeparator4 = new ToolStripSeparator();
+            пКМЦветПрямоугольникаToolStripMenuItem = new ToolStripMenuItem();
+            пКМЦветНачалаГрадиентаToolStripMenuItem = new ToolStripMenuItem();
+            пКМЦветКонцаГрадиентаToolStripMenuItem = new ToolStripMenuItem();
+            пКМЦветШрифтаToolStripMenuItem = new ToolStripMenuItem();
+            пКМЦветОбводкиToolStripMenuItem = new ToolStripMenuItem();
             splitContainer1 = new SplitContainer();
             tabControl1 = new TabControl();
             tabPageFont = new TabPage();
@@ -74,6 +80,12 @@
             checkBoxIsRect = new CheckBox();
             buttonRectColor = new Button();
             tabPageGeneral = new TabPage();
+            groupBox1 = new GroupBox();
+            radioButtonFontContur = new RadioButton();
+            radioButtonFont = new RadioButton();
+            radioButtonRectGrDown = new RadioButton();
+            radioButtonRectGrTop = new RadioButton();
+            radioButtonRect = new RadioButton();
             checkBoxChangeSize = new CheckBox();
             checkBoxSavePSD = new CheckBox();
             checkBoxSaveBMP = new CheckBox();
@@ -96,6 +108,7 @@
             ((System.ComponentModel.ISupportInitialize)numericUpDownFontSize).BeginInit();
             tabPageRectangle.SuspendLayout();
             tabPageGeneral.SuspendLayout();
+            groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridViewImages).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dataGridViewTranslationData).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBoxImage).BeginInit();
@@ -191,7 +204,7 @@
             // 
             // текстовыеДанныеToolStripMenuItem
             // 
-            текстовыеДанныеToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { удалитьВыделенноеToolStripMenuItem });
+            текстовыеДанныеToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { удалитьВыделенноеToolStripMenuItem, toolStripSeparator4, пКМЦветПрямоугольникаToolStripMenuItem, пКМЦветНачалаГрадиентаToolStripMenuItem, пКМЦветКонцаГрадиентаToolStripMenuItem, пКМЦветШрифтаToolStripMenuItem, пКМЦветОбводкиToolStripMenuItem });
             текстовыеДанныеToolStripMenuItem.Name = "текстовыеДанныеToolStripMenuItem";
             текстовыеДанныеToolStripMenuItem.Size = new Size(120, 20);
             текстовыеДанныеToolStripMenuItem.Text = "Текстовые данные";
@@ -199,9 +212,54 @@
             // удалитьВыделенноеToolStripMenuItem
             // 
             удалитьВыделенноеToolStripMenuItem.Name = "удалитьВыделенноеToolStripMenuItem";
-            удалитьВыделенноеToolStripMenuItem.Size = new Size(188, 22);
+            удалитьВыделенноеToolStripMenuItem.Size = new Size(272, 22);
             удалитьВыделенноеToolStripMenuItem.Text = "Удалить выделенное";
             удалитьВыделенноеToolStripMenuItem.Click += удалитьВыделенноеToolStripMenuItem_Click;
+            // 
+            // toolStripSeparator4
+            // 
+            toolStripSeparator4.Name = "toolStripSeparator4";
+            toolStripSeparator4.Size = new Size(269, 6);
+            // 
+            // пКМЦветПрямоугольникаToolStripMenuItem
+            // 
+            пКМЦветПрямоугольникаToolStripMenuItem.Name = "пКМЦветПрямоугольникаToolStripMenuItem";
+            пКМЦветПрямоугольникаToolStripMenuItem.ShortcutKeys = Keys.Alt | Keys.D1;
+            пКМЦветПрямоугольникаToolStripMenuItem.Size = new Size(272, 22);
+            пКМЦветПрямоугольникаToolStripMenuItem.Text = "ПКМ - цвет прямоугольника";
+            пКМЦветПрямоугольникаToolStripMenuItem.Click += пКМЦветПрямоугольникаToolStripMenuItem_Click;
+            // 
+            // пКМЦветНачалаГрадиентаToolStripMenuItem
+            // 
+            пКМЦветНачалаГрадиентаToolStripMenuItem.Name = "пКМЦветНачалаГрадиентаToolStripMenuItem";
+            пКМЦветНачалаГрадиентаToolStripMenuItem.ShortcutKeys = Keys.Alt | Keys.D2;
+            пКМЦветНачалаГрадиентаToolStripMenuItem.Size = new Size(272, 22);
+            пКМЦветНачалаГрадиентаToolStripMenuItem.Text = "ПКМ - цвет начала градиента";
+            пКМЦветНачалаГрадиентаToolStripMenuItem.Click += пКМЦветНачалаГрадиентаToolStripMenuItem_Click;
+            // 
+            // пКМЦветКонцаГрадиентаToolStripMenuItem
+            // 
+            пКМЦветКонцаГрадиентаToolStripMenuItem.Name = "пКМЦветКонцаГрадиентаToolStripMenuItem";
+            пКМЦветКонцаГрадиентаToolStripMenuItem.ShortcutKeys = Keys.Alt | Keys.D3;
+            пКМЦветКонцаГрадиентаToolStripMenuItem.Size = new Size(272, 22);
+            пКМЦветКонцаГрадиентаToolStripMenuItem.Text = "ПКМ - цвет конца градиента";
+            пКМЦветКонцаГрадиентаToolStripMenuItem.Click += пКМЦветКонцаГрадиентаToolStripMenuItem_Click;
+            // 
+            // пКМЦветШрифтаToolStripMenuItem
+            // 
+            пКМЦветШрифтаToolStripMenuItem.Name = "пКМЦветШрифтаToolStripMenuItem";
+            пКМЦветШрифтаToolStripMenuItem.ShortcutKeys = Keys.Alt | Keys.D4;
+            пКМЦветШрифтаToolStripMenuItem.Size = new Size(272, 22);
+            пКМЦветШрифтаToolStripMenuItem.Text = "ПКМ - цвет шрифта";
+            пКМЦветШрифтаToolStripMenuItem.Click += пКМЦветШрифтаToolStripMenuItem_Click;
+            // 
+            // пКМЦветОбводкиToolStripMenuItem
+            // 
+            пКМЦветОбводкиToolStripMenuItem.Name = "пКМЦветОбводкиToolStripMenuItem";
+            пКМЦветОбводкиToolStripMenuItem.ShortcutKeys = Keys.Alt | Keys.D5;
+            пКМЦветОбводкиToolStripMenuItem.Size = new Size(272, 22);
+            пКМЦветОбводкиToolStripMenuItem.Text = "ПКМ - цвет обводки";
+            пКМЦветОбводкиToolStripMenuItem.Click += пКМЦветОбводкиToolStripMenuItem_Click;
             // 
             // splitContainer1
             // 
@@ -527,6 +585,7 @@
             // 
             // tabPageGeneral
             // 
+            tabPageGeneral.Controls.Add(groupBox1);
             tabPageGeneral.Controls.Add(checkBoxChangeSize);
             tabPageGeneral.Controls.Add(checkBoxSavePSD);
             tabPageGeneral.Controls.Add(checkBoxSaveBMP);
@@ -536,6 +595,75 @@
             tabPageGeneral.TabIndex = 2;
             tabPageGeneral.Text = "Общее";
             tabPageGeneral.UseVisualStyleBackColor = true;
+            // 
+            // groupBox1
+            // 
+            groupBox1.Controls.Add(radioButtonFontContur);
+            groupBox1.Controls.Add(radioButtonFont);
+            groupBox1.Controls.Add(radioButtonRectGrDown);
+            groupBox1.Controls.Add(radioButtonRectGrTop);
+            groupBox1.Controls.Add(radioButtonRect);
+            groupBox1.Location = new Point(308, 28);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(176, 165);
+            groupBox1.TabIndex = 21;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "Быстрый цвет ПКМ";
+            // 
+            // radioButtonFontContur
+            // 
+            radioButtonFontContur.AutoSize = true;
+            radioButtonFontContur.Location = new Point(6, 122);
+            radioButtonFontContur.Name = "radioButtonFontContur";
+            radioButtonFontContur.Size = new Size(100, 19);
+            radioButtonFontContur.TabIndex = 4;
+            radioButtonFontContur.Text = "Цвет обводки";
+            radioButtonFontContur.UseVisualStyleBackColor = true;
+            // 
+            // radioButtonFont
+            // 
+            radioButtonFont.AutoSize = true;
+            radioButtonFont.Location = new Point(6, 97);
+            radioButtonFont.Name = "radioButtonFont";
+            radioButtonFont.Size = new Size(99, 19);
+            radioButtonFont.TabIndex = 3;
+            radioButtonFont.TabStop = true;
+            radioButtonFont.Text = "Цвет шрифта";
+            radioButtonFont.UseVisualStyleBackColor = true;
+            // 
+            // radioButtonRectGrDown
+            // 
+            radioButtonRectGrDown.AutoSize = true;
+            radioButtonRectGrDown.Location = new Point(6, 72);
+            radioButtonRectGrDown.Name = "radioButtonRectGrDown";
+            radioButtonRectGrDown.Size = new Size(151, 19);
+            radioButtonRectGrDown.TabIndex = 2;
+            radioButtonRectGrDown.TabStop = true;
+            radioButtonRectGrDown.Text = "Прямоуг. градиент низ";
+            radioButtonRectGrDown.UseVisualStyleBackColor = true;
+            // 
+            // radioButtonRectGrTop
+            // 
+            radioButtonRectGrTop.AutoSize = true;
+            radioButtonRectGrTop.Location = new Point(6, 47);
+            radioButtonRectGrTop.Name = "radioButtonRectGrTop";
+            radioButtonRectGrTop.Size = new Size(157, 19);
+            radioButtonRectGrTop.TabIndex = 1;
+            radioButtonRectGrTop.TabStop = true;
+            radioButtonRectGrTop.Text = "Прямоуг. градиент верх";
+            radioButtonRectGrTop.UseVisualStyleBackColor = true;
+            // 
+            // radioButtonRect
+            // 
+            radioButtonRect.AutoSize = true;
+            radioButtonRect.Checked = true;
+            radioButtonRect.Location = new Point(6, 22);
+            radioButtonRect.Name = "radioButtonRect";
+            radioButtonRect.Size = new Size(114, 19);
+            radioButtonRect.TabIndex = 0;
+            radioButtonRect.TabStop = true;
+            radioButtonRect.Text = "Прямоугольник";
+            radioButtonRect.UseVisualStyleBackColor = true;
             // 
             // checkBoxChangeSize
             // 
@@ -608,6 +736,7 @@
             pictureBoxImage.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBoxImage.TabIndex = 0;
             pictureBoxImage.TabStop = false;
+            pictureBoxImage.MouseClick += pictureBoxImage_MouseClick;
             pictureBoxImage.MouseDown += pictureBoxImage_MouseDown;
             pictureBoxImage.MouseMove += pictureBoxImage_MouseMove;
             pictureBoxImage.MouseUp += pictureBoxImage_MouseUp;
@@ -661,6 +790,8 @@
             tabPageRectangle.PerformLayout();
             tabPageGeneral.ResumeLayout(false);
             tabPageGeneral.PerformLayout();
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridViewImages).EndInit();
             ((System.ComponentModel.ISupportInitialize)dataGridViewTranslationData).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBoxImage).EndInit();
@@ -727,5 +858,17 @@
         private Button buttonGrEndColor;
         private Button buttonGrStartColor;
         private CheckBox checkBoxUseGradient;
+        private GroupBox groupBox1;
+        private RadioButton radioButtonFontContur;
+        private RadioButton radioButtonFont;
+        private RadioButton radioButtonRectGrDown;
+        private RadioButton radioButtonRectGrTop;
+        private RadioButton radioButtonRect;
+        private ToolStripSeparator toolStripSeparator4;
+        private ToolStripMenuItem пКМЦветПрямоугольникаToolStripMenuItem;
+        private ToolStripMenuItem пКМЦветНачалаГрадиентаToolStripMenuItem;
+        private ToolStripMenuItem пКМЦветКонцаГрадиентаToolStripMenuItem;
+        private ToolStripMenuItem пКМЦветШрифтаToolStripMenuItem;
+        private ToolStripMenuItem пКМЦветОбводкиToolStripMenuItem;
     }
 }
