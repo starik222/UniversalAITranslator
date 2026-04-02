@@ -25,6 +25,7 @@ namespace UniversalAITranslator
         public event Extensions.TextDelegate ErrorLogged;
         public event Extensions.BoolDelegate TranslationCompleted;
         private bool selectionChanging = false;
+        private Dictionary<int, PresetData> presets;
         public Form_ImageTranslator(AiTranslator aiTranslator)
         {
             InitializeComponent();
@@ -42,6 +43,8 @@ namespace UniversalAITranslator
             RegisterFontSettingsChangedEvents();
             RegisterRectangleSettingsChangedEvents();
             comboBoxGradientAngle.SelectedIndex = 0;
+            presets = new Dictionary<int, PresetData>();
+            toolStripStatusLabelMode.Text = GetCurrentPkmControl().ToString();
         }
 
         private void RegisterFontSettingsChangedEvents()
@@ -63,6 +66,9 @@ namespace UniversalAITranslator
         {
             checkBoxIsRect.CheckedChanged += RectangleSettingsChanged;
             buttonRectColor.BackColorChanged += RectangleSettingsChanged;
+            checkBoxUseGradient.CheckedChanged += RectangleSettingsChanged;
+            buttonGrStartColor.BackColorChanged += RectangleSettingsChanged;
+            buttonGrEndColor.BackColorChanged += RectangleSettingsChanged;
         }
 
         private void FontSettingsChanged(object? sender, EventArgs e)
@@ -270,20 +276,32 @@ namespace UniversalAITranslator
         {
             if (dataGridViewTranslationData.SelectedCells.Count == 0)
                 return;
-            int rowIndex = dataGridViewTranslationData.SelectedCells[0].RowIndex;
-            var currentTranslationData = translationDatas[rowIndex];
-            SetTextFontDataToControls(currentTranslationData.FontSettings);
-            SetRectangleDataToControls(currentTranslationData.RectangleSettings);
             var tempImage = (Image)currentImage.Clone();
-            using (Graphics g = Graphics.FromImage(tempImage))
+            for (int i = 0; i < dataGridViewTranslationData.SelectedCells.Count; i++)
             {
-                int x = (int)(currentTranslationData.X - 1);
-                int y = (int)(currentTranslationData.Y - 1);
-                int w = (int)(currentTranslationData.Width + 1);
-                int h = (int)(currentTranslationData.Height + 1);
-                g.DrawRectangle(new Pen(Color.Yellow, 2), x, y, w, h);
+                int rowIndex = dataGridViewTranslationData.SelectedCells[i].RowIndex;
+                var currentTranslationData = translationDatas[rowIndex];
+                SetTextFontDataToControls(currentTranslationData.FontSettings);
+                SetRectangleDataToControls(currentTranslationData.RectangleSettings);
+                int penWidth = 1;
+                if (tempImage.Width > 300 || tempImage.Height > 300)
+                    penWidth = 2;
+                using (Graphics g = Graphics.FromImage(tempImage))
+                {
+                    int x = (int)(currentTranslationData.X - 1);
+                    int y = (int)(currentTranslationData.Y - 1);
+                    int w = (int)(currentTranslationData.Width + 1);
+                    int h = (int)(currentTranslationData.Height + 1);
+                    g.DrawRectangle(new Pen(Color.Yellow, penWidth), x, y, w, h);
+                }
+
             }
+            Image oldImage = pictureBoxImage.Image;
             pictureBoxImage.Image = tempImage;
+            if (oldImage != null && oldImage != currentImage)
+            {
+                oldImage.Dispose();
+            }
         }
 
 
@@ -416,15 +434,45 @@ namespace UniversalAITranslator
 
         private Point startCoordinates;
         private bool startMove = false;
-        private BindingImageTranslationData currentTransData;
+        private List<BindingImageTranslationData> currentTransDatas;
+        private PointF GetScaleRatios()
+        {
+            // Если картинки нет или размеры нулевые, масштаб 1:1
+            if (currentImage == null || currentImage.Width == 0 || currentImage.Height == 0)
+                return new PointF(1f, 1f);
+
+            float ratioX = 1f;
+            float ratioY = 1f;
+
+            // Расчет для режима Zoom (сохранение пропорций)
+            if (pictureBoxImage.SizeMode == PictureBoxSizeMode.Zoom)
+            {
+                float ratio = Math.Min(
+                    (float)pictureBoxImage.Width / currentImage.Width,
+                    (float)pictureBoxImage.Height / currentImage.Height);
+                ratioX = ratio;
+                ratioY = ratio;
+            }
+            // Расчет для режима StretchImage (растягивание без сохранения пропорций)
+            else if (pictureBoxImage.SizeMode == PictureBoxSizeMode.StretchImage)
+            {
+                ratioX = (float)pictureBoxImage.Width / currentImage.Width;
+                ratioY = (float)pictureBoxImage.Height / currentImage.Height;
+            }
+
+            return new PointF(ratioX, ratioY);
+        }
         private void pictureBoxImage_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button != MouseButtons.Left)
                 return;
             if (dataGridViewTranslationData.SelectedCells.Count == 0)
                 return;
-            int rowIndex = dataGridViewTranslationData.SelectedCells[0].RowIndex;
-            currentTransData = translationDatas[rowIndex];
+            currentTransDatas = new List<BindingImageTranslationData>();
+            for (int i = 0; i < dataGridViewTranslationData.SelectedCells.Count; i++)
+            {
+                currentTransDatas.Add(translationDatas[dataGridViewTranslationData.SelectedCells[i].RowIndex]);
+            }
             startCoordinates = e.Location;
             startMove = true;
         }
@@ -434,18 +482,28 @@ namespace UniversalAITranslator
             if (e.Button != MouseButtons.Left)
                 return;
             startMove = false;
-            if (currentTransData == null)
+            if (currentTransDatas == null || currentTransDatas.Count == 0)
                 return;
-            Point subData = new Point(startCoordinates.X - e.Location.X, startCoordinates.Y - e.Location.Y);
-            if (checkBoxChangeSize.Checked)
+
+            // Получаем коэффициенты масштаба
+            PointF scale = GetScaleRatios();
+
+            // Переводим смещение мыши в смещение по координатам самого изображения
+            int subX = (int)Math.Round((startCoordinates.X - e.Location.X) / scale.X);
+            int subY = (int)Math.Round((startCoordinates.Y - e.Location.Y) / scale.Y);
+
+            foreach (var item in currentTransDatas)
             {
-                currentTransData.Width -= subData.X;
-                currentTransData.Height -= subData.Y;
-            }
-            else
-            {
-                currentTransData.X -= subData.X;
-                currentTransData.Y -= subData.Y;
+                if (checkBoxChangeSize.Checked)
+                {
+                    item.Width -= subX;
+                    item.Height -= subY;
+                }
+                else
+                {
+                    item.X -= subX;
+                    item.Y -= subY;
+                }
             }
             dataGridViewTranslationData.Refresh();
         }
@@ -457,27 +515,46 @@ namespace UniversalAITranslator
             if (startMove)
             {
                 var tempImage = (Image)currentImage.Clone();
-                Point subData = new Point(startCoordinates.X - e.Location.X, startCoordinates.Y - e.Location.Y);
+
+                // Получаем коэффициенты масштаба
+                PointF scale = GetScaleRatios();
+
+                // Переводим смещение мыши в смещение по координатам самого изображения
+                int subX = (int)Math.Round((startCoordinates.X - e.Location.X) / scale.X);
+                int subY = (int)Math.Round((startCoordinates.Y - e.Location.Y) / scale.Y);
+                int penWidth = 1;
+                if (tempImage.Width > 300 || tempImage.Height > 300)
+                    penWidth = 2;
                 using (Graphics g = Graphics.FromImage(tempImage))
                 {
-                    if (checkBoxChangeSize.Checked)
+                    foreach (var item in currentTransDatas)
                     {
-                        int x = (int)(currentTransData.X - 1);
-                        int y = (int)(currentTransData.Y - 1);
-                        int w = (int)(currentTransData.Width + 1) - subData.X;
-                        int h = (int)(currentTransData.Height + 1) - subData.Y;
-                        g.DrawRectangle(new Pen(Color.Yellow, 2), x, y, w, h);
-                    }
-                    else
-                    {
-                        int x = (int)(currentTransData.X - 1) - subData.X;
-                        int y = (int)(currentTransData.Y - 1) - subData.Y;
-                        int w = (int)(currentTransData.Width + 1);
-                        int h = (int)(currentTransData.Height + 1);
-                        g.DrawRectangle(new Pen(Color.Yellow, 2), x, y, w, h);
+                        if (checkBoxChangeSize.Checked)
+                        {
+                            int x = (int)(item.X - 1);
+                            int y = (int)(item.Y - 1);
+                            int w = (int)(item.Width + 1) - subX;
+                            int h = (int)(item.Height + 1) - subY;
+                            g.DrawRectangle(new Pen(Color.Yellow, penWidth), x, y, w, h);
+                        }
+                        else
+                        {
+                            int x = (int)(item.X - 1) - subX;
+                            int y = (int)(item.Y - 1) - subY;
+                            int w = (int)(item.Width + 1);
+                            int h = (int)(item.Height + 1);
+                            g.DrawRectangle(new Pen(Color.Yellow, penWidth), x, y, w, h);
+                        }
                     }
                 }
+
+                // ВАЖНО: Освобождаем старое изображение, чтобы избежать утечки памяти (OutOfMemoryException)
+                Image oldImage = pictureBoxImage.Image;
                 pictureBoxImage.Image = tempImage;
+                if (oldImage != null && oldImage != currentImage)
+                {
+                    oldImage.Dispose();
+                }
             }
         }
 
@@ -533,7 +610,7 @@ namespace UniversalAITranslator
             numericUpDownFontSize.Value = data.FontSize;
             buttonFontColor.BackColor = data.Color;
             checkBoxIsStroke.Checked = data.StrokeEnabled;
-            buttonStrokeColor.BackColor = buttonStrokeColor.BackColor;
+            buttonStrokeColor.BackColor = data.StrokeColor;
             numericUpDownStrokeSize.Value = data.StrokeSize;
             comboBoxAlign.SelectedItem = data.Justification;
             numericUpDownOpacity.Value = data.StrokeOpacity;
@@ -578,33 +655,39 @@ namespace UniversalAITranslator
             SetStatus("Идет определение цвета фона...");
             foreach (var imageData in dataSet)
             {
-                using (Image img = Image.FromFile(imageData.Key))
-                {
-                    foreach (var textData in imageData.Value)
-                    {
-                        bool isGradient = BackgroundColorDetector.CheckIfGradientAndGetColors((Bitmap)img,
-                            new Rectangle((int)textData.X, (int)textData.Y, (int)textData.Width, (int)textData.Height),
-                            out Color topBg,
-                            out Color bottomBg,
-                            3,
-                            20,
-                            35);
-                        if (isGradient)
-                        {
-                            textData.RectangleSettings.UseGradient = true;
-                            textData.RectangleSettings.GradientStartColor = topBg;
-                            textData.RectangleSettings.GradientEndColor = bottomBg;
-                        }
-                        else
-                        {
-                            textData.RectangleSettings.UseGradient = false;
-                            textData.RectangleSettings.Color = topBg;
-                        }
-                        textData.RectangleSettings.Visible = true;
-                    }
-                }
+                DetectRectangleFillColor(imageData.Key);
             }
             SetStatus("Завершено!");
+        }
+
+        private void DetectRectangleFillColor(string image)
+        {
+            using (Image img = Image.FromFile(image))
+            {
+                foreach (var textData in dataSet[image])
+                {
+                    bool isGradient = BackgroundColorDetector.CheckIfGradientAndGetColors((Bitmap)img,
+                        new Rectangle((int)textData.X, (int)textData.Y, (int)textData.Width, (int)textData.Height),
+                        out Color topBg,
+                        out Color bottomBg,
+                        2,
+                        20,
+                        35);
+                    if (isGradient)
+                    {
+                        textData.RectangleSettings.UseGradient = true;
+                        textData.RectangleSettings.GradientStartColor = topBg;
+                        textData.RectangleSettings.GradientEndColor = bottomBg;
+                    }
+                    else
+                    {
+                        textData.RectangleSettings.UseGradient = false;
+                        textData.RectangleSettings.Color = BackgroundColorDetector.GetBackgroundColor((Bitmap)img,
+                        new Rectangle((int)textData.X, (int)textData.Y, (int)textData.Width, (int)textData.Height), 2);
+                    }
+                    textData.RectangleSettings.Visible = true;
+                }
+            }
         }
 
         private void удалитьВыделенноеToolStripMenuItem_Click(object sender, EventArgs e)
@@ -713,6 +796,7 @@ namespace UniversalAITranslator
                 default:
                     throw new Exception("Тип не реализован!");
             }
+            toolStripStatusLabelMode.Text = GetCurrentPkmControl().ToString();
         }
 
         /// <summary>
@@ -784,6 +868,7 @@ namespace UniversalAITranslator
                 int x = imagePoint.Value.X;
                 int y = imagePoint.Value.Y;
                 Color pixelColor = ((Bitmap)currentImage).GetPixel(x, y);
+                toolStripStatusLabelColor.BackColor = pixelColor;
                 SetColorByPkmColorType(pixelColor, GetCurrentPkmControl());
             }
         }
@@ -813,6 +898,38 @@ namespace UniversalAITranslator
             SetRadioCheckedByPkmColorType(PkmColorType.FontStrokeColor);
         }
 
+        private void toolStripButtonAddPreset_Click(object sender, EventArgs e)
+        {
+            int curIndex = presets.Count == 0 ? 0 : presets.Max(a => a.Key) + 1;
+            PresetData preset = new PresetData();
+            preset.GradientStartColor = buttonGrStartColor.BackColor;
+            preset.GradientEndColor = buttonGrEndColor.BackColor;
+            preset.FontColor = buttonFontColor.BackColor;
+            preset.FontStrokeColor = buttonStrokeColor.BackColor;
+            preset.RectangleColor = buttonRectColor.BackColor;
+            preset.IsGradient = checkBoxUseGradient.Checked;
+            preset.DrawRectangle = checkBoxIsRect.Checked;
+            presets[curIndex] = preset;
+            dataGridViewPresets.Rows.Add(curIndex, preset.FontColor.ToHex(), preset.FontStrokeColor.ToHex(),
+                preset.IsGradient ? "-" : preset.RectangleColor.ToHex(),
+                preset.IsGradient ? preset.GradientStartColor.ToHex() : "-", preset.IsGradient ? preset.GradientEndColor.ToHex() : "-",
+                preset.DrawRectangle, preset.IsGradient);
+            int dataIndex = dataGridViewPresets.Rows.Count - 1;
+            dataGridViewPresets["ColFontColor", dataIndex].Style.BackColor = preset.FontColor;
+            dataGridViewPresets["ColFontStrokeColor", dataIndex].Style.BackColor = preset.FontStrokeColor;
+            dataGridViewPresets["ColRectangleColor", dataIndex].Style.BackColor = preset.RectangleColor;
+            dataGridViewPresets["ColGradStart", dataIndex].Style.BackColor = preset.GradientStartColor;
+            dataGridViewPresets["ColGradEnd", dataIndex].Style.BackColor = preset.GradientEndColor;
+        }
+        private void toolStripButtonRemovePreset_Click(object sender, EventArgs e)
+        {
+            if (dataGridViewPresets.SelectedCells.Count == 0)
+                return;
+            int index = (int)dataGridViewPresets["ColIndex", dataGridViewPresets.SelectedCells[0].RowIndex].Value;
+            dataGridViewPresets.Rows.RemoveAt(dataGridViewPresets.SelectedCells[0].RowIndex);
+            presets.Remove(index);
+        }
+
         private enum PkmColorType
         {
             RectangleColor,
@@ -820,6 +937,110 @@ namespace UniversalAITranslator
             RectangleGradEnd,
             FontColor,
             FontStrokeColor
+        }
+        private class PresetData
+        {
+            public Color FontColor { get; set; }
+            public Color FontStrokeColor { get; set; }
+            public bool DrawRectangle { get; set; }
+            public bool IsGradient { get; set; }
+            public Color RectangleColor { get; set; }
+            public Color GradientStartColor { get; set; }
+            public Color GradientEndColor { get; set; }
+        }
+
+        private void dataGridViewPresets_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex == -1)
+                return;
+            int index = (int)dataGridViewPresets["ColIndex", e.RowIndex].Value;
+            var preset = presets[index];
+            buttonGrStartColor.BackColor = preset.GradientStartColor;
+            buttonGrEndColor.BackColor = preset.GradientEndColor;
+            buttonFontColor.BackColor = preset.FontColor;
+            buttonStrokeColor.BackColor = preset.FontStrokeColor;
+            buttonRectColor.BackColor = preset.RectangleColor;
+            checkBoxIsRect.Checked = preset.DrawRectangle;
+            checkBoxUseGradient.Checked = preset.IsGradient;
+            RectangleSettingsChanged(this, EventArgs.Empty);
+            FontSettingsChanged(this, EventArgs.Empty);
+        }
+
+        private void создатьСписокПереводапервыйЭлементИзображенияToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (var item in dataSet)
+            {
+                sb.AppendLine($"{item.Value.First().OriginalText}\t{item.Value.First().TranslatedText}\t{item.Key}");
+            }
+            NotepadHelper.ShowMessage(sb.ToString());
+        }
+
+        private void применитьТекущиеКоординатыКоВсемСхожимИзображениямToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ApplyCurrentCoordinatesToOther();
+        }
+
+        private void ApplyCurrentCoordinatesToOther()
+        {
+            string img = (string)dataGridViewImages["ImagePath", dataGridViewImages.SelectedCells[0].RowIndex].Value;
+            var curTransData = dataSet[img];
+            foreach (var item in dataSet)
+            {
+                if (item.Value == curTransData || item.Value.Count != curTransData.Count)
+                    continue;
+                for (int j = 0; j < curTransData.Count; j++)
+                {
+                    item.Value[j].X = curTransData[j].X;
+                    item.Value[j].Y = curTransData[j].Y;
+                    item.Value[j].Width = curTransData[j].Width;
+                    item.Value[j].Height = curTransData[j].Height;
+                }
+            }
+        }
+
+        private void ApplyCurrentSettingsToOther()
+        {
+            string img = (string)dataGridViewImages["ImagePath", dataGridViewImages.SelectedCells[0].RowIndex].Value;
+            var curTransData = dataSet[img];
+            foreach (var item in dataSet)
+            {
+                if (item.Value == curTransData || item.Value.Count != curTransData.Count)
+                    continue;
+                for (int j = 0; j < curTransData.Count; j++)
+                {
+                    item.Value[j].FontSettings.Update(curTransData[j].FontSettings);
+                    item.Value[j].RectangleSettings.Update(curTransData[j].RectangleSettings);
+                }
+            }
+        }
+
+        private void применитьТекущиеКоординатыИНастройкиКоВсемСхожимИзображениямToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ApplyCurrentCoordinatesToOther();
+            ApplyCurrentSettingsToOther();
+        }
+
+        private void автоматическиОбнаружитьЦветФонаДляТекущегоToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string img = (string)dataGridViewImages["ImagePath", dataGridViewImages.SelectedCells[0].RowIndex].Value;
+            DetectRectangleFillColor(img);
+        }
+
+        private void применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var curFontSettings = GetTextFontDataFromControls();
+            foreach (var item in dataSet)
+            {
+                foreach (var transData in item.Value)
+                {
+                    transData.FontSettings.FontName = curFontSettings.FontName;
+                    transData.FontSettings.FontSize = curFontSettings.FontSize;
+                    transData.FontSettings.Leading = curFontSettings.Leading;
+                    transData.FontSettings.StrokeSize = curFontSettings.StrokeSize;
+                    transData.FontSettings.StrokeEnabled = curFontSettings.StrokeEnabled;
+                }
+            }
         }
     }
 }

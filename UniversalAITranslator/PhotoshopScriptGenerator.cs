@@ -405,7 +405,10 @@ function applyStroke(layer, size, hexColor, opacity, position) {
                 jsx.AppendLine("        doc.saveAs(bmpFile, bmpSaveOptions, true, Extension.LOWERCASE);");
             }
 
+            // НОВЫЙ КОД: Закрытие документа
             jsx.AppendLine("        ");
+            jsx.AppendLine("        // Закрываем документ без сохранения исходника");
+            jsx.AppendLine("        doc.close(SaveOptions.DONOTSAVECHANGES);");
             jsx.AppendLine("    }");
             jsx.AppendLine("} catch (e) {");
             jsx.AppendLine("    alert('Ошибка: ' + e.message + '\\nСтрока: ' + e.line);");

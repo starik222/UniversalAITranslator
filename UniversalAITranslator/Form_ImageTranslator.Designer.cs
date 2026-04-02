@@ -39,8 +39,14 @@
             сохранитьИВыполнитьВсеСкриптыToolStripMenuItem = new ToolStripMenuItem();
             toolStripSeparator3 = new ToolStripSeparator();
             повторитьПереводДляИзображенияToolStripMenuItem = new ToolStripMenuItem();
+            toolStripSeparator6 = new ToolStripSeparator();
+            создатьСписокПереводапервыйЭлементИзображенияToolStripMenuItem = new ToolStripMenuItem();
             операцииToolStripMenuItem = new ToolStripMenuItem();
             автоматическиОбнаружитьЦветФонаToolStripMenuItem = new ToolStripMenuItem();
+            автоматическиОбнаружитьЦветФонаДляТекущегоToolStripMenuItem = new ToolStripMenuItem();
+            toolStripSeparator7 = new ToolStripSeparator();
+            применитьТекущиеКоординатыКоВсемСхожимИзображениямToolStripMenuItem = new ToolStripMenuItem();
+            применитьТекущиеКоординатыИНастройкиКоВсемСхожимИзображениямToolStripMenuItem = new ToolStripMenuItem();
             текстовыеДанныеToolStripMenuItem = new ToolStripMenuItem();
             удалитьВыделенноеToolStripMenuItem = new ToolStripMenuItem();
             toolStripSeparator4 = new ToolStripSeparator();
@@ -49,6 +55,7 @@
             пКМЦветКонцаГрадиентаToolStripMenuItem = new ToolStripMenuItem();
             пКМЦветШрифтаToolStripMenuItem = new ToolStripMenuItem();
             пКМЦветОбводкиToolStripMenuItem = new ToolStripMenuItem();
+            toolStripSeparator5 = new ToolStripSeparator();
             splitContainer1 = new SplitContainer();
             tabControl1 = new TabControl();
             tabPageFont = new TabPage();
@@ -89,12 +96,30 @@
             checkBoxChangeSize = new CheckBox();
             checkBoxSavePSD = new CheckBox();
             checkBoxSaveBMP = new CheckBox();
+            tabPagePresets = new TabPage();
+            dataGridViewPresets = new DataGridView();
+            ColIndex = new DataGridViewTextBoxColumn();
+            ColFontColor = new DataGridViewTextBoxColumn();
+            ColFontStrokeColor = new DataGridViewTextBoxColumn();
+            ColRectangleColor = new DataGridViewTextBoxColumn();
+            ColGradStart = new DataGridViewTextBoxColumn();
+            ColGradEnd = new DataGridViewTextBoxColumn();
+            ColDrawRect = new DataGridViewCheckBoxColumn();
+            ColGrad = new DataGridViewCheckBoxColumn();
+            toolStrip1 = new ToolStrip();
+            toolStripButtonAddPreset = new ToolStripButton();
+            toolStripButtonRemovePreset = new ToolStripButton();
             dataGridViewImages = new DataGridView();
             ImagePath = new DataGridViewTextBoxColumn();
             dataGridViewTranslationData = new DataGridView();
             pictureBoxImage = new PictureBox();
             statusStrip1 = new StatusStrip();
             StatusLabel = new ToolStripStatusLabel();
+            toolStripStatusLabelColor = new ToolStripStatusLabel();
+            toolStripStatusLabel2 = new ToolStripStatusLabel();
+            toolStripStatusLabelMode = new ToolStripStatusLabel();
+            toolStripSeparator8 = new ToolStripSeparator();
+            применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
@@ -109,6 +134,9 @@
             tabPageRectangle.SuspendLayout();
             tabPageGeneral.SuspendLayout();
             groupBox1.SuspendLayout();
+            tabPagePresets.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dataGridViewPresets).BeginInit();
+            toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridViewImages).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dataGridViewTranslationData).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBoxImage).BeginInit();
@@ -126,7 +154,7 @@
             // 
             // файлToolStripMenuItem
             // 
-            файлToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { перевестиИзображенияToolStripMenuItem, toolStripSeparator1, сохранитьСкриптДляPhotoshopToolStripMenuItem, сохранитьСкриптИВыполнитьToolStripMenuItem, toolStripSeparator2, сохранитьСкриптыДляВсехИзображенийToolStripMenuItem, сохранитьИВыполнитьВсеСкриптыToolStripMenuItem, toolStripSeparator3, повторитьПереводДляИзображенияToolStripMenuItem });
+            файлToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { перевестиИзображенияToolStripMenuItem, toolStripSeparator1, сохранитьСкриптДляPhotoshopToolStripMenuItem, сохранитьСкриптИВыполнитьToolStripMenuItem, toolStripSeparator2, сохранитьСкриптыДляВсехИзображенийToolStripMenuItem, сохранитьИВыполнитьВсеСкриптыToolStripMenuItem, toolStripSeparator3, повторитьПереводДляИзображенияToolStripMenuItem, toolStripSeparator6, создатьСписокПереводапервыйЭлементИзображенияToolStripMenuItem });
             файлToolStripMenuItem.Name = "файлToolStripMenuItem";
             файлToolStripMenuItem.Size = new Size(48, 20);
             файлToolStripMenuItem.Text = "Файл";
@@ -134,63 +162,75 @@
             // перевестиИзображенияToolStripMenuItem
             // 
             перевестиИзображенияToolStripMenuItem.Name = "перевестиИзображенияToolStripMenuItem";
-            перевестиИзображенияToolStripMenuItem.Size = new Size(310, 22);
+            перевестиИзображенияToolStripMenuItem.Size = new Size(392, 22);
             перевестиИзображенияToolStripMenuItem.Text = "Перевести изображения...";
             перевестиИзображенияToolStripMenuItem.Click += перевестиИзображенияToolStripMenuItem_Click;
             // 
             // toolStripSeparator1
             // 
             toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(307, 6);
+            toolStripSeparator1.Size = new Size(389, 6);
             // 
             // сохранитьСкриптДляPhotoshopToolStripMenuItem
             // 
             сохранитьСкриптДляPhotoshopToolStripMenuItem.Name = "сохранитьСкриптДляPhotoshopToolStripMenuItem";
-            сохранитьСкриптДляPhotoshopToolStripMenuItem.Size = new Size(310, 22);
+            сохранитьСкриптДляPhotoshopToolStripMenuItem.Size = new Size(392, 22);
             сохранитьСкриптДляPhotoshopToolStripMenuItem.Text = "Сохранить скрипт для Photoshop";
             сохранитьСкриптДляPhotoshopToolStripMenuItem.Click += сохранитьСкриптДляPhotoshopToolStripMenuItem_Click;
             // 
             // сохранитьСкриптИВыполнитьToolStripMenuItem
             // 
             сохранитьСкриптИВыполнитьToolStripMenuItem.Name = "сохранитьСкриптИВыполнитьToolStripMenuItem";
-            сохранитьСкриптИВыполнитьToolStripMenuItem.Size = new Size(310, 22);
+            сохранитьСкриптИВыполнитьToolStripMenuItem.Size = new Size(392, 22);
             сохранитьСкриптИВыполнитьToolStripMenuItem.Text = "Сохранить скрипт и выполнить";
             сохранитьСкриптИВыполнитьToolStripMenuItem.Click += сохранитьСкриптИВыполнитьToolStripMenuItem_Click;
             // 
             // toolStripSeparator2
             // 
             toolStripSeparator2.Name = "toolStripSeparator2";
-            toolStripSeparator2.Size = new Size(307, 6);
+            toolStripSeparator2.Size = new Size(389, 6);
             // 
             // сохранитьСкриптыДляВсехИзображенийToolStripMenuItem
             // 
             сохранитьСкриптыДляВсехИзображенийToolStripMenuItem.Name = "сохранитьСкриптыДляВсехИзображенийToolStripMenuItem";
-            сохранитьСкриптыДляВсехИзображенийToolStripMenuItem.Size = new Size(310, 22);
+            сохранитьСкриптыДляВсехИзображенийToolStripMenuItem.Size = new Size(392, 22);
             сохранитьСкриптыДляВсехИзображенийToolStripMenuItem.Text = "Сохранить скрипты для всех изображений";
             сохранитьСкриптыДляВсехИзображенийToolStripMenuItem.Click += сохранитьСкриптыДляВсехИзображенийToolStripMenuItem_Click;
             // 
             // сохранитьИВыполнитьВсеСкриптыToolStripMenuItem
             // 
             сохранитьИВыполнитьВсеСкриптыToolStripMenuItem.Name = "сохранитьИВыполнитьВсеСкриптыToolStripMenuItem";
-            сохранитьИВыполнитьВсеСкриптыToolStripMenuItem.Size = new Size(310, 22);
+            сохранитьИВыполнитьВсеСкриптыToolStripMenuItem.Size = new Size(392, 22);
             сохранитьИВыполнитьВсеСкриптыToolStripMenuItem.Text = "Сохранить и выполнить все скрипты";
             сохранитьИВыполнитьВсеСкриптыToolStripMenuItem.Click += сохранитьИВыполнитьВсеСкриптыToolStripMenuItem_Click;
             // 
             // toolStripSeparator3
             // 
             toolStripSeparator3.Name = "toolStripSeparator3";
-            toolStripSeparator3.Size = new Size(307, 6);
+            toolStripSeparator3.Size = new Size(389, 6);
             // 
             // повторитьПереводДляИзображенияToolStripMenuItem
             // 
             повторитьПереводДляИзображенияToolStripMenuItem.Name = "повторитьПереводДляИзображенияToolStripMenuItem";
-            повторитьПереводДляИзображенияToolStripMenuItem.Size = new Size(310, 22);
+            повторитьПереводДляИзображенияToolStripMenuItem.Size = new Size(392, 22);
             повторитьПереводДляИзображенияToolStripMenuItem.Text = "Повторить перевод для изображения";
             повторитьПереводДляИзображенияToolStripMenuItem.Click += повторитьПереводДляИзображенияToolStripMenuItem_Click;
             // 
+            // toolStripSeparator6
+            // 
+            toolStripSeparator6.Name = "toolStripSeparator6";
+            toolStripSeparator6.Size = new Size(389, 6);
+            // 
+            // создатьСписокПереводапервыйЭлементИзображенияToolStripMenuItem
+            // 
+            создатьСписокПереводапервыйЭлементИзображенияToolStripMenuItem.Name = "создатьСписокПереводапервыйЭлементИзображенияToolStripMenuItem";
+            создатьСписокПереводапервыйЭлементИзображенияToolStripMenuItem.Size = new Size(392, 22);
+            создатьСписокПереводапервыйЭлементИзображенияToolStripMenuItem.Text = "Создать список перевода (первый элемент изображения)";
+            создатьСписокПереводапервыйЭлементИзображенияToolStripMenuItem.Click += создатьСписокПереводапервыйЭлементИзображенияToolStripMenuItem_Click;
+            // 
             // операцииToolStripMenuItem
             // 
-            операцииToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { автоматическиОбнаружитьЦветФонаToolStripMenuItem });
+            операцииToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { автоматическиОбнаружитьЦветФонаToolStripMenuItem, автоматическиОбнаружитьЦветФонаДляТекущегоToolStripMenuItem, toolStripSeparator7, применитьТекущиеКоординатыКоВсемСхожимИзображениямToolStripMenuItem, применитьТекущиеКоординатыИНастройкиКоВсемСхожимИзображениямToolStripMenuItem, toolStripSeparator8, применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem });
             операцииToolStripMenuItem.Name = "операцииToolStripMenuItem";
             операцииToolStripMenuItem.Size = new Size(75, 20);
             операцииToolStripMenuItem.Text = "Операции";
@@ -198,13 +238,39 @@
             // автоматическиОбнаружитьЦветФонаToolStripMenuItem
             // 
             автоматическиОбнаружитьЦветФонаToolStripMenuItem.Name = "автоматическиОбнаружитьЦветФонаToolStripMenuItem";
-            автоматическиОбнаружитьЦветФонаToolStripMenuItem.Size = new Size(288, 22);
-            автоматическиОбнаружитьЦветФонаToolStripMenuItem.Text = "Автоматически обнаружить цвет фона";
+            автоматическиОбнаружитьЦветФонаToolStripMenuItem.Size = new Size(507, 22);
+            автоматическиОбнаружитьЦветФонаToolStripMenuItem.Text = "Автоматически обнаружить цвет фона для всех";
             автоматическиОбнаружитьЦветФонаToolStripMenuItem.Click += автоматическиОбнаружитьЦветФонаToolStripMenuItem_Click;
+            // 
+            // автоматическиОбнаружитьЦветФонаДляТекущегоToolStripMenuItem
+            // 
+            автоматическиОбнаружитьЦветФонаДляТекущегоToolStripMenuItem.Name = "автоматическиОбнаружитьЦветФонаДляТекущегоToolStripMenuItem";
+            автоматическиОбнаружитьЦветФонаДляТекущегоToolStripMenuItem.Size = new Size(507, 22);
+            автоматическиОбнаружитьЦветФонаДляТекущегоToolStripMenuItem.Text = "Автоматически обнаружить цвет фона для текущего";
+            автоматическиОбнаружитьЦветФонаДляТекущегоToolStripMenuItem.Click += автоматическиОбнаружитьЦветФонаДляТекущегоToolStripMenuItem_Click;
+            // 
+            // toolStripSeparator7
+            // 
+            toolStripSeparator7.Name = "toolStripSeparator7";
+            toolStripSeparator7.Size = new Size(504, 6);
+            // 
+            // применитьТекущиеКоординатыКоВсемСхожимИзображениямToolStripMenuItem
+            // 
+            применитьТекущиеКоординатыКоВсемСхожимИзображениямToolStripMenuItem.Name = "применитьТекущиеКоординатыКоВсемСхожимИзображениямToolStripMenuItem";
+            применитьТекущиеКоординатыКоВсемСхожимИзображениямToolStripMenuItem.Size = new Size(507, 22);
+            применитьТекущиеКоординатыКоВсемСхожимИзображениямToolStripMenuItem.Text = "Применить текущие координаты ко всем схожим изображениям";
+            применитьТекущиеКоординатыКоВсемСхожимИзображениямToolStripMenuItem.Click += применитьТекущиеКоординатыКоВсемСхожимИзображениямToolStripMenuItem_Click;
+            // 
+            // применитьТекущиеКоординатыИНастройкиКоВсемСхожимИзображениямToolStripMenuItem
+            // 
+            применитьТекущиеКоординатыИНастройкиКоВсемСхожимИзображениямToolStripMenuItem.Name = "применитьТекущиеКоординатыИНастройкиКоВсемСхожимИзображениямToolStripMenuItem";
+            применитьТекущиеКоординатыИНастройкиКоВсемСхожимИзображениямToolStripMenuItem.Size = new Size(507, 22);
+            применитьТекущиеКоординатыИНастройкиКоВсемСхожимИзображениямToolStripMenuItem.Text = "Применить текущие координаты и настройки ко всем схожим изображениям";
+            применитьТекущиеКоординатыИНастройкиКоВсемСхожимИзображениямToolStripMenuItem.Click += применитьТекущиеКоординатыИНастройкиКоВсемСхожимИзображениямToolStripMenuItem_Click;
             // 
             // текстовыеДанныеToolStripMenuItem
             // 
-            текстовыеДанныеToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { удалитьВыделенноеToolStripMenuItem, toolStripSeparator4, пКМЦветПрямоугольникаToolStripMenuItem, пКМЦветНачалаГрадиентаToolStripMenuItem, пКМЦветКонцаГрадиентаToolStripMenuItem, пКМЦветШрифтаToolStripMenuItem, пКМЦветОбводкиToolStripMenuItem });
+            текстовыеДанныеToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { удалитьВыделенноеToolStripMenuItem, toolStripSeparator4, пКМЦветПрямоугольникаToolStripMenuItem, пКМЦветНачалаГрадиентаToolStripMenuItem, пКМЦветКонцаГрадиентаToolStripMenuItem, пКМЦветШрифтаToolStripMenuItem, пКМЦветОбводкиToolStripMenuItem, toolStripSeparator5 });
             текстовыеДанныеToolStripMenuItem.Name = "текстовыеДанныеToolStripMenuItem";
             текстовыеДанныеToolStripMenuItem.Size = new Size(120, 20);
             текстовыеДанныеToolStripMenuItem.Text = "Текстовые данные";
@@ -261,6 +327,11 @@
             пКМЦветОбводкиToolStripMenuItem.Text = "ПКМ - цвет обводки";
             пКМЦветОбводкиToolStripMenuItem.Click += пКМЦветОбводкиToolStripMenuItem_Click;
             // 
+            // toolStripSeparator5
+            // 
+            toolStripSeparator5.Name = "toolStripSeparator5";
+            toolStripSeparator5.Size = new Size(269, 6);
+            // 
             // splitContainer1
             // 
             splitContainer1.Dock = DockStyle.Fill;
@@ -282,10 +353,11 @@
             // 
             // tabControl1
             // 
-            tabControl1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            tabControl1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             tabControl1.Controls.Add(tabPageFont);
             tabControl1.Controls.Add(tabPageRectangle);
             tabControl1.Controls.Add(tabPageGeneral);
+            tabControl1.Controls.Add(tabPagePresets);
             tabControl1.Location = new Point(3, 475);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
@@ -695,6 +767,116 @@
             checkBoxSaveBMP.Text = "Сохранять BMP";
             checkBoxSaveBMP.UseVisualStyleBackColor = true;
             // 
+            // tabPagePresets
+            // 
+            tabPagePresets.Controls.Add(dataGridViewPresets);
+            tabPagePresets.Controls.Add(toolStrip1);
+            tabPagePresets.Location = new Point(4, 24);
+            tabPagePresets.Name = "tabPagePresets";
+            tabPagePresets.Size = new Size(487, 219);
+            tabPagePresets.TabIndex = 3;
+            tabPagePresets.Text = "Пресеты";
+            tabPagePresets.UseVisualStyleBackColor = true;
+            // 
+            // dataGridViewPresets
+            // 
+            dataGridViewPresets.AllowUserToAddRows = false;
+            dataGridViewPresets.AllowUserToDeleteRows = false;
+            dataGridViewPresets.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewPresets.Columns.AddRange(new DataGridViewColumn[] { ColIndex, ColFontColor, ColFontStrokeColor, ColRectangleColor, ColGradStart, ColGradEnd, ColDrawRect, ColGrad });
+            dataGridViewPresets.Dock = DockStyle.Fill;
+            dataGridViewPresets.Location = new Point(0, 25);
+            dataGridViewPresets.Name = "dataGridViewPresets";
+            dataGridViewPresets.ReadOnly = true;
+            dataGridViewPresets.Size = new Size(487, 194);
+            dataGridViewPresets.TabIndex = 1;
+            dataGridViewPresets.CellDoubleClick += dataGridViewPresets_CellDoubleClick;
+            // 
+            // ColIndex
+            // 
+            ColIndex.HeaderText = "Index";
+            ColIndex.Name = "ColIndex";
+            ColIndex.ReadOnly = true;
+            ColIndex.Width = 50;
+            // 
+            // ColFontColor
+            // 
+            ColFontColor.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            ColFontColor.HeaderText = "FontColor";
+            ColFontColor.Name = "ColFontColor";
+            ColFontColor.ReadOnly = true;
+            // 
+            // ColFontStrokeColor
+            // 
+            ColFontStrokeColor.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            ColFontStrokeColor.HeaderText = "StrokeColor";
+            ColFontStrokeColor.Name = "ColFontStrokeColor";
+            ColFontStrokeColor.ReadOnly = true;
+            // 
+            // ColRectangleColor
+            // 
+            ColRectangleColor.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            ColRectangleColor.HeaderText = "RectangleColor";
+            ColRectangleColor.Name = "ColRectangleColor";
+            ColRectangleColor.ReadOnly = true;
+            // 
+            // ColGradStart
+            // 
+            ColGradStart.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            ColGradStart.HeaderText = "GradientStart";
+            ColGradStart.Name = "ColGradStart";
+            ColGradStart.ReadOnly = true;
+            // 
+            // ColGradEnd
+            // 
+            ColGradEnd.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            ColGradEnd.HeaderText = "GradientEnd";
+            ColGradEnd.Name = "ColGradEnd";
+            ColGradEnd.ReadOnly = true;
+            // 
+            // ColDrawRect
+            // 
+            ColDrawRect.HeaderText = "Draw";
+            ColDrawRect.Name = "ColDrawRect";
+            ColDrawRect.ReadOnly = true;
+            ColDrawRect.Width = 40;
+            // 
+            // ColGrad
+            // 
+            ColGrad.HeaderText = "Grad";
+            ColGrad.Name = "ColGrad";
+            ColGrad.ReadOnly = true;
+            ColGrad.Width = 40;
+            // 
+            // toolStrip1
+            // 
+            toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripButtonAddPreset, toolStripButtonRemovePreset });
+            toolStrip1.Location = new Point(0, 0);
+            toolStrip1.Name = "toolStrip1";
+            toolStrip1.Size = new Size(487, 25);
+            toolStrip1.TabIndex = 0;
+            toolStrip1.Text = "toolStrip1";
+            // 
+            // toolStripButtonAddPreset
+            // 
+            toolStripButtonAddPreset.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            toolStripButtonAddPreset.Image = Properties.Resources.i48_load;
+            toolStripButtonAddPreset.ImageTransparentColor = Color.Magenta;
+            toolStripButtonAddPreset.Name = "toolStripButtonAddPreset";
+            toolStripButtonAddPreset.Size = new Size(23, 22);
+            toolStripButtonAddPreset.Text = "toolStripButton1";
+            toolStripButtonAddPreset.Click += toolStripButtonAddPreset_Click;
+            // 
+            // toolStripButtonRemovePreset
+            // 
+            toolStripButtonRemovePreset.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            toolStripButtonRemovePreset.Image = Properties.Resources.i48_hide;
+            toolStripButtonRemovePreset.ImageTransparentColor = Color.Magenta;
+            toolStripButtonRemovePreset.Name = "toolStripButtonRemovePreset";
+            toolStripButtonRemovePreset.Size = new Size(23, 22);
+            toolStripButtonRemovePreset.Text = "toolStripButton2";
+            toolStripButtonRemovePreset.Click += toolStripButtonRemovePreset_Click;
+            // 
             // dataGridViewImages
             // 
             dataGridViewImages.AllowUserToAddRows = false;
@@ -743,7 +925,7 @@
             // 
             // statusStrip1
             // 
-            statusStrip1.Items.AddRange(new ToolStripItem[] { StatusLabel });
+            statusStrip1.Items.AddRange(new ToolStripItem[] { StatusLabel, toolStripStatusLabelColor, toolStripStatusLabel2, toolStripStatusLabelMode });
             statusStrip1.Location = new Point(0, 749);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Size = new Size(1080, 22);
@@ -755,6 +937,36 @@
             StatusLabel.Name = "StatusLabel";
             StatusLabel.Size = new Size(12, 17);
             StatusLabel.Text = "-";
+            // 
+            // toolStripStatusLabelColor
+            // 
+            toolStripStatusLabelColor.Name = "toolStripStatusLabelColor";
+            toolStripStatusLabelColor.Size = new Size(70, 17);
+            toolStripStatusLabelColor.Text = "        COLOR";
+            // 
+            // toolStripStatusLabel2
+            // 
+            toolStripStatusLabel2.Name = "toolStripStatusLabel2";
+            toolStripStatusLabel2.Size = new Size(68, 17);
+            toolStripStatusLabel2.Text = "         Mode:";
+            // 
+            // toolStripStatusLabelMode
+            // 
+            toolStripStatusLabelMode.Name = "toolStripStatusLabelMode";
+            toolStripStatusLabelMode.Size = new Size(12, 17);
+            toolStripStatusLabelMode.Text = "-";
+            // 
+            // toolStripSeparator8
+            // 
+            toolStripSeparator8.Name = "toolStripSeparator8";
+            toolStripSeparator8.Size = new Size(504, 6);
+            // 
+            // применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem
+            // 
+            применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem.Name = "применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem";
+            применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem.Size = new Size(507, 22);
+            применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem.Text = "Применить текущие числовые настройки шрифта ко всем";
+            применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem.Click += применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem_Click;
             // 
             // Form_ImageTranslator
             // 
@@ -792,6 +1004,11 @@
             tabPageGeneral.PerformLayout();
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
+            tabPagePresets.ResumeLayout(false);
+            tabPagePresets.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)dataGridViewPresets).EndInit();
+            toolStrip1.ResumeLayout(false);
+            toolStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridViewImages).EndInit();
             ((System.ComponentModel.ISupportInitialize)dataGridViewTranslationData).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBoxImage).EndInit();
@@ -870,5 +1087,30 @@
         private ToolStripMenuItem пКМЦветКонцаГрадиентаToolStripMenuItem;
         private ToolStripMenuItem пКМЦветШрифтаToolStripMenuItem;
         private ToolStripMenuItem пКМЦветОбводкиToolStripMenuItem;
+        private TabPage tabPagePresets;
+        private DataGridView dataGridViewPresets;
+        private ToolStrip toolStrip1;
+        private ToolStripButton toolStripButtonAddPreset;
+        private ToolStripButton toolStripButtonRemovePreset;
+        private DataGridViewTextBoxColumn ColIndex;
+        private DataGridViewTextBoxColumn ColFontColor;
+        private DataGridViewTextBoxColumn ColFontStrokeColor;
+        private DataGridViewTextBoxColumn ColRectangleColor;
+        private DataGridViewTextBoxColumn ColGradStart;
+        private DataGridViewTextBoxColumn ColGradEnd;
+        private DataGridViewCheckBoxColumn ColDrawRect;
+        private DataGridViewCheckBoxColumn ColGrad;
+        private ToolStripStatusLabel toolStripStatusLabelColor;
+        private ToolStripStatusLabel toolStripStatusLabel2;
+        private ToolStripStatusLabel toolStripStatusLabelMode;
+        private ToolStripSeparator toolStripSeparator6;
+        private ToolStripMenuItem создатьСписокПереводапервыйЭлементИзображенияToolStripMenuItem;
+        private ToolStripSeparator toolStripSeparator5;
+        private ToolStripSeparator toolStripSeparator7;
+        private ToolStripMenuItem применитьТекущиеКоординатыКоВсемСхожимИзображениямToolStripMenuItem;
+        private ToolStripMenuItem применитьТекущиеКоординатыИНастройкиКоВсемСхожимИзображениямToolStripMenuItem;
+        private ToolStripMenuItem автоматическиОбнаружитьЦветФонаДляТекущегоToolStripMenuItem;
+        private ToolStripSeparator toolStripSeparator8;
+        private ToolStripMenuItem применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem;
     }
 }
