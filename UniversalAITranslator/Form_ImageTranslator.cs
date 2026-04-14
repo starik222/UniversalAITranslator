@@ -60,6 +60,7 @@ namespace UniversalAITranslator
             numericUpDownOpacity.ValueChanged += FontSettingsChanged;
             checkBoxImageCenterX.CheckedChanged += FontSettingsChanged;
             checkBoxImageCenterY.CheckedChanged += FontSettingsChanged;
+            checkBoxFontDrawOnAlpha.CheckedChanged += FontSettingsChanged;
         }
 
         private void RegisterRectangleSettingsChangedEvents()
@@ -69,6 +70,7 @@ namespace UniversalAITranslator
             checkBoxUseGradient.CheckedChanged += RectangleSettingsChanged;
             buttonGrStartColor.BackColorChanged += RectangleSettingsChanged;
             buttonGrEndColor.BackColorChanged += RectangleSettingsChanged;
+            checkBoxRectDrawOnAlpha.CheckedChanged += RectangleSettingsChanged;
         }
 
         private void FontSettingsChanged(object? sender, EventArgs e)
@@ -239,6 +241,7 @@ namespace UniversalAITranslator
                     layer.Justification = item.FontSettings.Justification;
                     layer.StrokeOpacity = item.FontSettings.StrokeOpacity;
                     layer.Leading = item.FontSettings.Leading;
+                    layer.DrawOnAlpha = item.FontSettings.DrawOnAlpha;
                     layers.Add(layer);
 
                     if (item.RectangleSettings.Visible)
@@ -253,6 +256,7 @@ namespace UniversalAITranslator
                         rectLayer.GradientStartColor = item.RectangleSettings.GradientStartColor.ToHex();
                         rectLayer.GradientEndColor = item.RectangleSettings.GradientEndColor.ToHex();
                         rectLayer.GradientAngle = item.RectangleSettings.GradientAngle;
+                        rectLayer.DrawOnAlpha = item.RectangleSettings.DrawOnAlpha;
                         rects.Add(rectLayer);
                     }
                 }
@@ -601,6 +605,7 @@ namespace UniversalAITranslator
             data.Leading = numericUpDownLeading.Value == 0 ? null : (double)numericUpDownLeading.Value;
             data.CenterOnX = checkBoxImageCenterX.Checked;
             data.CenterOnY = checkBoxImageCenterY.Checked;
+            data.DrawOnAlpha = checkBoxFontDrawOnAlpha.Checked;
             return data;
         }
 
@@ -617,6 +622,7 @@ namespace UniversalAITranslator
             numericUpDownLeading.Value = data.Leading == null ? 0 : (decimal)data.Leading.Value;
             checkBoxImageCenterX.Checked = data.CenterOnX;
             checkBoxImageCenterY.Checked = data.CenterOnY;
+            checkBoxFontDrawOnAlpha.Checked = data.DrawOnAlpha;
         }
 
         public RectangleData GetRectangleDataFromControls()
@@ -628,6 +634,7 @@ namespace UniversalAITranslator
             data.GradientStartColor = buttonGrStartColor.BackColor;
             data.GradientEndColor = buttonGrEndColor.BackColor;
             data.GradientAngle = Convert.ToDouble(comboBoxGradientAngle.SelectedItem);
+            data.DrawOnAlpha = checkBoxRectDrawOnAlpha.Checked;
             return data;
         }
 
@@ -639,6 +646,7 @@ namespace UniversalAITranslator
             buttonGrStartColor.BackColor = data.GradientStartColor;
             buttonGrEndColor.BackColor = data.GradientEndColor;
             comboBoxGradientAngle.SelectedItem = (int)data.GradientAngle;
+            checkBoxRectDrawOnAlpha.Checked = data.DrawOnAlpha;
         }
 
         private void buttonRectColor_Click(object sender, EventArgs e)
@@ -648,6 +656,7 @@ namespace UniversalAITranslator
             if (colorDialog.ShowDialog() != DialogResult.OK)
                 return;
             buttonRectColor.BackColor = colorDialog.Color;
+            checkBoxIsRect.Checked = true;
         }
 
         private void автоматическиОбнаружитьЦветФонаToolStripMenuItem_Click(object sender, EventArgs e)
@@ -746,6 +755,7 @@ namespace UniversalAITranslator
             {
                 case PkmColorType.RectangleColor:
                     buttonRectColor.BackColor = c;
+                    checkBoxIsRect.Checked = true;
                     RectangleSettingsChanged(this, EventArgs.Empty);
                     break;
                 case PkmColorType.RectangleGradStart:

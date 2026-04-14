@@ -22,6 +22,9 @@ namespace UniversalAITranslator.Utils
 
         public string Justification { get; set; } = "center";
         public double? Leading { get; set; } = null;
+
+        // НОВОЕ СВОЙСТВО
+        public bool DrawOnAlpha { get; set; } = false;
     }
 
     public class RectangleLayer
@@ -37,6 +40,9 @@ namespace UniversalAITranslator.Utils
         public string GradientStartColor { get; set; } = "FFFFFF";
         public string GradientEndColor { get; set; } = "000000";
         public double GradientAngle { get; set; } = -90.0;
+
+        // НОВОЕ СВОЙСТВО
+        public bool DrawOnAlpha { get; set; } = false;
     }
 
     public class ScriptGenerator
@@ -121,7 +127,7 @@ namespace UniversalAITranslator.Utils
     return textLayer;
 }
 
-function createRectangleLayer(doc, x, y, width, height, hexColor, useGradient, gradStart, gradEnd, gradAngle) {
+function createRectangleLayer(doc, x, y, width, height, hexColor, useGradient, gradStart, gradEnd, gradAngle, drawOnAlpha) {
     var rectLayer = doc.artLayers.add();
     rectLayer.kind = LayerKind.NORMAL;
     rectLayer.name = 'Rectangle Background';
@@ -140,10 +146,61 @@ function createRectangleLayer(doc, x, y, width, height, hexColor, useGradient, g
         applyGradientOverlay(rectLayer, gradStart, gradEnd, gradAngle);
     }
     
+    // ОПТИМИЗИРОВАННАЯ ЛОГИКА: Отрисовка черного прямоугольника на альфа канале
+    if (drawOnAlpha && doc.channels.length > 3) {
+        try {
+            var alphaChannel = doc.channels[3];
+            var origChannels = doc.activeChannels;
+            doc.activeChannels = [alphaChannel];
+            
+            doc.selection.select(shape);
+            var blackColor = new SolidColor();
+            blackColor.rgb.hexValue = '000000';
+            doc.selection.fill(blackColor);
+            doc.selection.deselect();
+            
+            doc.activeChannels = origChannels;
+        } catch(e) {}
+    }
+    
     return rectLayer;
 }
 
-// ПЕРЕПИСАННАЯ ФУНКЦИЯ: Точная структура ActionManager (исправлен баг с типами данных)
+// НОВАЯ ФУНКЦИЯ: Отрисовка текста на альфе (Смарт-объект -> Выделение -> Заливка на Альфе)
+function processTextAlpha(doc, layer) {
+    if (doc.channels.length <= 3) return;
+    var alphaChannel = doc.channels[3]; // Динамически берем первый альфа-канал
+    
+    try {
+        doc.activeLayer = layer;
+        
+        // 1. Превращаем в смарт-объект
+        var idnewPlacedLayer = stringIDToTypeID('newPlacedLayer');
+        executeAction(idnewPlacedLayer, undefined, DialogModes.NO);
+        
+        // 2. Выделяем пиксели слоя (аналог Ctrl + Click по иконке слоя)
+        var desc = new ActionDescriptor();
+        var ref = new ActionReference();
+        ref.putProperty(charIDToTypeID('Chnl'), charIDToTypeID('fsel'));
+        desc.putReference(charIDToTypeID('null'), ref);
+        var ref2 = new ActionReference();
+        ref2.putEnumerated(charIDToTypeID('Chnl'), charIDToTypeID('Chnl'), charIDToTypeID('Trsp'));
+        desc.putReference(charIDToTypeID('T   '), ref2);
+        executeAction(charIDToTypeID('setd'), desc, DialogModes.NO);
+        
+        // 3. Переходим на альфа-канал и заливаем черным цветом
+        var origChannels = doc.activeChannels;
+        doc.activeChannels = [alphaChannel];
+        
+        var whiteColor = new SolidColor();
+        whiteColor.rgb.hexValue = 'FFFFFF';
+        doc.selection.fill(whiteColor);
+        doc.selection.deselect();
+        
+        doc.activeChannels = origChannels; // Возвращаем обратно RGB
+    } catch(e) {}
+}
+
 function applyGradientOverlay(layer, hex1, hex2, angle) {
     app.activeDocument.activeLayer = layer;
     
@@ -201,12 +258,10 @@ function applyGradientOverlay(layer, hex1, hex2, angle) {
     var idClrs = charIDToTypeID( 'Clrs' );
     var list1 = new ActionList();
     
-    // --- ПЕРВЫЙ ЦВЕТ ---
     var desc5 = new ActionDescriptor();
     var idType = charIDToTypeID( 'Type' );
     var idClry = charIDToTypeID( 'Clry' );
     var idUsrS = charIDToTypeID( 'UsrS' );
-    // ИСПРАВЛЕНИЕ ТУТ: Photoshop требует Enumerated (UsrS), а не Integer
     desc5.putEnumerated( idType, idClry, idUsrS ); 
     var idLctn = charIDToTypeID( 'Lctn' );
     desc5.putInteger( idLctn, 0 );
@@ -225,9 +280,8 @@ function applyGradientOverlay(layer, hex1, hex2, angle) {
     var idClrt = charIDToTypeID( 'Clrt' );
     list1.putObject( idClrt, desc5 );
     
-    // --- ВТОРОЙ ЦВЕТ ---
     var desc7 = new ActionDescriptor();
-    desc7.putEnumerated( idType, idClry, idUsrS ); // ИСПРАВЛЕНИЕ ТУТ
+    desc7.putEnumerated( idType, idClry, idUsrS ); 
     desc7.putInteger( idLctn, 4096 );
     desc7.putInteger( idMdpn, 50 );
     var desc8 = new ActionDescriptor();
@@ -242,7 +296,6 @@ function applyGradientOverlay(layer, hex1, hex2, angle) {
     var idTrns = charIDToTypeID( 'Trns' );
     var list2 = new ActionList();
     
-    // Прозрачность 1
     var desc9 = new ActionDescriptor();
     desc9.putUnitDouble( idOpct, idPrc, 100.0 );
     desc9.putInteger( idLctn, 0 );
@@ -250,7 +303,6 @@ function applyGradientOverlay(layer, hex1, hex2, angle) {
     var idTrnS = charIDToTypeID( 'TrnS' );
     list2.putObject( idTrnS, desc9 );
     
-    // Прозрачность 2
     var desc10 = new ActionDescriptor();
     desc10.putUnitDouble( idOpct, idPrc, 100.0 );
     desc10.putInteger( idLctn, 4096 );
@@ -334,6 +386,7 @@ function applyStroke(layer, size, hexColor, opacity, position) {
             jsx.AppendLine("        alert('Файл изображения не найден: ' + imageFile.fsName);");
             jsx.AppendLine("    } else {");
             jsx.AppendLine("        var doc = app.open(imageFile);");
+            jsx.AppendLine("        var textLayersForAlpha = []; // Массив для отложенной обработки текста на альфе");
             jsx.AppendLine("        ");
 
             if (rectangleLayers != null && rectangleLayers.Count > 0)
@@ -351,7 +404,8 @@ function applyStroke(layer, size, hexColor, opacity, position) {
                         $"{rect.UseGradient.ToString().ToLower()}, " +
                         $"\"{rect.GradientStartColor}\", " +
                         $"\"{rect.GradientEndColor}\", " +
-                        $"{rect.GradientAngle.ToString(System.Globalization.CultureInfo.InvariantCulture)});");
+                        $"{rect.GradientAngle.ToString(System.Globalization.CultureInfo.InvariantCulture)}, " +
+                        $"{rect.DrawOnAlpha.ToString().ToLower()});"); // Передача флага DrawOnAlpha
                 }
                 jsx.AppendLine("        ");
             }
@@ -364,7 +418,7 @@ function applyStroke(layer, size, hexColor, opacity, position) {
                     var layer = textLayers[i];
                     string leadingValue = layer.Leading.HasValue ? layer.Leading.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) : "null";
 
-                    jsx.AppendLine($"        createTextLayer(doc, \"{EscapeJSString(layer.Text)}\", " +
+                    jsx.AppendLine($"        var tLayer{i} = createTextLayer(doc, \"{EscapeJSString(layer.Text)}\", " +
                         $"{layer.X.ToString(System.Globalization.CultureInfo.InvariantCulture)}, " +
                         $"{layer.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)}, " +
                         $"{layer.FontSize}, " +
@@ -377,14 +431,21 @@ function applyStroke(layer, size, hexColor, opacity, position) {
                         $"\"{layer.StrokePosition}\", " +
                         $"\"{layer.Justification}\", " +
                         $"{leadingValue});");
+
+                    // Если текст нужно отрисовать в альфе, добавляем ссылку на слой в JS-массив
+                    if (layer.DrawOnAlpha)
+                    {
+                        jsx.AppendLine($"        textLayersForAlpha.push(tLayer{i});");
+                    }
                 }
             }
 
+            // ШАГ 1: Сохраняем исходный PSD
             if (savePSD)
             {
                 string psdPath = Path.ChangeExtension(imagePath, ".psd").Replace("\\", "/");
                 jsx.AppendLine("        ");
-                jsx.AppendLine("        // Сохранение в формат PSD");
+                jsx.AppendLine("        // Сохранение в формат PSD (до растеризации текста)");
                 jsx.AppendLine($"        var psdFile = new File(\"{psdPath}\");");
                 jsx.AppendLine("        var psdSaveOptions = new PhotoshopSaveOptions();");
                 jsx.AppendLine("        psdSaveOptions.layers = true;");
@@ -392,11 +453,21 @@ function applyStroke(layer, size, hexColor, opacity, position) {
                 jsx.AppendLine("        doc.saveAs(psdFile, psdSaveOptions, true, Extension.LOWERCASE);");
             }
 
+            // ШАГ 2: Обработка альфа-канала для текста СТРОГО МЕЖДУ сохранениями PSD и BMP
+            jsx.AppendLine("        ");
+            jsx.AppendLine("        // Выполнение обработки текста для Альфа-канала (Превращение в смарт-объекты)");
+            jsx.AppendLine("        if (textLayersForAlpha.length > 0) {");
+            jsx.AppendLine("            for(var k = 0; k < textLayersForAlpha.length; k++) {");
+            jsx.AppendLine("                processTextAlpha(doc, textLayersForAlpha[k]);");
+            jsx.AppendLine("            }");
+            jsx.AppendLine("        }");
+
+            // ШАГ 3: Сохраняем BMP
             if (saveBMP)
             {
                 string bmpPath = Path.ChangeExtension(imagePath, ".bmp").Replace("\\", "/");
                 jsx.AppendLine("        ");
-                jsx.AppendLine("        // Сохранение в формат BMP");
+                jsx.AppendLine("        // Сохранение в формат BMP (с изменениями на альфа-канале)");
                 jsx.AppendLine($"        var bmpFile = new File(\"{bmpPath}\");");
                 jsx.AppendLine("        var bmpSaveOptions = new BMPSaveOptions();");
                 jsx.AppendLine("        bmpSaveOptions.depth = BMPDepthType.THIRTYTWO;");
@@ -405,9 +476,8 @@ function applyStroke(layer, size, hexColor, opacity, position) {
                 jsx.AppendLine("        doc.saveAs(bmpFile, bmpSaveOptions, true, Extension.LOWERCASE);");
             }
 
-            // НОВЫЙ КОД: Закрытие документа
             jsx.AppendLine("        ");
-            jsx.AppendLine("        // Закрываем документ без сохранения исходника");
+            jsx.AppendLine("        // Закрываем документ без сохранения исходника (чтобы в оригинале слои остались текстом)");
             jsx.AppendLine("        doc.close(SaveOptions.DONOTSAVECHANGES);");
             jsx.AppendLine("    }");
             jsx.AppendLine("} catch (e) {");

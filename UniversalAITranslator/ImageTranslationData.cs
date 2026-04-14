@@ -117,6 +117,7 @@ namespace UniversalAITranslator
         public double? Leading { get; set; } = 12;
         public bool CenterOnX { get; set; } = false;
         public bool CenterOnY { get; set; } = false;
+        public bool DrawOnAlpha { get; set; } = false;
 
         public void Update(TextFontData data)
         {
@@ -131,6 +132,7 @@ namespace UniversalAITranslator
             Leading = data.Leading;
             CenterOnX = data.CenterOnX;
             CenterOnY = data.CenterOnY;
+            DrawOnAlpha = data.DrawOnAlpha;
         }
 
         public TextFontData Clone()
@@ -147,6 +149,7 @@ namespace UniversalAITranslator
             data.Leading = Leading;
             data.CenterOnX = CenterOnX;
             data.CenterOnY = CenterOnY;
+            data.DrawOnAlpha = DrawOnAlpha;
             return data;
         }
     }
@@ -159,6 +162,7 @@ namespace UniversalAITranslator
         public Color GradientStartColor { get; set; } = Color.Black;
         public Color GradientEndColor { get; set; } = Color.Black;
         public double GradientAngle { get; set; } = -90.0; // -90 = сверху вниз по оси Y
+        public bool DrawOnAlpha { get; set; } = false;
 
         public void Update(RectangleData data)
         {
@@ -168,6 +172,7 @@ namespace UniversalAITranslator
             GradientStartColor = data.GradientStartColor;
             GradientEndColor = data.GradientEndColor;
             GradientAngle = data.GradientAngle;
+            DrawOnAlpha = data.DrawOnAlpha;
 
         }
 
@@ -180,6 +185,7 @@ namespace UniversalAITranslator
             data.GradientStartColor = GradientStartColor;
             data.GradientEndColor = GradientEndColor;
             data.GradientAngle = GradientAngle;
+            data.DrawOnAlpha = DrawOnAlpha;
             return data;
         }
     }

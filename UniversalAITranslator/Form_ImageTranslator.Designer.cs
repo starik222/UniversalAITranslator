@@ -48,6 +48,7 @@
             применитьТекущиеКоординатыКоВсемСхожимИзображениямToolStripMenuItem = new ToolStripMenuItem();
             применитьТекущиеКоординатыИНастройкиКоВсемСхожимИзображениямToolStripMenuItem = new ToolStripMenuItem();
             применитьТекущиеНастройкиПрямоугольникаКоВсемСхожимИзображениямToolStripMenuItem = new ToolStripMenuItem();
+            применитьТекущиеНастройкиШрифтаКоВсемСхожимИзображениямToolStripMenuItem = new ToolStripMenuItem();
             toolStripSeparator8 = new ToolStripSeparator();
             применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem = new ToolStripMenuItem();
             текстовыеДанныеToolStripMenuItem = new ToolStripMenuItem();
@@ -121,7 +122,8 @@
             toolStripStatusLabelColor = new ToolStripStatusLabel();
             toolStripStatusLabel2 = new ToolStripStatusLabel();
             toolStripStatusLabelMode = new ToolStripStatusLabel();
-            применитьТекущиеНастройкиШрифтаКоВсемСхожимИзображениямToolStripMenuItem = new ToolStripMenuItem();
+            checkBoxFontDrawOnAlpha = new CheckBox();
+            checkBoxRectDrawOnAlpha = new CheckBox();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
@@ -277,6 +279,13 @@
             применитьТекущиеНастройкиПрямоугольникаКоВсемСхожимИзображениямToolStripMenuItem.Text = "Применить текущие настройки прямоугольника ко всем схожим изображениям";
             применитьТекущиеНастройкиПрямоугольникаКоВсемСхожимИзображениямToolStripMenuItem.Click += применитьТекущиеНастройкиПрямоугольникаКоВсемСхожимИзображениямToolStripMenuItem_Click;
             // 
+            // применитьТекущиеНастройкиШрифтаКоВсемСхожимИзображениямToolStripMenuItem
+            // 
+            применитьТекущиеНастройкиШрифтаКоВсемСхожимИзображениямToolStripMenuItem.Name = "применитьТекущиеНастройкиШрифтаКоВсемСхожимИзображениямToolStripMenuItem";
+            применитьТекущиеНастройкиШрифтаКоВсемСхожимИзображениямToolStripMenuItem.Size = new Size(523, 22);
+            применитьТекущиеНастройкиШрифтаКоВсемСхожимИзображениямToolStripMenuItem.Text = "Применить текущие настройки шрифта ко всем схожим изображениям";
+            применитьТекущиеНастройкиШрифтаКоВсемСхожимИзображениямToolStripMenuItem.Click += применитьТекущиеНастройкиШрифтаКоВсемСхожимИзображениямToolStripMenuItem_Click;
+            // 
             // toolStripSeparator8
             // 
             toolStripSeparator8.Name = "toolStripSeparator8";
@@ -387,6 +396,7 @@
             // 
             // tabPageFont
             // 
+            tabPageFont.Controls.Add(checkBoxFontDrawOnAlpha);
             tabPageFont.Controls.Add(checkBoxImageCenterY);
             tabPageFont.Controls.Add(checkBoxImageCenterX);
             tabPageFont.Controls.Add(button1);
@@ -418,7 +428,7 @@
             // checkBoxImageCenterY
             // 
             checkBoxImageCenterY.AutoSize = true;
-            checkBoxImageCenterY.Location = new Point(241, 115);
+            checkBoxImageCenterY.Location = new Point(241, 139);
             checkBoxImageCenterY.Name = "checkBoxImageCenterY";
             checkBoxImageCenterY.Size = new Size(229, 19);
             checkBoxImageCenterY.TabIndex = 21;
@@ -428,7 +438,7 @@
             // checkBoxImageCenterX
             // 
             checkBoxImageCenterX.AutoSize = true;
-            checkBoxImageCenterX.Location = new Point(6, 115);
+            checkBoxImageCenterX.Location = new Point(6, 139);
             checkBoxImageCenterX.Name = "checkBoxImageCenterX";
             checkBoxImageCenterX.Size = new Size(229, 19);
             checkBoxImageCenterX.TabIndex = 21;
@@ -602,6 +612,7 @@
             // 
             // tabPageRectangle
             // 
+            tabPageRectangle.Controls.Add(checkBoxRectDrawOnAlpha);
             tabPageRectangle.Controls.Add(comboBoxGradientAngle);
             tabPageRectangle.Controls.Add(buttonGrEndColor);
             tabPageRectangle.Controls.Add(buttonGrStartColor);
@@ -977,12 +988,25 @@
             toolStripStatusLabelMode.Size = new Size(12, 17);
             toolStripStatusLabelMode.Text = "-";
             // 
-            // применитьТекущиеНастройкиШрифтаКоВсемСхожимИзображениямToolStripMenuItem
+            // checkBoxFontDrawOnAlpha
             // 
-            применитьТекущиеНастройкиШрифтаКоВсемСхожимИзображениямToolStripMenuItem.Name = "применитьТекущиеНастройкиШрифтаКоВсемСхожимИзображениямToolStripMenuItem";
-            применитьТекущиеНастройкиШрифтаКоВсемСхожимИзображениямToolStripMenuItem.Size = new Size(523, 22);
-            применитьТекущиеНастройкиШрифтаКоВсемСхожимИзображениямToolStripMenuItem.Text = "Применить текущие настройки шрифта ко всем схожим изображениям";
-            применитьТекущиеНастройкиШрифтаКоВсемСхожимИзображениямToolStripMenuItem.Click += применитьТекущиеНастройкиШрифтаКоВсемСхожимИзображениямToolStripMenuItem_Click;
+            checkBoxFontDrawOnAlpha.AutoSize = true;
+            checkBoxFontDrawOnAlpha.Location = new Point(6, 110);
+            checkBoxFontDrawOnAlpha.Name = "checkBoxFontDrawOnAlpha";
+            checkBoxFontDrawOnAlpha.Size = new Size(199, 19);
+            checkBoxFontDrawOnAlpha.TabIndex = 22;
+            checkBoxFontDrawOnAlpha.Text = "Отрисовывать на альфа канале";
+            checkBoxFontDrawOnAlpha.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxRectDrawOnAlpha
+            // 
+            checkBoxRectDrawOnAlpha.AutoSize = true;
+            checkBoxRectDrawOnAlpha.Location = new Point(5, 65);
+            checkBoxRectDrawOnAlpha.Name = "checkBoxRectDrawOnAlpha";
+            checkBoxRectDrawOnAlpha.Size = new Size(199, 19);
+            checkBoxRectDrawOnAlpha.TabIndex = 23;
+            checkBoxRectDrawOnAlpha.Text = "Отрисовывать на альфа канале";
+            checkBoxRectDrawOnAlpha.UseVisualStyleBackColor = true;
             // 
             // Form_ImageTranslator
             // 
@@ -1130,5 +1154,7 @@
         private ToolStripMenuItem применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem;
         private ToolStripMenuItem применитьТекущиеНастройкиПрямоугольникаКоВсемСхожимИзображениямToolStripMenuItem;
         private ToolStripMenuItem применитьТекущиеНастройкиШрифтаКоВсемСхожимИзображениямToolStripMenuItem;
+        private CheckBox checkBoxFontDrawOnAlpha;
+        private CheckBox checkBoxRectDrawOnAlpha;
     }
 }
