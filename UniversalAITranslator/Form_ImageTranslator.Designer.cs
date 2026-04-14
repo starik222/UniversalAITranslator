@@ -47,6 +47,9 @@
             toolStripSeparator7 = new ToolStripSeparator();
             применитьТекущиеКоординатыКоВсемСхожимИзображениямToolStripMenuItem = new ToolStripMenuItem();
             применитьТекущиеКоординатыИНастройкиКоВсемСхожимИзображениямToolStripMenuItem = new ToolStripMenuItem();
+            применитьТекущиеНастройкиПрямоугольникаКоВсемСхожимИзображениямToolStripMenuItem = new ToolStripMenuItem();
+            toolStripSeparator8 = new ToolStripSeparator();
+            применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem = new ToolStripMenuItem();
             текстовыеДанныеToolStripMenuItem = new ToolStripMenuItem();
             удалитьВыделенноеToolStripMenuItem = new ToolStripMenuItem();
             toolStripSeparator4 = new ToolStripSeparator();
@@ -118,8 +121,7 @@
             toolStripStatusLabelColor = new ToolStripStatusLabel();
             toolStripStatusLabel2 = new ToolStripStatusLabel();
             toolStripStatusLabelMode = new ToolStripStatusLabel();
-            toolStripSeparator8 = new ToolStripSeparator();
-            применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem = new ToolStripMenuItem();
+            применитьТекущиеНастройкиШрифтаКоВсемСхожимИзображениямToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
@@ -230,7 +232,7 @@
             // 
             // операцииToolStripMenuItem
             // 
-            операцииToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { автоматическиОбнаружитьЦветФонаToolStripMenuItem, автоматическиОбнаружитьЦветФонаДляТекущегоToolStripMenuItem, toolStripSeparator7, применитьТекущиеКоординатыКоВсемСхожимИзображениямToolStripMenuItem, применитьТекущиеКоординатыИНастройкиКоВсемСхожимИзображениямToolStripMenuItem, toolStripSeparator8, применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem });
+            операцииToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { автоматическиОбнаружитьЦветФонаToolStripMenuItem, автоматическиОбнаружитьЦветФонаДляТекущегоToolStripMenuItem, toolStripSeparator7, применитьТекущиеКоординатыКоВсемСхожимИзображениямToolStripMenuItem, применитьТекущиеКоординатыИНастройкиКоВсемСхожимИзображениямToolStripMenuItem, применитьТекущиеНастройкиПрямоугольникаКоВсемСхожимИзображениямToolStripMenuItem, применитьТекущиеНастройкиШрифтаКоВсемСхожимИзображениямToolStripMenuItem, toolStripSeparator8, применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem });
             операцииToolStripMenuItem.Name = "операцииToolStripMenuItem";
             операцииToolStripMenuItem.Size = new Size(75, 20);
             операцииToolStripMenuItem.Text = "Операции";
@@ -238,35 +240,54 @@
             // автоматическиОбнаружитьЦветФонаToolStripMenuItem
             // 
             автоматическиОбнаружитьЦветФонаToolStripMenuItem.Name = "автоматическиОбнаружитьЦветФонаToolStripMenuItem";
-            автоматическиОбнаружитьЦветФонаToolStripMenuItem.Size = new Size(507, 22);
+            автоматическиОбнаружитьЦветФонаToolStripMenuItem.Size = new Size(523, 22);
             автоматическиОбнаружитьЦветФонаToolStripMenuItem.Text = "Автоматически обнаружить цвет фона для всех";
             автоматическиОбнаружитьЦветФонаToolStripMenuItem.Click += автоматическиОбнаружитьЦветФонаToolStripMenuItem_Click;
             // 
             // автоматическиОбнаружитьЦветФонаДляТекущегоToolStripMenuItem
             // 
             автоматическиОбнаружитьЦветФонаДляТекущегоToolStripMenuItem.Name = "автоматическиОбнаружитьЦветФонаДляТекущегоToolStripMenuItem";
-            автоматическиОбнаружитьЦветФонаДляТекущегоToolStripMenuItem.Size = new Size(507, 22);
+            автоматическиОбнаружитьЦветФонаДляТекущегоToolStripMenuItem.Size = new Size(523, 22);
             автоматическиОбнаружитьЦветФонаДляТекущегоToolStripMenuItem.Text = "Автоматически обнаружить цвет фона для текущего";
             автоматическиОбнаружитьЦветФонаДляТекущегоToolStripMenuItem.Click += автоматическиОбнаружитьЦветФонаДляТекущегоToolStripMenuItem_Click;
             // 
             // toolStripSeparator7
             // 
             toolStripSeparator7.Name = "toolStripSeparator7";
-            toolStripSeparator7.Size = new Size(504, 6);
+            toolStripSeparator7.Size = new Size(520, 6);
             // 
             // применитьТекущиеКоординатыКоВсемСхожимИзображениямToolStripMenuItem
             // 
             применитьТекущиеКоординатыКоВсемСхожимИзображениямToolStripMenuItem.Name = "применитьТекущиеКоординатыКоВсемСхожимИзображениямToolStripMenuItem";
-            применитьТекущиеКоординатыКоВсемСхожимИзображениямToolStripMenuItem.Size = new Size(507, 22);
+            применитьТекущиеКоординатыКоВсемСхожимИзображениямToolStripMenuItem.Size = new Size(523, 22);
             применитьТекущиеКоординатыКоВсемСхожимИзображениямToolStripMenuItem.Text = "Применить текущие координаты ко всем схожим изображениям";
             применитьТекущиеКоординатыКоВсемСхожимИзображениямToolStripMenuItem.Click += применитьТекущиеКоординатыКоВсемСхожимИзображениямToolStripMenuItem_Click;
             // 
             // применитьТекущиеКоординатыИНастройкиКоВсемСхожимИзображениямToolStripMenuItem
             // 
             применитьТекущиеКоординатыИНастройкиКоВсемСхожимИзображениямToolStripMenuItem.Name = "применитьТекущиеКоординатыИНастройкиКоВсемСхожимИзображениямToolStripMenuItem";
-            применитьТекущиеКоординатыИНастройкиКоВсемСхожимИзображениямToolStripMenuItem.Size = new Size(507, 22);
+            применитьТекущиеКоординатыИНастройкиКоВсемСхожимИзображениямToolStripMenuItem.Size = new Size(523, 22);
             применитьТекущиеКоординатыИНастройкиКоВсемСхожимИзображениямToolStripMenuItem.Text = "Применить текущие координаты и настройки ко всем схожим изображениям";
             применитьТекущиеКоординатыИНастройкиКоВсемСхожимИзображениямToolStripMenuItem.Click += применитьТекущиеКоординатыИНастройкиКоВсемСхожимИзображениямToolStripMenuItem_Click;
+            // 
+            // применитьТекущиеНастройкиПрямоугольникаКоВсемСхожимИзображениямToolStripMenuItem
+            // 
+            применитьТекущиеНастройкиПрямоугольникаКоВсемСхожимИзображениямToolStripMenuItem.Name = "применитьТекущиеНастройкиПрямоугольникаКоВсемСхожимИзображениямToolStripMenuItem";
+            применитьТекущиеНастройкиПрямоугольникаКоВсемСхожимИзображениямToolStripMenuItem.Size = new Size(523, 22);
+            применитьТекущиеНастройкиПрямоугольникаКоВсемСхожимИзображениямToolStripMenuItem.Text = "Применить текущие настройки прямоугольника ко всем схожим изображениям";
+            применитьТекущиеНастройкиПрямоугольникаКоВсемСхожимИзображениямToolStripMenuItem.Click += применитьТекущиеНастройкиПрямоугольникаКоВсемСхожимИзображениямToolStripMenuItem_Click;
+            // 
+            // toolStripSeparator8
+            // 
+            toolStripSeparator8.Name = "toolStripSeparator8";
+            toolStripSeparator8.Size = new Size(520, 6);
+            // 
+            // применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem
+            // 
+            применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem.Name = "применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem";
+            применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem.Size = new Size(523, 22);
+            применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem.Text = "Применить текущие числовые настройки шрифта ко всем";
+            применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem.Click += применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem_Click;
             // 
             // текстовыеДанныеToolStripMenuItem
             // 
@@ -956,17 +977,12 @@
             toolStripStatusLabelMode.Size = new Size(12, 17);
             toolStripStatusLabelMode.Text = "-";
             // 
-            // toolStripSeparator8
+            // применитьТекущиеНастройкиШрифтаКоВсемСхожимИзображениямToolStripMenuItem
             // 
-            toolStripSeparator8.Name = "toolStripSeparator8";
-            toolStripSeparator8.Size = new Size(504, 6);
-            // 
-            // применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem
-            // 
-            применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem.Name = "применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem";
-            применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem.Size = new Size(507, 22);
-            применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem.Text = "Применить текущие числовые настройки шрифта ко всем";
-            применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem.Click += применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem_Click;
+            применитьТекущиеНастройкиШрифтаКоВсемСхожимИзображениямToolStripMenuItem.Name = "применитьТекущиеНастройкиШрифтаКоВсемСхожимИзображениямToolStripMenuItem";
+            применитьТекущиеНастройкиШрифтаКоВсемСхожимИзображениямToolStripMenuItem.Size = new Size(523, 22);
+            применитьТекущиеНастройкиШрифтаКоВсемСхожимИзображениямToolStripMenuItem.Text = "Применить текущие настройки шрифта ко всем схожим изображениям";
+            применитьТекущиеНастройкиШрифтаКоВсемСхожимИзображениямToolStripMenuItem.Click += применитьТекущиеНастройкиШрифтаКоВсемСхожимИзображениямToolStripMenuItem_Click;
             // 
             // Form_ImageTranslator
             // 
@@ -1112,5 +1128,7 @@
         private ToolStripMenuItem автоматическиОбнаружитьЦветФонаДляТекущегоToolStripMenuItem;
         private ToolStripSeparator toolStripSeparator8;
         private ToolStripMenuItem применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem;
+        private ToolStripMenuItem применитьТекущиеНастройкиПрямоугольникаКоВсемСхожимИзображениямToolStripMenuItem;
+        private ToolStripMenuItem применитьТекущиеНастройкиШрифтаКоВсемСхожимИзображениямToolStripMenuItem;
     }
 }

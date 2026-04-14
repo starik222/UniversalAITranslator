@@ -999,7 +999,7 @@ namespace UniversalAITranslator
             }
         }
 
-        private void ApplyCurrentSettingsToOther()
+        private void ApplyCurrentFontSettingsToOther()
         {
             string img = (string)dataGridViewImages["ImagePath", dataGridViewImages.SelectedCells[0].RowIndex].Value;
             var curTransData = dataSet[img];
@@ -1010,6 +1010,20 @@ namespace UniversalAITranslator
                 for (int j = 0; j < curTransData.Count; j++)
                 {
                     item.Value[j].FontSettings.Update(curTransData[j].FontSettings);
+                }
+            }
+        }
+
+        private void ApplyCurrentRectSettingsToOther()
+        {
+            string img = (string)dataGridViewImages["ImagePath", dataGridViewImages.SelectedCells[0].RowIndex].Value;
+            var curTransData = dataSet[img];
+            foreach (var item in dataSet)
+            {
+                if (item.Value == curTransData || item.Value.Count != curTransData.Count)
+                    continue;
+                for (int j = 0; j < curTransData.Count; j++)
+                {
                     item.Value[j].RectangleSettings.Update(curTransData[j].RectangleSettings);
                 }
             }
@@ -1018,7 +1032,8 @@ namespace UniversalAITranslator
         private void применитьТекущиеКоординатыИНастройкиКоВсемСхожимИзображениямToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ApplyCurrentCoordinatesToOther();
-            ApplyCurrentSettingsToOther();
+            ApplyCurrentFontSettingsToOther();
+            ApplyCurrentRectSettingsToOther();
         }
 
         private void автоматическиОбнаружитьЦветФонаДляТекущегоToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1041,6 +1056,16 @@ namespace UniversalAITranslator
                     transData.FontSettings.StrokeEnabled = curFontSettings.StrokeEnabled;
                 }
             }
+        }
+
+        private void применитьТекущиеНастройкиПрямоугольникаКоВсемСхожимИзображениямToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ApplyCurrentRectSettingsToOther();
+        }
+
+        private void применитьТекущиеНастройкиШрифтаКоВсемСхожимИзображениямToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ApplyCurrentFontSettingsToOther();
         }
     }
 }

@@ -296,6 +296,13 @@ namespace UniversalAITranslator
                     fixTranslation.OriginalCount = textData.TextData.Count;
                     fixTranslation.TranslatedCount = lines.Length;
                     fixTranslation.dataGridViewData.Rows.Add(maxLines);
+                    for (int i = 0; i < maxLines; i++)
+                    {
+                        fixTranslation.dataGridViewData["OrigName", i].Value = "";
+                        fixTranslation.dataGridViewData["OrigText", i].Value = "";
+                        fixTranslation.dataGridViewData["TransName", i].Value = "";
+                        fixTranslation.dataGridViewData["TransText", i].Value = "";
+                    }
                     for (int i = 0; i < textData.TextData.Count; i++)
                     {
                         fixTranslation.dataGridViewData["OrigName", i].Value = textData.TextData[i].Name;
@@ -403,7 +410,11 @@ namespace UniversalAITranslator
                 chatManager.SetSystemPrompt(SystemPrompt);
             else
                 chatManager.ResetSystemPrompt();
-            ChatOptions.ResponseFormat = ChatResponseFormat.CreateJsonObjectFormat();
+            //Отключение структурированого вывода при локальном сервере LM Studio
+#pragma warning disable OPENAI001 // Тип предназначен только для оценки и может быть изменен или удален в будущих обновлениях. Чтобы продолжить, скройте эту диагностику.
+            if (chat.Endpoint.Port != 1234)
+                ChatOptions.ResponseFormat = ChatResponseFormat.CreateJsonObjectFormat();
+#pragma warning restore OPENAI001 // Тип предназначен только для оценки и может быть изменен или удален в будущих обновлениях. Чтобы продолжить, скройте эту диагностику.
             string userMessage = JsonConvert.SerializeObject(data.Where(a => a.Enabled).Select(a => a.CreateTypedRequestItem()).ToArray());
             chatManager.SetUserPrompt(userMessage);
             ChatCompletion result;
@@ -457,7 +468,11 @@ namespace UniversalAITranslator
             string contentType = GetContentTypeFromExtention(imgExt);
             ChatMessageContentPart partImage = ChatMessageContentPart.CreateImagePart(bd, contentType);
 
-            ChatOptions.ResponseFormat = ChatResponseFormat.CreateJsonObjectFormat();
+            //Отключение структурированого вывода при локальном сервере LM Studio
+#pragma warning disable OPENAI001 // Тип предназначен только для оценки и может быть изменен или удален в будущих обновлениях. Чтобы продолжить, скройте эту диагностику.
+            if (chat.Endpoint.Port != 1234)
+                ChatOptions.ResponseFormat = ChatResponseFormat.CreateJsonObjectFormat();
+#pragma warning restore OPENAI001 // Тип предназначен только для оценки и может быть изменен или удален в будущих обновлениях. Чтобы продолжить, скройте эту диагностику.
             messages.Add(ChatMessage.CreateUserMessage(partImage));
             ChatCompletion result;
             try
@@ -484,7 +499,9 @@ namespace UniversalAITranslator
             if (string.IsNullOrWhiteSpace(text))
                 return text;
             string pattern = @"<think>.*?(?:</think>|$)";
+            string pattern2 = @"<\|channel>.*?(?:<channel\|>|$)"; //Gemma4 start block
             string result = Regex.Replace(text, pattern, string.Empty, RegexOptions.Singleline | RegexOptions.IgnoreCase);
+            result = Regex.Replace(result, pattern2, string.Empty, RegexOptions.Singleline | RegexOptions.IgnoreCase);
             return FixPotentialBadChars(result.Trim(['\n', '\r']).Trim());
 
             //if (text.Trim().StartsWith("<think>"))

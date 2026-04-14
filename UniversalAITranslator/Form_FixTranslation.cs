@@ -118,10 +118,10 @@ namespace UniversalAITranslator
                     string orig = dataGridViewData["OrigText", i].Value?.ToString();
                     string trans = dataGridViewData["TransText", i].Value?.ToString();
                     bool origQuoted = false;
-                    if (orig.StartsWith('「'))
+                    if (orig !=null && orig.StartsWith('「'))
                         origQuoted = true;
                     bool transQuoted = false;
-                    if (trans.StartsWith('「') || trans.StartsWith('«'))
+                    if (trans !=null && (trans.StartsWith('「') || trans.StartsWith('«')))
                         transQuoted = true;
                     if (origQuoted != transQuoted)
                     {

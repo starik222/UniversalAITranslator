@@ -28,7 +28,7 @@ namespace UniversalAITranslator
                 case FixType.CommonQuote:
                     return string.Concat('«', clearedText, '»');
                 case FixType.RussianDirectSpeech:
-                    return string.Concat("— ", clearedText);
+                    return string.Concat("- ", clearedText);
                 default:
                     return text;
             }
@@ -40,6 +40,8 @@ namespace UniversalAITranslator
             char startChar = result[0];
             char endChar = result[result.Length - 1];
             if (startChar == '—' && result.Length > 1 && result[1] == ' ')
+                return result.Substring(2);
+            else if (startChar == '-' && result.Length > 1 && result[1] == ' ')
                 return result.Substring(2);
             else if (startChar == '「' && endChar == '」')
                 return result.Substring(1, result.Length - 2);

@@ -41,6 +41,8 @@
             OriginalName = new DataGridViewTextBoxColumn();
             TranslatedName = new DataGridViewTextBoxColumn();
             Gender = new DataGridViewTextBoxColumn();
+            toolStripSeparator2 = new ToolStripSeparator();
+            загрузитьЗначенияПолаИзДругогоСловаряToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
@@ -56,7 +58,7 @@
             // 
             // файлToolStripMenuItem
             // 
-            файлToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { новыйToolStripMenuItem, загрузитьToolStripMenuItem, сохранитьToolStripMenuItem, toolStripSeparator1, загрузитьИзТекстовогоСловаряToolStripMenuItem });
+            файлToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { новыйToolStripMenuItem, загрузитьToolStripMenuItem, сохранитьToolStripMenuItem, toolStripSeparator1, загрузитьИзТекстовогоСловаряToolStripMenuItem, toolStripSeparator2, загрузитьЗначенияПолаИзДругогоСловаряToolStripMenuItem });
             файлToolStripMenuItem.Name = "файлToolStripMenuItem";
             файлToolStripMenuItem.Size = new Size(48, 20);
             файлToolStripMenuItem.Text = "Файл";
@@ -64,33 +66,33 @@
             // новыйToolStripMenuItem
             // 
             новыйToolStripMenuItem.Name = "новыйToolStripMenuItem";
-            новыйToolStripMenuItem.Size = new Size(254, 22);
+            новыйToolStripMenuItem.Size = new Size(321, 22);
             новыйToolStripMenuItem.Text = "Новый";
             новыйToolStripMenuItem.Click += новыйToolStripMenuItem_Click;
             // 
             // загрузитьToolStripMenuItem
             // 
             загрузитьToolStripMenuItem.Name = "загрузитьToolStripMenuItem";
-            загрузитьToolStripMenuItem.Size = new Size(254, 22);
+            загрузитьToolStripMenuItem.Size = new Size(321, 22);
             загрузитьToolStripMenuItem.Text = "Загрузить";
             загрузитьToolStripMenuItem.Click += загрузитьToolStripMenuItem_Click;
             // 
             // сохранитьToolStripMenuItem
             // 
             сохранитьToolStripMenuItem.Name = "сохранитьToolStripMenuItem";
-            сохранитьToolStripMenuItem.Size = new Size(254, 22);
+            сохранитьToolStripMenuItem.Size = new Size(321, 22);
             сохранитьToolStripMenuItem.Text = "Сохранить";
             сохранитьToolStripMenuItem.Click += сохранитьToolStripMenuItem_Click;
             // 
             // toolStripSeparator1
             // 
             toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(251, 6);
+            toolStripSeparator1.Size = new Size(318, 6);
             // 
             // загрузитьИзТекстовогоСловаряToolStripMenuItem
             // 
             загрузитьИзТекстовогоСловаряToolStripMenuItem.Name = "загрузитьИзТекстовогоСловаряToolStripMenuItem";
-            загрузитьИзТекстовогоСловаряToolStripMenuItem.Size = new Size(254, 22);
+            загрузитьИзТекстовогоСловаряToolStripMenuItem.Size = new Size(321, 22);
             загрузитьИзТекстовогоСловаряToolStripMenuItem.Text = "Загрузить из текстового словаря";
             загрузитьИзТекстовогоСловаряToolStripMenuItem.Click += загрузитьИзТекстовогоСловаряToolStripMenuItem_Click;
             // 
@@ -146,6 +148,18 @@
             Gender.SortMode = DataGridViewColumnSortMode.NotSortable;
             Gender.Width = 200;
             // 
+            // toolStripSeparator2
+            // 
+            toolStripSeparator2.Name = "toolStripSeparator2";
+            toolStripSeparator2.Size = new Size(318, 6);
+            // 
+            // загрузитьЗначенияПолаИзДругогоСловаряToolStripMenuItem
+            // 
+            загрузитьЗначенияПолаИзДругогоСловаряToolStripMenuItem.Name = "загрузитьЗначенияПолаИзДругогоСловаряToolStripMenuItem";
+            загрузитьЗначенияПолаИзДругогоСловаряToolStripMenuItem.Size = new Size(321, 22);
+            загрузитьЗначенияПолаИзДругогоСловаряToolStripMenuItem.Text = "Загрузить значения пола из другого словаря";
+            загрузитьЗначенияПолаИзДругогоСловаряToolStripMenuItem.Click += загрузитьЗначенияПолаИзДругогоСловаряToolStripMenuItem_Click;
+            // 
             // Form_AiCharaDictEditor
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -179,5 +193,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Gender;
         private ToolStripSeparator toolStripSeparator1;
         private ToolStripMenuItem загрузитьИзТекстовогоСловаряToolStripMenuItem;
+        private ToolStripSeparator toolStripSeparator2;
+        private ToolStripMenuItem загрузитьЗначенияПолаИзДругогоСловаряToolStripMenuItem;
     }
 }

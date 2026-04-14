@@ -49,6 +49,7 @@ namespace UniversalAITranslator
             result.Height = rect.Height;
             return result;
         }
+
     }
     public class BoxCoordinates
     {

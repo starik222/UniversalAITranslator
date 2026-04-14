@@ -17,7 +17,6 @@ namespace UniversalAITranslator
         {
             InitializeComponent();
             dataGridView1.AutoGenerateColumns = false;
-
         }
 
         private void новыйToolStripMenuItem_Click(object sender, EventArgs e)
@@ -92,6 +91,25 @@ namespace UniversalAITranslator
                 translationManager.AddCharaInfo(orig, trans);
             }
             dataGridView1.DataSource = translationManager.Characters;
+            dataGridView1.Refresh();
+        }
+
+        private void загрузитьЗначенияПолаИзДругогоСловаряToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "json files|*.json";
+            if (openFileDialog.ShowDialog() != DialogResult.OK)
+                return;
+            StructuredTranslationManager oldManager = new StructuredTranslationManager();
+            oldManager.Load(openFileDialog.FileName);
+            foreach (var item in translationManager.Characters)
+            {
+                var foundItem = oldManager.Characters.Find(a=>a.OriginalName == item.OriginalName);
+                if (foundItem != null)
+                {
+                    item.Gender = foundItem.Gender;
+                }
+            }
             dataGridView1.Refresh();
         }
     }
