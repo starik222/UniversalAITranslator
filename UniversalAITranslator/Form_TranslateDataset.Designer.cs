@@ -59,11 +59,16 @@
             toolStripSeparator7 = new ToolStripSeparator();
             добавитьСплиттерToolStripMenuItem = new ToolStripMenuItem();
             удалитьВыделенныйСплиттерToolStripMenuItem = new ToolStripMenuItem();
+            удалитьВсеСплиттерыToolStripMenuItem = new ToolStripMenuItem();
+            toolStripSeparator10 = new ToolStripSeparator();
             разбитьПоКоличествуСтрокToolStripMenuItem = new ToolStripMenuItem();
+            разбитьНепереведенноеНаNБлоковToolStripMenuItem = new ToolStripMenuItem();
             типТекстаДляВсегоToolStripMenuItem = new ToolStripMenuItem();
             типТекстаДляВыделенногоToolStripMenuItem = new ToolStripMenuItem();
             инструментыToolStripMenuItem = new ToolStripMenuItem();
             перевестиИзображениеToolStripMenuItem = new ToolStripMenuItem();
+            toolStripSeparator9 = new ToolStripSeparator();
+            подсветитьНезакрытыеДиалогиToolStripMenuItem = new ToolStripMenuItem();
             statusStrip1 = new StatusStrip();
             statusLabel = new ToolStripStatusLabel();
             splitContainer1 = new SplitContainer();
@@ -89,8 +94,7 @@
             textBoxPrompt = new TextBox();
             dataGridViewDS = new DataGridView();
             notifyIconTray = new NotifyIcon(components);
-            подсветитьНезакрытыеДиалогиToolStripMenuItem = new ToolStripMenuItem();
-            toolStripSeparator9 = new ToolStripSeparator();
+            использоватьРезервноеПодключениеToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
@@ -115,7 +119,7 @@
             // 
             // операцииToolStripMenuItem
             // 
-            операцииToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { настроитьПодключениеToolStripMenuItem, показатьскрытьНастройкиСистемногоПромптаToolStripMenuItem, показатьскрытьПоляИмениИПолаToolStripMenuItem, отчиститьКонтекстToolStripMenuItem, toolStripSeparator2, сохранитьТекущийНаборДанныхToolStripMenuItem, загрузитьНаборДанныхИзФайлаToolStripMenuItem, toolStripSeparator3, перевестиToolStripMenuItem, перевестиСПредварительнымОбъединениемСтрокToolStripMenuItem, переводДиалоговToolStripMenuItem, toolStripSeparator4, завершитьПереводToolStripMenuItem });
+            операцииToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { настроитьПодключениеToolStripMenuItem, использоватьРезервноеПодключениеToolStripMenuItem, показатьскрытьНастройкиСистемногоПромптаToolStripMenuItem, показатьскрытьПоляИмениИПолаToolStripMenuItem, отчиститьКонтекстToolStripMenuItem, toolStripSeparator2, сохранитьТекущийНаборДанныхToolStripMenuItem, загрузитьНаборДанныхИзФайлаToolStripMenuItem, toolStripSeparator3, перевестиToolStripMenuItem, перевестиСПредварительнымОбъединениемСтрокToolStripMenuItem, переводДиалоговToolStripMenuItem, toolStripSeparator4, завершитьПереводToolStripMenuItem });
             операцииToolStripMenuItem.Name = "операцииToolStripMenuItem";
             операцииToolStripMenuItem.Size = new Size(75, 20);
             операцииToolStripMenuItem.Text = "Операции";
@@ -212,7 +216,7 @@
             // 
             // выборПереводимогоToolStripMenuItem
             // 
-            выборПереводимогоToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { выбратьВсеToolStripMenuItem, ничегоToolStripMenuItem, toolStripSeparator1, выбратьВыделенноеToolStripMenuItem, отменитьВыделенноеToolStripMenuItem, toolStripSeparator5, установитьВыделениеПоСовпадениюToolStripMenuItem, снятьВыделениеПоСовпадениюToolStripMenuItem, toolStripSeparator6, выделитьПомеченныеСтрокиToolStripMenuItem, toolStripSeparator7, добавитьСплиттерToolStripMenuItem, удалитьВыделенныйСплиттерToolStripMenuItem, разбитьПоКоличествуСтрокToolStripMenuItem });
+            выборПереводимогоToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { выбратьВсеToolStripMenuItem, ничегоToolStripMenuItem, toolStripSeparator1, выбратьВыделенноеToolStripMenuItem, отменитьВыделенноеToolStripMenuItem, toolStripSeparator5, установитьВыделениеПоСовпадениюToolStripMenuItem, снятьВыделениеПоСовпадениюToolStripMenuItem, toolStripSeparator6, выделитьПомеченныеСтрокиToolStripMenuItem, toolStripSeparator7, добавитьСплиттерToolStripMenuItem, удалитьВыделенныйСплиттерToolStripMenuItem, удалитьВсеСплиттерыToolStripMenuItem, toolStripSeparator10, разбитьПоКоличествуСтрокToolStripMenuItem, разбитьНепереведенноеНаNБлоковToolStripMenuItem });
             выборПереводимогоToolStripMenuItem.Name = "выборПереводимогоToolStripMenuItem";
             выборПереводимогоToolStripMenuItem.Size = new Size(139, 20);
             выборПереводимогоToolStripMenuItem.Text = "Выбор переводимого";
@@ -306,12 +310,31 @@
             удалитьВыделенныйСплиттерToolStripMenuItem.Text = "Удалить выделенный сплиттер";
             удалитьВыделенныйСплиттерToolStripMenuItem.Click += удалитьВыделенныйСплиттерToolStripMenuItem_Click;
             // 
+            // удалитьВсеСплиттерыToolStripMenuItem
+            // 
+            удалитьВсеСплиттерыToolStripMenuItem.Name = "удалитьВсеСплиттерыToolStripMenuItem";
+            удалитьВсеСплиттерыToolStripMenuItem.Size = new Size(332, 22);
+            удалитьВсеСплиттерыToolStripMenuItem.Text = "Удалить все сплиттеры";
+            удалитьВсеСплиттерыToolStripMenuItem.Click += удалитьВсеСплиттерыToolStripMenuItem_Click;
+            // 
+            // toolStripSeparator10
+            // 
+            toolStripSeparator10.Name = "toolStripSeparator10";
+            toolStripSeparator10.Size = new Size(329, 6);
+            // 
             // разбитьПоКоличествуСтрокToolStripMenuItem
             // 
             разбитьПоКоличествуСтрокToolStripMenuItem.Name = "разбитьПоКоличествуСтрокToolStripMenuItem";
             разбитьПоКоличествуСтрокToolStripMenuItem.Size = new Size(332, 22);
             разбитьПоКоличествуСтрокToolStripMenuItem.Text = "Разбить по количеству строк";
             разбитьПоКоличествуСтрокToolStripMenuItem.Click += разбитьПоКоличествуСтрокToolStripMenuItem_Click;
+            // 
+            // разбитьНепереведенноеНаNБлоковToolStripMenuItem
+            // 
+            разбитьНепереведенноеНаNБлоковToolStripMenuItem.Name = "разбитьНепереведенноеНаNБлоковToolStripMenuItem";
+            разбитьНепереведенноеНаNБлоковToolStripMenuItem.Size = new Size(332, 22);
+            разбитьНепереведенноеНаNБлоковToolStripMenuItem.Text = "Разбить непереведенное на N блоков";
+            разбитьНепереведенноеНаNБлоковToolStripMenuItem.Click += разбитьНепереведенноеНаNБлоковToolStripMenuItem_Click;
             // 
             // типТекстаДляВсегоToolStripMenuItem
             // 
@@ -338,6 +361,18 @@
             перевестиИзображениеToolStripMenuItem.Size = new Size(254, 22);
             перевестиИзображениеToolStripMenuItem.Text = "Перевести изображение";
             перевестиИзображениеToolStripMenuItem.Click += перевестиИзображениеToolStripMenuItem_Click;
+            // 
+            // toolStripSeparator9
+            // 
+            toolStripSeparator9.Name = "toolStripSeparator9";
+            toolStripSeparator9.Size = new Size(251, 6);
+            // 
+            // подсветитьНезакрытыеДиалогиToolStripMenuItem
+            // 
+            подсветитьНезакрытыеДиалогиToolStripMenuItem.Name = "подсветитьНезакрытыеДиалогиToolStripMenuItem";
+            подсветитьНезакрытыеДиалогиToolStripMenuItem.Size = new Size(254, 22);
+            подсветитьНезакрытыеДиалогиToolStripMenuItem.Text = "Подсветить незакрытые диалоги";
+            подсветитьНезакрытыеДиалогиToolStripMenuItem.Click += подсветитьНезакрытыеДиалогиToolStripMenuItem_Click;
             // 
             // statusStrip1
             // 
@@ -598,17 +633,12 @@
             notifyIconTray.Text = "ИИ переводчик";
             notifyIconTray.Visible = true;
             // 
-            // подсветитьНезакрытыеДиалогиToolStripMenuItem
+            // использоватьРезервноеПодключениеToolStripMenuItem
             // 
-            подсветитьНезакрытыеДиалогиToolStripMenuItem.Name = "подсветитьНезакрытыеДиалогиToolStripMenuItem";
-            подсветитьНезакрытыеДиалогиToolStripMenuItem.Size = new Size(254, 22);
-            подсветитьНезакрытыеДиалогиToolStripMenuItem.Text = "Подсветить незакрытые диалоги";
-            подсветитьНезакрытыеДиалогиToolStripMenuItem.Click += подсветитьНезакрытыеДиалогиToolStripMenuItem_Click;
-            // 
-            // toolStripSeparator9
-            // 
-            toolStripSeparator9.Name = "toolStripSeparator9";
-            toolStripSeparator9.Size = new Size(251, 6);
+            использоватьРезервноеПодключениеToolStripMenuItem.Name = "использоватьРезервноеПодключениеToolStripMenuItem";
+            использоватьРезервноеПодключениеToolStripMenuItem.Size = new Size(383, 22);
+            использоватьРезервноеПодключениеToolStripMenuItem.Text = "Использовать резервное подключение";
+            использоватьРезервноеПодключениеToolStripMenuItem.Click += использоватьРезервноеПодключениеToolStripMenuItem_Click;
             // 
             // Form_TranslateDataset
             // 
@@ -706,5 +736,9 @@
         private ToolStripMenuItem отчиститьКонтекстToolStripMenuItem;
         private ToolStripSeparator toolStripSeparator9;
         private ToolStripMenuItem подсветитьНезакрытыеДиалогиToolStripMenuItem;
+        private ToolStripMenuItem удалитьВсеСплиттерыToolStripMenuItem;
+        private ToolStripSeparator toolStripSeparator10;
+        private ToolStripMenuItem разбитьНепереведенноеНаNБлоковToolStripMenuItem;
+        private ToolStripMenuItem использоватьРезервноеПодключениеToolStripMenuItem;
     }
 }

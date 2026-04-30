@@ -71,16 +71,31 @@ namespace UniversalAITranslator
             buttonGrStartColor.BackColorChanged += RectangleSettingsChanged;
             buttonGrEndColor.BackColorChanged += RectangleSettingsChanged;
             checkBoxRectDrawOnAlpha.CheckedChanged += RectangleSettingsChanged;
+            comboBoxGradientAngle.SelectedIndexChanged += RectangleSettingsChanged;
         }
 
         private void FontSettingsChanged(object? sender, EventArgs e)
         {
             if (dataGridViewTranslationData.SelectedCells.Count == 0 || selectionChanging)
                 return;
-            for (int i = 0; i < dataGridViewTranslationData.SelectedCells.Count; i++)
+            if (dataGridViewImages.SelectedCells.Count == 1)
             {
-                int rowIndex = dataGridViewTranslationData.SelectedCells[i].RowIndex;
-                translationDatas[rowIndex].FontSettings.Update(GetTextFontDataFromControls());
+                for (int i = 0; i < dataGridViewTranslationData.SelectedCells.Count; i++)
+                {
+                    int rowIndex = dataGridViewTranslationData.SelectedCells[i].RowIndex;
+                    translationDatas[rowIndex].FontSettings.Update(GetTextFontDataFromControls());
+                }
+            }
+            else
+            {
+                for (int imgIndex = 0; imgIndex < dataGridViewImages.SelectedCells.Count; imgIndex++)
+                {
+                    string imgPath = (string)dataGridViewImages.SelectedCells[imgIndex].Value;
+                    for (int i = 0; i < dataSet[imgPath].Count; i++)
+                    {
+                        dataSet[imgPath][i].FontSettings.Update(GetTextFontDataFromControls());
+                    }
+                }
             }
 
         }
@@ -89,10 +104,24 @@ namespace UniversalAITranslator
         {
             if (dataGridViewTranslationData.SelectedCells.Count == 0 || selectionChanging)
                 return;
-            for (int i = 0; i < dataGridViewTranslationData.SelectedCells.Count; i++)
+            if (dataGridViewImages.SelectedCells.Count == 1)
             {
-                int rowIndex = dataGridViewTranslationData.SelectedCells[i].RowIndex;
-                translationDatas[rowIndex].RectangleSettings.Update(GetRectangleDataFromControls());
+                for (int i = 0; i < dataGridViewTranslationData.SelectedCells.Count; i++)
+                {
+                    int rowIndex = dataGridViewTranslationData.SelectedCells[i].RowIndex;
+                    translationDatas[rowIndex].RectangleSettings.Update(GetRectangleDataFromControls());
+                }
+            }
+            else
+            {
+                for (int imgIndex = 0; imgIndex < dataGridViewImages.SelectedCells.Count; imgIndex++)
+                {
+                    string imgPath = (string)dataGridViewImages.SelectedCells[imgIndex].Value;
+                    for (int i = 0; i < dataSet[imgPath].Count; i++)
+                    {
+                        dataSet[imgPath][i].RectangleSettings.Update(GetRectangleDataFromControls());
+                    }
+                }
             }
         }
 
@@ -414,26 +443,26 @@ namespace UniversalAITranslator
         {
             if (dataSet.Count == 0 || comboBoxAlign.SelectedIndex == -1)
                 return;
-            MessageBox.Show("Идет сохранение...");
+            SetStatus("Идет сохранение...");
             foreach (var item in dataSet)
             {
                 string fName = Path.Combine(Path.GetDirectoryName(item.Key), Path.GetFileNameWithoutExtension(item.Key) + ".jsx");
                 SaveScript(item.Key, fName);
             }
-            MessageBox.Show("Завершено");
+            SetStatus("Завершено");
         }
 
         private async void повторитьПереводДляИзображенияToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (dataGridViewImages.SelectedCells.Count == 0)
                 return;
-            MessageBox.Show("Идет перевод...");
+            SetStatus("Идет перевод...");
             string img = (string)dataGridViewImages["ImagePath", dataGridViewImages.SelectedCells[0].RowIndex].Value;
             var defFont = GetTextFontDataFromControls();
             var defRect = GetRectangleDataFromControls();
             await TranslateImage(img, defFont, defRect);
             SetTranslationData(img);
-            MessageBox.Show("Завершено");
+            SetStatus("Завершено");
         }
 
         private Point startCoordinates;
@@ -1076,6 +1105,96 @@ namespace UniversalAITranslator
         private void применитьТекущиеНастройкиШрифтаКоВсемСхожимИзображениямToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ApplyCurrentFontSettingsToOther();
+        }
+
+        private void добавитьИзображенияБезПереводаToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Multiselect = true;
+            openFileDialog.Title = "Выберите изображения для перевода";
+            if (openFileDialog.ShowDialog() != DialogResult.OK)
+                return;
+            foreach (var item in openFileDialog.FileNames)
+            {
+                dataSet[item] = new List<BindingImageTranslationData>();
+                dataGridViewImages.Rows.Add(item);
+            }
+        }
+        private SortedDictionary<int, string> copiedData = new SortedDictionary<int, string>();
+        private void копироватьДанныеToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (dataGridViewImages.SelectedCells.Count == 0)
+                return;
+            copiedData.Clear();
+            for (int i = 0; i < dataGridViewImages.SelectedCells.Count; i++)
+            {
+                copiedData[dataGridViewImages.SelectedCells[i].RowIndex] = (string)dataGridViewImages["ImagePath", dataGridViewImages.SelectedCells[i].RowIndex].Value;
+            }
+        }
+
+        private void вставитьДанныеToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (dataGridViewImages.SelectedCells.Count == 0)
+                return;
+            if (dataGridViewImages.SelectedCells.Count != copiedData.Count)
+            {
+                MessageBox.Show("Количество скопированных записей не совпадает с количеством выделенных");
+                return;
+            }
+            SortedDictionary<int, string> pastingData = new SortedDictionary<int, string>();
+            for (int i = 0; i < dataGridViewImages.SelectedCells.Count; i++)
+            {
+                pastingData[dataGridViewImages.SelectedCells[i].RowIndex] = (string)dataGridViewImages["ImagePath", dataGridViewImages.SelectedCells[i].RowIndex].Value;
+            }
+            List<string> sortedCopiedData = copiedData.Values.ToList();
+            int index = 0;
+            foreach (string data in pastingData.Values)
+            {
+                int height = 0;
+                int width = 0;
+                using (var fileStream = new FileStream(data, FileMode.Open, FileAccess.Read, FileShare.Read))
+                {
+                    using (var image = Image.FromStream(fileStream, false, false))
+                    {
+                        height = image.Height;
+                        width = image.Width;
+                    }
+                }
+                dataSet[data].Clear();
+
+                dataSet[data].AddRange(dataSet[sortedCopiedData[index]].Select(a => a.Clone(width, height)));
+                index++;
+            }
+        }
+
+        private void автоматическиОбнаружитьЦветФонаДляВыделенныхToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SetStatus("Идет определение цвета фона...");
+            if (dataGridViewImages.SelectedCells.Count == 0)
+                return;
+            copiedData.Clear();
+            for (int i = 0; i < dataGridViewImages.SelectedCells.Count; i++)
+            {
+                DetectRectangleFillColor((string)dataGridViewImages["ImagePath", dataGridViewImages.SelectedCells[i].RowIndex].Value);
+            }
+            SetStatus("Завершено!");
+        }
+
+        private void изменитьКоординатыПоРазмеруИзображенияДляВсехToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (var item in dataSet.Keys)
+            {
+                ChangeCoordinatesByImageSize(item, 1);
+            }
+            dataGridViewTranslationData.Refresh();
+        }
+
+        private void ChangeCoordinatesByImageSize(string imgPath, int padding)
+        {
+            foreach (var item in dataSet[imgPath])
+            {
+                item.ChangeCoordinatesByImageSize(padding);
+            }
         }
     }
 }

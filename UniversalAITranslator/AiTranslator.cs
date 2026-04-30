@@ -21,7 +21,9 @@ namespace UniversalAITranslator
 
         public AiChatManager ChatManager => chatManager;
 
-        private ChatClient chat;
+        private ChatClient mainChat;
+        private ChatClient reserveChat;
+        private ChatClient currentUsedChat;
         public AiTranslator() { }
         public AiTranslator(ModelConfiguration config)
         {
@@ -29,7 +31,10 @@ namespace UniversalAITranslator
             chatManager = new AiChatManager();
             ApiKeyCredential credential = new ApiKeyCredential(config.ApiKey);
             OpenAIClientOptions options = new OpenAIClientOptions();
+            ApiKeyCredential credentialReserve = new ApiKeyCredential(config.ApiKeyReserve);
+            OpenAIClientOptions optionsReserve = new OpenAIClientOptions();
             options.Endpoint = new Uri(config.Endpoint);
+            optionsReserve.Endpoint = new Uri(config.EndpointReserve);
             ChatOptions = new ChatCompletionOptions();
             if (config.Temperature != 0)
             {
@@ -49,7 +54,21 @@ namespace UniversalAITranslator
                 UseChatOptions = true;
             }
             options.NetworkTimeout = TimeSpan.FromMinutes(300);
-            chat = new ChatClient(config.ModelName, credential, options);
+            optionsReserve.NetworkTimeout = TimeSpan.FromMinutes(300);
+            mainChat = new ChatClient(config.ModelName, credential, options);
+            reserveChat = new ChatClient(config.ModelNameReserve, credentialReserve, optionsReserve);
+            currentUsedChat = mainChat;
+        }
+        /// <summary>
+        /// Устанавливает используемое подключение(основное или резервное)
+        /// </summary>
+        /// <param name="useReserveChat"></param>
+        public void SetReserveChatMode(bool useReserveChat)
+        {
+            if (useReserveChat)
+                currentUsedChat = reserveChat;
+            else
+                currentUsedChat = mainChat;
         }
 
         /// <summary>
@@ -162,9 +181,9 @@ namespace UniversalAITranslator
             chatManager.SetUserPrompt(text);
             ChatCompletion result;
             if (UseChatOptions)
-                result = await chat.CompleteChatAsync(chatManager.GetRequest(withContext), ChatOptions);
+                result = await currentUsedChat.CompleteChatAsync(chatManager.GetRequest(withContext), ChatOptions);
             else
-                result = await chat.CompleteChatAsync(chatManager.GetRequest(withContext));
+                result = await currentUsedChat.CompleteChatAsync(chatManager.GetRequest(withContext));
             if (result.FinishReason != ChatFinishReason.Stop)
             {
                 return "Server return: " + result.FinishReason.ToString();
@@ -257,10 +276,10 @@ namespace UniversalAITranslator
             {
                 if (UseChatOptions)
                 {
-                    result = await chat.CompleteChatAsync(GetRequest(withContext), ChatOptions);
+                    result = await currentUsedChat.CompleteChatAsync(GetRequest(withContext), ChatOptions);
                 }
                 else
-                    result = await chat.CompleteChatAsync(GetRequest(withContext));
+                    result = await currentUsedChat.CompleteChatAsync(GetRequest(withContext));
                 //if (UseChatOptions)
                 //{
                 //    //Newtonsoft.Json.Schema.JsonSchemaGenerator a = new JsonSchemaGenerator();
@@ -366,10 +385,10 @@ namespace UniversalAITranslator
             {
                 if (UseChatOptions)
                 {
-                    result = await chat.CompleteChatAsync(GetRequest(withContext), ChatOptions);
+                    result = await currentUsedChat.CompleteChatAsync(GetRequest(withContext), ChatOptions);
                 }
                 else
-                    result = await chat.CompleteChatAsync(GetRequest(withContext));
+                    result = await currentUsedChat.CompleteChatAsync(GetRequest(withContext));
                 //if (UseChatOptions)
                 //{
                 //    //Newtonsoft.Json.Schema.JsonSchemaGenerator a = new JsonSchemaGenerator();
@@ -412,7 +431,7 @@ namespace UniversalAITranslator
                 chatManager.ResetSystemPrompt();
             //Отключение структурированого вывода при локальном сервере LM Studio
 #pragma warning disable OPENAI001 // Тип предназначен только для оценки и может быть изменен или удален в будущих обновлениях. Чтобы продолжить, скройте эту диагностику.
-            if (chat.Endpoint.Port != 1234)
+            if (currentUsedChat.Endpoint.Port != 1234)
                 ChatOptions.ResponseFormat = ChatResponseFormat.CreateJsonObjectFormat();
 #pragma warning restore OPENAI001 // Тип предназначен только для оценки и может быть изменен или удален в будущих обновлениях. Чтобы продолжить, скройте эту диагностику.
             string userMessage = JsonConvert.SerializeObject(data.Where(a => a.Enabled).Select(a => a.CreateTypedRequestItem()).ToArray());
@@ -420,7 +439,7 @@ namespace UniversalAITranslator
             ChatCompletion result;
             try
             {
-                result = await chat.CompleteChatAsync(GetRequest(withContext), ChatOptions);
+                result = await currentUsedChat.CompleteChatAsync(GetRequest(withContext), ChatOptions);
                 if (result.FinishReason != ChatFinishReason.Stop)
                 {
                     return ("Сервер вернул причину ошибки перевода: " + result.FinishReason.ToString(), null);
@@ -470,14 +489,14 @@ namespace UniversalAITranslator
 
             //Отключение структурированого вывода при локальном сервере LM Studio
 #pragma warning disable OPENAI001 // Тип предназначен только для оценки и может быть изменен или удален в будущих обновлениях. Чтобы продолжить, скройте эту диагностику.
-            if (chat.Endpoint.Port != 1234)
+            if (currentUsedChat.Endpoint.Port != 1234)
                 ChatOptions.ResponseFormat = ChatResponseFormat.CreateJsonObjectFormat();
 #pragma warning restore OPENAI001 // Тип предназначен только для оценки и может быть изменен или удален в будущих обновлениях. Чтобы продолжить, скройте эту диагностику.
             messages.Add(ChatMessage.CreateUserMessage(partImage));
             ChatCompletion result;
             try
             {
-                result = await chat.CompleteChatAsync(messages, ChatOptions);
+                result = await currentUsedChat.CompleteChatAsync(messages, ChatOptions);
                 if (result.FinishReason != ChatFinishReason.Stop)
                 {
                     return ("Сервер вернул причину ошибки перевода: " + result.FinishReason.ToString(), null);

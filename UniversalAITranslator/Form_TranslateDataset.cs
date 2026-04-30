@@ -25,6 +25,8 @@ namespace UniversalAITranslator
         private bool translatedWithError = false;
         private bool runTransAfterLoad = false;
         private bool needShowTrayNotify = true;
+        private int splitUntranslatedBlockCount = 0;
+        private int splitUntranslatedBlockMinSize = 0;
         public Form_TranslateDataset()
         {
             InitializeComponent();
@@ -131,6 +133,12 @@ namespace UniversalAITranslator
         {
             statusLabel.Text = status;
         }
+
+        public void SetAutoResplitUntranslatedText(int splitBlockCount, int minBlockSize)
+        {
+            splitUntranslatedBlockCount = splitBlockCount;
+            splitUntranslatedBlockMinSize = minBlockSize;
+        }
         /// <summary>
         /// Установка текста для перевода в набор данных
         /// </summary>
@@ -144,14 +152,6 @@ namespace UniversalAITranslator
             }
             //UpdateIdColumn();
             dataGridViewDS.Refresh();
-        }
-        private void UpdateIdColumn()
-        {
-            for (int i = 0; i < dataGridViewDS.RowCount; i++)
-            {
-                dataGridViewDS.Rows[i].HeaderCell.Value = i;
-                //dataGridViewDS.Rows[i].HeaderCell.
-            }
         }
 
         /// <summary>
@@ -198,6 +198,61 @@ namespace UniversalAITranslator
             dataGridViewReplacment.Rows.Add(orig, trans);
         }
 
+        /// <summary>
+        /// Разбивает непереведенные блоки текст (между сплиттерами и с Enable=true) еще на N блоков.
+        /// </summary>
+        /// <param name="splitCount">Количество блоков</param>
+        public bool SplitUntranslatedData(int splitCount, int minBlockSize)
+        {
+            if (splitCount < 2)
+                return false;
+            bool openBlock = false;
+            int blockStartIndex = -1;
+            int blockEndIndex = -1;
+            bool untranslatedBlockFound = false;
+            for (int i = 0; i < typedDataSet.Count; i++)
+            {
+                if (!openBlock && typedDataSet[i].Enabled && typedDataSet[i].Type != TextType.Splitter)
+                {
+                    openBlock = true;
+                    blockStartIndex = i;
+                    untranslatedBlockFound = true;
+                }
+                else if (openBlock && (!typedDataSet[i].Enabled || typedDataSet[i].Type == TextType.Splitter))
+                {
+                    openBlock = false;
+                    blockEndIndex = i - 1;
+                    int lineCount = blockEndIndex - blockStartIndex;
+                    int lineToSplit = lineCount / splitCount;
+                    if (lineToSplit <= minBlockSize)
+                        return false;
+                    for (int sp = 1; sp < splitCount; sp++)
+                    {
+                        TypedTranslationData splitter = new TypedTranslationData() { Type = TextType.Splitter, Id = -1 };
+                        typedDataSet.Insert(blockStartIndex + sp * lineToSplit, splitter);
+                        i++;
+                    }
+                }
+            }
+            if (openBlock)
+            {
+                openBlock = false;
+                blockEndIndex = typedDataSet.Count - 1;
+                int lineCount = blockEndIndex - blockStartIndex;
+                int lineToSplit = lineCount / splitCount;
+                if (lineToSplit <= 6)
+                    return false;
+                for (int sp = 1; sp < splitCount; sp++)
+                {
+                    TypedTranslationData splitter = new TypedTranslationData() { Type = TextType.Splitter, Id = -1 };
+                    typedDataSet.Insert(blockStartIndex + sp * lineToSplit, splitter);
+                }
+            }
+            if (untranslatedBlockFound)
+                return true;
+            return false;
+        }
+
         private void ShowNameAndGenderFields(bool show)
         {
             dataGridViewDS.Columns["Name"].Visible = show;
@@ -240,7 +295,11 @@ namespace UniversalAITranslator
             menuStrip1.Invalidate();
             menuStrip1.Refresh();
             if (translator != null)
+            {
                 translator.ChatManager.ClearHistory();
+                translator.SetReserveChatMode(false);
+                использоватьРезервноеПодключениеToolStripMenuItem.Checked = false;
+            }
             if (runTransAfterLoad)
             {
                 переводДиалоговToolStripMenuItem_Click(this, EventArgs.Empty);
@@ -840,7 +899,18 @@ namespace UniversalAITranslator
             SetControlsEnabled(true);
             SetStatus("Перевод завершен!");
             ShowBalloonTip("Перевод завершен", translatedWithError ? "Перевод завершен с ошибками" : "Перевод успешно завершен!", 5);
-            TranslationCompleted?.Invoke(!translatedWithError);
+            if (runTransAfterLoad && translatedWithError && splitUntranslatedBlockCount > 1)
+            {
+                if (SplitUntranslatedData(splitUntranslatedBlockCount, splitUntranslatedBlockMinSize))
+                {
+                    translator.ChatManager.ClearHistory();
+                    переводДиалоговToolStripMenuItem_Click(sender, e);
+                }
+                else
+                    TranslationCompleted?.Invoke(!translatedWithError);
+            }
+            else
+                TranslationCompleted?.Invoke(!translatedWithError);
         }
 
         private void SetControlsEnabled(bool enabled)
@@ -866,7 +936,8 @@ namespace UniversalAITranslator
                     block.Add(item.Clone());
                 else
                 {
-                    blocksToTranslate.Add(block);
+                    if (block.Count > 0)
+                        blocksToTranslate.Add(block);
                     block = new List<TypedTranslationData>();
                     continue;
                 }
@@ -874,7 +945,8 @@ namespace UniversalAITranslator
                 if (curIndex > currentConfiguration.MaxLinesInQuery && item.Type == TextType.Name)
                 {
                     curIndex = 0;
-                    blocksToTranslate.Add(block);
+                    if (block.Count > 0)
+                        blocksToTranslate.Add(block);
                     block = new List<TypedTranslationData>();
                     block.Add(item.Clone());
                     continue;
@@ -1073,6 +1145,36 @@ namespace UniversalAITranslator
                     }
                 }
             }
+        }
+
+        private void удалитьВсеСплиттерыToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            for (int i = typedDataSet.Count - 1; i >= 0; i--)
+            {
+                if (typedDataSet[i].Type == TextType.Splitter)
+                {
+                    typedDataSet.RemoveAt(i);
+                }
+            }
+            dataGridViewDS.Refresh();
+            dataGridViewDS.PerformLayout();
+        }
+
+        private void разбитьНепереведенноеНаNБлоковToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form_input fInput = new Form_input();
+            fInput.textBoxInput.Text = 3.ToString();
+            if (fInput.ShowDialog() != DialogResult.OK)
+                return;
+            SplitUntranslatedData(Convert.ToInt32(fInput.textBoxInput.Text), 4);
+        }
+
+        private void использоватьРезервноеПодключениеToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (translator == null)
+                return;
+            использоватьРезервноеПодключениеToolStripMenuItem.Checked = !использоватьРезервноеПодключениеToolStripMenuItem.Checked;
+            translator.SetReserveChatMode(использоватьРезервноеПодключениеToolStripMenuItem.Checked);
         }
     }
 }

@@ -14,10 +14,12 @@ namespace UniversalAITranslator
     public partial class Form_AiServerConfig : Form
     {
         private string lastModel = "";
+        private string lastModelReserve = "";
         public Form_AiServerConfig()
         {
             InitializeComponent();
             textBoxServerUrl.AutoCompleteSource = AutoCompleteSource.CustomSource;
+            textBoxServerUrlReserve.AutoCompleteSource = AutoCompleteSource.CustomSource;
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -81,6 +83,12 @@ namespace UniversalAITranslator
             configuration.MaxLinesInQuery = (int)numericUpDownMaxLines.Value;
             configuration.ShrinkContext = checkBoxShrinkContext.Checked;
             configuration.KeepLastNRequestInContext = (int)numericUpDownKeepContext.Value;
+
+            //Резервное подключение
+            if (!string.IsNullOrEmpty(textBoxKeyReserve.Text))
+                configuration.ApiKeyReserve = textBoxKeyReserve.Text;
+            configuration.EndpointReserve = textBoxServerUrlReserve.Text;
+            configuration.ModelNameReserve = comboBoxModelReserve.SelectedItem.ToString();
             return configuration;
         }
 
@@ -138,6 +146,32 @@ namespace UniversalAITranslator
             numericUpDownMaxLines.Value = configuration.MaxLinesInQuery;
             checkBoxShrinkContext.Checked = configuration.ShrinkContext;
             numericUpDownKeepContext.Value = configuration.KeepLastNRequestInContext;
+
+            //Резервное подключение
+            if (!string.IsNullOrEmpty(configuration.ApiKeyReserve))
+                textBoxKeyReserve.Text = configuration.ApiKeyReserve;
+            textBoxServerUrlReserve.Text = configuration.EndpointReserve;
+            if (comboBoxModelReserve.Items.Count == 0)
+            {
+                lastModelReserve = configuration.ModelNameReserve;
+                if (lastModelReserve != null)
+                    comboBoxModelReserve.Items.Add(lastModelReserve);
+            }
+            comboBoxModelReserve.SelectedItem = configuration.ModelNameReserve;
+        }
+
+        private async void buttonConnectReserve_Click(object sender, EventArgs e)
+        {
+            string key = "lm-studio";
+            if (!string.IsNullOrEmpty(textBoxKeyReserve.Text))
+                key = textBoxKeyReserve.Text;
+            var models = await AiServerUtils.GetModelList(textBoxServerUrlReserve.Text, key);
+            comboBoxModelReserve.Items.Clear();
+            comboBoxModelReserve.Items.AddRange(models.ToArray());
+            if (!string.IsNullOrEmpty(lastModelReserve))
+            {
+                comboBoxModelReserve.SelectedItem = lastModelReserve;
+            }
         }
     }
 }

@@ -19,5 +19,9 @@ namespace UniversalAITranslator
         public int MaxLinesInQuery { get; set; } = 2000;
         public bool ShrinkContext { get; set; } = false;
         public int KeepLastNRequestInContext { get; set; } = 2;
+
+        public string EndpointReserve { get; set; }
+        public string ModelNameReserve { get; set; }
+        public string ApiKeyReserve { get; set; } = "lm-studio";
     }
 }

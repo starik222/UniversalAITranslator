@@ -28,9 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             menuStrip1 = new MenuStrip();
             файлToolStripMenuItem = new ToolStripMenuItem();
             перевестиИзображенияToolStripMenuItem = new ToolStripMenuItem();
+            добавитьИзображенияБезПереводаToolStripMenuItem = new ToolStripMenuItem();
             toolStripSeparator1 = new ToolStripSeparator();
             сохранитьСкриптДляPhotoshopToolStripMenuItem = new ToolStripMenuItem();
             сохранитьСкриптИВыполнитьToolStripMenuItem = new ToolStripMenuItem();
@@ -44,6 +46,7 @@
             операцииToolStripMenuItem = new ToolStripMenuItem();
             автоматическиОбнаружитьЦветФонаToolStripMenuItem = new ToolStripMenuItem();
             автоматическиОбнаружитьЦветФонаДляТекущегоToolStripMenuItem = new ToolStripMenuItem();
+            автоматическиОбнаружитьЦветФонаДляВыделенныхToolStripMenuItem = new ToolStripMenuItem();
             toolStripSeparator7 = new ToolStripSeparator();
             применитьТекущиеКоординатыКоВсемСхожимИзображениямToolStripMenuItem = new ToolStripMenuItem();
             применитьТекущиеКоординатыИНастройкиКоВсемСхожимИзображениямToolStripMenuItem = new ToolStripMenuItem();
@@ -51,6 +54,7 @@
             применитьТекущиеНастройкиШрифтаКоВсемСхожимИзображениямToolStripMenuItem = new ToolStripMenuItem();
             toolStripSeparator8 = new ToolStripSeparator();
             применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem = new ToolStripMenuItem();
+            toolStripSeparator9 = new ToolStripSeparator();
             текстовыеДанныеToolStripMenuItem = new ToolStripMenuItem();
             удалитьВыделенноеToolStripMenuItem = new ToolStripMenuItem();
             toolStripSeparator4 = new ToolStripSeparator();
@@ -63,6 +67,7 @@
             splitContainer1 = new SplitContainer();
             tabControl1 = new TabControl();
             tabPageFont = new TabPage();
+            checkBoxFontDrawOnAlpha = new CheckBox();
             checkBoxImageCenterY = new CheckBox();
             checkBoxImageCenterX = new CheckBox();
             button1 = new Button();
@@ -84,6 +89,7 @@
             label6 = new Label();
             label3 = new Label();
             tabPageRectangle = new TabPage();
+            checkBoxRectDrawOnAlpha = new CheckBox();
             comboBoxGradientAngle = new ComboBox();
             buttonGrEndColor = new Button();
             buttonGrStartColor = new Button();
@@ -115,15 +121,18 @@
             toolStripButtonRemovePreset = new ToolStripButton();
             dataGridViewImages = new DataGridView();
             ImagePath = new DataGridViewTextBoxColumn();
+            contextMenuStripImages = new ContextMenuStrip(components);
+            копироватьДанныеToolStripMenuItem = new ToolStripMenuItem();
+            вставитьДанныеToolStripMenuItem = new ToolStripMenuItem();
             dataGridViewTranslationData = new DataGridView();
+            contextMenuStripTranslation = new ContextMenuStrip(components);
             pictureBoxImage = new PictureBox();
             statusStrip1 = new StatusStrip();
             StatusLabel = new ToolStripStatusLabel();
             toolStripStatusLabelColor = new ToolStripStatusLabel();
             toolStripStatusLabel2 = new ToolStripStatusLabel();
             toolStripStatusLabelMode = new ToolStripStatusLabel();
-            checkBoxFontDrawOnAlpha = new CheckBox();
-            checkBoxRectDrawOnAlpha = new CheckBox();
+            изменитьКоординатыПоРазмеруИзображенияДляВсехToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
@@ -142,6 +151,7 @@
             ((System.ComponentModel.ISupportInitialize)dataGridViewPresets).BeginInit();
             toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridViewImages).BeginInit();
+            contextMenuStripImages.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridViewTranslationData).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBoxImage).BeginInit();
             statusStrip1.SuspendLayout();
@@ -158,7 +168,7 @@
             // 
             // файлToolStripMenuItem
             // 
-            файлToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { перевестиИзображенияToolStripMenuItem, toolStripSeparator1, сохранитьСкриптДляPhotoshopToolStripMenuItem, сохранитьСкриптИВыполнитьToolStripMenuItem, toolStripSeparator2, сохранитьСкриптыДляВсехИзображенийToolStripMenuItem, сохранитьИВыполнитьВсеСкриптыToolStripMenuItem, toolStripSeparator3, повторитьПереводДляИзображенияToolStripMenuItem, toolStripSeparator6, создатьСписокПереводапервыйЭлементИзображенияToolStripMenuItem });
+            файлToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { перевестиИзображенияToolStripMenuItem, добавитьИзображенияБезПереводаToolStripMenuItem, toolStripSeparator1, сохранитьСкриптДляPhotoshopToolStripMenuItem, сохранитьСкриптИВыполнитьToolStripMenuItem, toolStripSeparator2, сохранитьСкриптыДляВсехИзображенийToolStripMenuItem, сохранитьИВыполнитьВсеСкриптыToolStripMenuItem, toolStripSeparator3, повторитьПереводДляИзображенияToolStripMenuItem, toolStripSeparator6, создатьСписокПереводапервыйЭлементИзображенияToolStripMenuItem });
             файлToolStripMenuItem.Name = "файлToolStripMenuItem";
             файлToolStripMenuItem.Size = new Size(48, 20);
             файлToolStripMenuItem.Text = "Файл";
@@ -169,6 +179,13 @@
             перевестиИзображенияToolStripMenuItem.Size = new Size(392, 22);
             перевестиИзображенияToolStripMenuItem.Text = "Перевести изображения...";
             перевестиИзображенияToolStripMenuItem.Click += перевестиИзображенияToolStripMenuItem_Click;
+            // 
+            // добавитьИзображенияБезПереводаToolStripMenuItem
+            // 
+            добавитьИзображенияБезПереводаToolStripMenuItem.Name = "добавитьИзображенияБезПереводаToolStripMenuItem";
+            добавитьИзображенияБезПереводаToolStripMenuItem.Size = new Size(392, 22);
+            добавитьИзображенияБезПереводаToolStripMenuItem.Text = "Добавить изображения без перевода...";
+            добавитьИзображенияБезПереводаToolStripMenuItem.Click += добавитьИзображенияБезПереводаToolStripMenuItem_Click;
             // 
             // toolStripSeparator1
             // 
@@ -234,7 +251,7 @@
             // 
             // операцииToolStripMenuItem
             // 
-            операцииToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { автоматическиОбнаружитьЦветФонаToolStripMenuItem, автоматическиОбнаружитьЦветФонаДляТекущегоToolStripMenuItem, toolStripSeparator7, применитьТекущиеКоординатыКоВсемСхожимИзображениямToolStripMenuItem, применитьТекущиеКоординатыИНастройкиКоВсемСхожимИзображениямToolStripMenuItem, применитьТекущиеНастройкиПрямоугольникаКоВсемСхожимИзображениямToolStripMenuItem, применитьТекущиеНастройкиШрифтаКоВсемСхожимИзображениямToolStripMenuItem, toolStripSeparator8, применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem });
+            операцииToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { автоматическиОбнаружитьЦветФонаToolStripMenuItem, автоматическиОбнаружитьЦветФонаДляТекущегоToolStripMenuItem, автоматическиОбнаружитьЦветФонаДляВыделенныхToolStripMenuItem, toolStripSeparator7, применитьТекущиеКоординатыКоВсемСхожимИзображениямToolStripMenuItem, применитьТекущиеКоординатыИНастройкиКоВсемСхожимИзображениямToolStripMenuItem, применитьТекущиеНастройкиПрямоугольникаКоВсемСхожимИзображениямToolStripMenuItem, применитьТекущиеНастройкиШрифтаКоВсемСхожимИзображениямToolStripMenuItem, toolStripSeparator8, применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem, toolStripSeparator9, изменитьКоординатыПоРазмеруИзображенияДляВсехToolStripMenuItem });
             операцииToolStripMenuItem.Name = "операцииToolStripMenuItem";
             операцииToolStripMenuItem.Size = new Size(75, 20);
             операцииToolStripMenuItem.Text = "Операции";
@@ -252,6 +269,13 @@
             автоматическиОбнаружитьЦветФонаДляТекущегоToolStripMenuItem.Size = new Size(523, 22);
             автоматическиОбнаружитьЦветФонаДляТекущегоToolStripMenuItem.Text = "Автоматически обнаружить цвет фона для текущего";
             автоматическиОбнаружитьЦветФонаДляТекущегоToolStripMenuItem.Click += автоматическиОбнаружитьЦветФонаДляТекущегоToolStripMenuItem_Click;
+            // 
+            // автоматическиОбнаружитьЦветФонаДляВыделенныхToolStripMenuItem
+            // 
+            автоматическиОбнаружитьЦветФонаДляВыделенныхToolStripMenuItem.Name = "автоматическиОбнаружитьЦветФонаДляВыделенныхToolStripMenuItem";
+            автоматическиОбнаружитьЦветФонаДляВыделенныхToolStripMenuItem.Size = new Size(523, 22);
+            автоматическиОбнаружитьЦветФонаДляВыделенныхToolStripMenuItem.Text = "Автоматически обнаружить цвет фона для выделенных";
+            автоматическиОбнаружитьЦветФонаДляВыделенныхToolStripMenuItem.Click += автоматическиОбнаружитьЦветФонаДляВыделенныхToolStripMenuItem_Click;
             // 
             // toolStripSeparator7
             // 
@@ -297,6 +321,11 @@
             применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem.Size = new Size(523, 22);
             применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem.Text = "Применить текущие числовые настройки шрифта ко всем";
             применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem.Click += применитьТекущиеЧисловыеНастройкиШрифтаКоВсемToolStripMenuItem_Click;
+            // 
+            // toolStripSeparator9
+            // 
+            toolStripSeparator9.Name = "toolStripSeparator9";
+            toolStripSeparator9.Size = new Size(520, 6);
             // 
             // текстовыеДанныеToolStripMenuItem
             // 
@@ -424,6 +453,16 @@
             tabPageFont.TabIndex = 0;
             tabPageFont.Text = "Шрифт";
             tabPageFont.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxFontDrawOnAlpha
+            // 
+            checkBoxFontDrawOnAlpha.AutoSize = true;
+            checkBoxFontDrawOnAlpha.Location = new Point(6, 110);
+            checkBoxFontDrawOnAlpha.Name = "checkBoxFontDrawOnAlpha";
+            checkBoxFontDrawOnAlpha.Size = new Size(199, 19);
+            checkBoxFontDrawOnAlpha.TabIndex = 22;
+            checkBoxFontDrawOnAlpha.Text = "Отрисовывать на альфа канале";
+            checkBoxFontDrawOnAlpha.UseVisualStyleBackColor = true;
             // 
             // checkBoxImageCenterY
             // 
@@ -626,6 +665,16 @@
             tabPageRectangle.TabIndex = 1;
             tabPageRectangle.Text = "Прямоугольник";
             tabPageRectangle.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxRectDrawOnAlpha
+            // 
+            checkBoxRectDrawOnAlpha.AutoSize = true;
+            checkBoxRectDrawOnAlpha.Location = new Point(5, 65);
+            checkBoxRectDrawOnAlpha.Name = "checkBoxRectDrawOnAlpha";
+            checkBoxRectDrawOnAlpha.Size = new Size(199, 19);
+            checkBoxRectDrawOnAlpha.TabIndex = 23;
+            checkBoxRectDrawOnAlpha.Text = "Отрисовывать на альфа канале";
+            checkBoxRectDrawOnAlpha.UseVisualStyleBackColor = true;
             // 
             // comboBoxGradientAngle
             // 
@@ -916,10 +965,11 @@
             dataGridViewImages.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             dataGridViewImages.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridViewImages.Columns.AddRange(new DataGridViewColumn[] { ImagePath });
-            dataGridViewImages.Location = new Point(3, 293);
+            dataGridViewImages.ContextMenuStrip = contextMenuStripImages;
+            dataGridViewImages.Location = new Point(3, 240);
             dataGridViewImages.Name = "dataGridViewImages";
             dataGridViewImages.ReadOnly = true;
-            dataGridViewImages.Size = new Size(495, 176);
+            dataGridViewImages.Size = new Size(495, 229);
             dataGridViewImages.TabIndex = 16;
             dataGridViewImages.SelectionChanged += dataGridViewImages_SelectionChanged;
             // 
@@ -930,16 +980,42 @@
             ImagePath.Name = "ImagePath";
             ImagePath.ReadOnly = true;
             // 
+            // contextMenuStripImages
+            // 
+            contextMenuStripImages.Items.AddRange(new ToolStripItem[] { копироватьДанныеToolStripMenuItem, вставитьДанныеToolStripMenuItem });
+            contextMenuStripImages.Name = "contextMenuStripDataset";
+            contextMenuStripImages.Size = new Size(184, 48);
+            // 
+            // копироватьДанныеToolStripMenuItem
+            // 
+            копироватьДанныеToolStripMenuItem.Name = "копироватьДанныеToolStripMenuItem";
+            копироватьДанныеToolStripMenuItem.Size = new Size(183, 22);
+            копироватьДанныеToolStripMenuItem.Text = "Копировать данные";
+            копироватьДанныеToolStripMenuItem.Click += копироватьДанныеToolStripMenuItem_Click;
+            // 
+            // вставитьДанныеToolStripMenuItem
+            // 
+            вставитьДанныеToolStripMenuItem.Name = "вставитьДанныеToolStripMenuItem";
+            вставитьДанныеToolStripMenuItem.Size = new Size(183, 22);
+            вставитьДанныеToolStripMenuItem.Text = "Вставить данные";
+            вставитьДанныеToolStripMenuItem.Click += вставитьДанныеToolStripMenuItem_Click;
+            // 
             // dataGridViewTranslationData
             // 
             dataGridViewTranslationData.AllowUserToAddRows = false;
             dataGridViewTranslationData.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             dataGridViewTranslationData.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewTranslationData.ContextMenuStrip = contextMenuStripTranslation;
             dataGridViewTranslationData.Location = new Point(3, 3);
             dataGridViewTranslationData.Name = "dataGridViewTranslationData";
-            dataGridViewTranslationData.Size = new Size(495, 284);
+            dataGridViewTranslationData.Size = new Size(495, 231);
             dataGridViewTranslationData.TabIndex = 14;
             dataGridViewTranslationData.SelectionChanged += dataGridViewTranslationData_SelectionChanged;
+            // 
+            // contextMenuStripTranslation
+            // 
+            contextMenuStripTranslation.Name = "contextMenuStripTranslation";
+            contextMenuStripTranslation.Size = new Size(61, 4);
             // 
             // pictureBoxImage
             // 
@@ -988,25 +1064,12 @@
             toolStripStatusLabelMode.Size = new Size(12, 17);
             toolStripStatusLabelMode.Text = "-";
             // 
-            // checkBoxFontDrawOnAlpha
+            // изменитьКоординатыПоРазмеруИзображенияДляВсехToolStripMenuItem
             // 
-            checkBoxFontDrawOnAlpha.AutoSize = true;
-            checkBoxFontDrawOnAlpha.Location = new Point(6, 110);
-            checkBoxFontDrawOnAlpha.Name = "checkBoxFontDrawOnAlpha";
-            checkBoxFontDrawOnAlpha.Size = new Size(199, 19);
-            checkBoxFontDrawOnAlpha.TabIndex = 22;
-            checkBoxFontDrawOnAlpha.Text = "Отрисовывать на альфа канале";
-            checkBoxFontDrawOnAlpha.UseVisualStyleBackColor = true;
-            // 
-            // checkBoxRectDrawOnAlpha
-            // 
-            checkBoxRectDrawOnAlpha.AutoSize = true;
-            checkBoxRectDrawOnAlpha.Location = new Point(5, 65);
-            checkBoxRectDrawOnAlpha.Name = "checkBoxRectDrawOnAlpha";
-            checkBoxRectDrawOnAlpha.Size = new Size(199, 19);
-            checkBoxRectDrawOnAlpha.TabIndex = 23;
-            checkBoxRectDrawOnAlpha.Text = "Отрисовывать на альфа канале";
-            checkBoxRectDrawOnAlpha.UseVisualStyleBackColor = true;
+            изменитьКоординатыПоРазмеруИзображенияДляВсехToolStripMenuItem.Name = "изменитьКоординатыПоРазмеруИзображенияДляВсехToolStripMenuItem";
+            изменитьКоординатыПоРазмеруИзображенияДляВсехToolStripMenuItem.Size = new Size(523, 22);
+            изменитьКоординатыПоРазмеруИзображенияДляВсехToolStripMenuItem.Text = "Изменить координаты по размеру изображения для всех";
+            изменитьКоординатыПоРазмеруИзображенияДляВсехToolStripMenuItem.Click += изменитьКоординатыПоРазмеруИзображенияДляВсехToolStripMenuItem_Click;
             // 
             // Form_ImageTranslator
             // 
@@ -1050,6 +1113,7 @@
             toolStrip1.ResumeLayout(false);
             toolStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridViewImages).EndInit();
+            contextMenuStripImages.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dataGridViewTranslationData).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBoxImage).EndInit();
             statusStrip1.ResumeLayout(false);
@@ -1156,5 +1220,13 @@
         private ToolStripMenuItem применитьТекущиеНастройкиШрифтаКоВсемСхожимИзображениямToolStripMenuItem;
         private CheckBox checkBoxFontDrawOnAlpha;
         private CheckBox checkBoxRectDrawOnAlpha;
+        private ToolStripMenuItem добавитьИзображенияБезПереводаToolStripMenuItem;
+        private ContextMenuStrip contextMenuStripImages;
+        private ToolStripMenuItem копироватьДанныеToolStripMenuItem;
+        private ToolStripMenuItem вставитьДанныеToolStripMenuItem;
+        private ContextMenuStrip contextMenuStripTranslation;
+        private ToolStripMenuItem автоматическиОбнаружитьЦветФонаДляВыделенныхToolStripMenuItem;
+        private ToolStripSeparator toolStripSeparator9;
+        private ToolStripMenuItem изменитьКоординатыПоРазмеруИзображенияДляВсехToolStripMenuItem;
     }
 }

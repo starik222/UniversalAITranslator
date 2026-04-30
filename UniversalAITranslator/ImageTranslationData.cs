@@ -99,6 +99,42 @@ namespace UniversalAITranslator
         {
             return new Size(ImageWidth, ImageHeight);
         }
+
+        public void ChangeCoordinatesByImageSize(int padding)
+        {
+            X = padding;
+            Y = padding;
+            Width = ImageWidth - padding - X;
+            Height = ImageHeight - padding - Y;
+        }
+
+        public BindingImageTranslationData Clone()
+        {
+            BindingImageTranslationData data = new BindingImageTranslationData(ImageWidth, ImageHeight);
+            data.OriginalText = OriginalText;
+            data.TranslatedText = TranslatedText;
+            data.X = X;
+            data.Y = Y;
+            data.Width = Width;
+            data.Height = Height;
+            data.FontSettings = FontSettings.Clone();
+            data.RectangleSettings = RectangleSettings.Clone();
+            return data;
+        }
+
+        public BindingImageTranslationData Clone(int imageWidth, int imageHeight)
+        {
+            BindingImageTranslationData data = new BindingImageTranslationData(imageWidth, imageHeight);
+            data.OriginalText = OriginalText;
+            data.TranslatedText = TranslatedText;
+            data.X = X;
+            data.Y = Y;
+            data.Width = Width;
+            data.Height = Height;
+            data.FontSettings = FontSettings.Clone();
+            data.RectangleSettings = RectangleSettings.Clone();
+            return data;
+        }
     }
 
     public class TextFontData
